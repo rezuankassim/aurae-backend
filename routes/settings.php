@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\AddressController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -21,4 +22,11 @@ Route::middleware('auth')->group(function () {
     Route::get('settings/appearance', function () {
         return Inertia::render('settings/appearance');
     })->name('appearance.edit');
+
+
+    Route::get('settings/address', [AddressController::class, 'index'])->name('address.index');
+    Route::post('settings/address', [AddressController::class, 'store'])->name('address.store');
+    Route::get('settings/address/{address}/edit', [AddressController::class, 'edit'])->name('address.edit');
+    Route::put('settings/address/{address}', [AddressController::class, 'update'])->name('address.update');
+    Route::delete('settings/address/{address}', [AddressController::class, 'destroy'])->name('address.destroy');
 });

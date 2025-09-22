@@ -3,10 +3,14 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { index as indexNews } from '@/routes/admin/news';
+import { index } from '@/routes/devices';
+import { index as indexOrderHistory } from '@/routes/order-history';
+import { SharedData, type NavItem } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { FileClock, LayoutGrid, Newspaper, TabletSmartphone } from 'lucide-react';
 import AppLogo from './app-logo';
+import { NavManagement } from './nav-management';
 
 const mainNavItems: NavItem[] = [
     {
@@ -14,22 +18,31 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
+    {
+        title: 'Devices',
+        href: index(),
+        icon: TabletSmartphone,
+    },
+    {
+        title: 'Order History',
+        href: indexOrderHistory(),
+        icon: FileClock,
+    },
 ];
 
-const footerNavItems: NavItem[] = [
+const managementNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'News',
+        href: indexNews(),
+        icon: Newspaper,
     },
 ];
+
+const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
+    const { auth } = usePage<SharedData>().props;
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -46,6 +59,7 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
+                {auth.user.is_admin ? <NavManagement items={managementNavItems} /> : null}
             </SidebarContent>
 
             <SidebarFooter>

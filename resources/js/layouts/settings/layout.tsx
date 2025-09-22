@@ -2,6 +2,7 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { index } from '@/routes/address';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editPassword } from '@/routes/password';
 import { edit } from '@/routes/profile';
@@ -18,6 +19,11 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Password',
         href: editPassword(),
+        icon: null,
+    },
+    {
+        title: 'Address',
+        href: index(),
         icon: null,
     },
     {

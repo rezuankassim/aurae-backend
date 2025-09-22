@@ -95,8 +95,26 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     </div>
                                 )}
 
+                                <div className="grid gap-2">
+                                    <Label htmlFor="phone">Phone number</Label>
+
+                                    <Input
+                                        id="phone"
+                                        type="phone"
+                                        className="mt-1 block w-full"
+                                        defaultValue={auth.user.phone}
+                                        name="phone"
+                                        required
+                                        placeholder="Phone number"
+                                    />
+
+                                    <InputError className="mt-2" message={errors.phone} />
+                                </div>
+
                                 <div className="flex items-center gap-4">
-                                    <Button disabled={processing} data-test="update-profile-button">Save</Button>
+                                    <Button disabled={processing} data-test="update-profile-button">
+                                        Save
+                                    </Button>
 
                                     <Transition
                                         show={recentlySuccessful}

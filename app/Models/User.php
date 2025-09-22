@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -18,9 +19,11 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'is_admin',
         'name',
         'email',
         'password',
+        'phone',
     ];
 
     /**
@@ -44,5 +47,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the addresses associated with the user.
+     */
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
     }
 }

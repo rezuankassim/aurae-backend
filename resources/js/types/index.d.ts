@@ -25,6 +25,8 @@ export interface NavItem {
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
+    success: string;
+    error: string;
     auth: Auth;
     sidebarOpen: boolean;
     [key: string]: unknown;
@@ -36,6 +38,45 @@ export interface User {
     email: string;
     avatar?: string;
     email_verified_at: string | null;
+    phone: string;
+    created_at: string;
+    updated_at: string;
+    is_admin: boolean;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface Address {
+    id: number;
+    is_default: boolean;
+    type: string;
+    name: string;
+    phone: string;
+    line1: string;
+    line2: string | null;
+    line3: string | null;
+    city: string;
+    state: string | null;
+    postal_code: string;
+    country: string;
+    user_id: number;
+    country_label: string;
+    state_label: string;
+    type_label: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface News {
+    id: number;
+    type: 0 | 1; // 0 = news, 1 = promotion
+    title: string;
+    content: string;
+    is_published: boolean;
+    published_at: string | null;
+    published_time: string | null;
+    published_date: string | null;
+    image: string | null;
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
