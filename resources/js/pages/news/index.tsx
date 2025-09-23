@@ -3,7 +3,7 @@ import { News as TNews, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 import Heading from '@/components/heading';
-import { index } from '@/routes/admin/news';
+import { index } from '@/routes/admin/news/index';
 import { columns } from './columns';
 import { DataTable } from './data-table';
 
