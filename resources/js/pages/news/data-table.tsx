@@ -2,7 +2,7 @@ import { DataTablePagination } from '@/components/datatable-pagination';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { show } from '@/routes/news';
+import news from '@/routes/news';
 import { Link } from '@inertiajs/react';
 import {
     ColumnDef,
@@ -59,7 +59,8 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
             <div className="overflow-hidden">
                 {table.getRowModel().rows?.length ? (
                     table.getRowModel().rows.map((row) => (
-                        <Link href={show(row.original.id).url} key={row.id}>
+                        // @ts-expect-error because row.original is of type unknown
+                        <Link href={news.show(row.original.id).url} key={row.id}>
                             <Card key={row.id} className="mb-4">
                                 <CardHeader className="flex flex-row items-center justify-between">
                                     <div className="flex flex-col gap-1.5">
