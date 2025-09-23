@@ -3,7 +3,7 @@ import { News, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 import Heading from '@/components/heading';
-import { index } from '@/routes/news/index';
+import news from '@/routes/news/index';
 
 import dayjs from 'dayjs';
 import { Clock } from 'lucide-react';
@@ -11,7 +11,7 @@ import { Clock } from 'lucide-react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'News',
-        href: index().url,
+        href: news.index().url,
     },
     {
         title: 'Show News',

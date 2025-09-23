@@ -3,14 +3,14 @@ import { News as TNews, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 import Heading from '@/components/heading';
-import { index } from '@/routes/admin/news/index';
+import news from '@/routes/news';
 import { columns } from './columns';
 import { DataTable } from './data-table';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'News',
-        href: index().url,
+        href: news.index().url,
     },
 ];
 
