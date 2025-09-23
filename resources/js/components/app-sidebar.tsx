@@ -5,6 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { index as indexNews } from '@/routes/admin/news';
 import { index } from '@/routes/devices';
+import { index as indexNewsCustomer } from '@/routes/news';
 import { index as indexOrderHistory } from '@/routes/order-history';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -27,6 +28,11 @@ const mainNavItems: NavItem[] = [
         title: 'Order History',
         href: indexOrderHistory(),
         icon: FileClock,
+    },
+    {
+        title: 'News',
+        href: indexNewsCustomer(),
+        icon: Newspaper,
     },
 ];
 
