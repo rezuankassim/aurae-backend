@@ -34,6 +34,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function EditNews({ news }: { news: News }) {
     const initialValue = JSON.parse(news.content) as unknown as SerializedEditorState;
     const [editorState, setEditorState] = useState<SerializedEditorState>(initialValue);
+    const [editorHtmlState, setEditorHtmlState] = useState<string>('');
 
     const [open, setOpen] = useState(false);
     const [date, setDate] = useState<Date | undefined>(news.published_at ? new Date(news.published_at) : undefined);
@@ -53,6 +54,7 @@ export default function EditNews({ news }: { news: News }) {
                     transform={(data) => ({
                         ...data,
                         content: JSON.stringify(editorState),
+                        html_content: editorHtmlState,
                         published_date: date ? dayjs(date).format('DD-MM-YYYY') : null,
                     })}
                     className="space-y-6"
@@ -99,6 +101,7 @@ export default function EditNews({ news }: { news: News }) {
                                     onSerializedChange={(value: SetStateAction<SerializedEditorState<SerializedLexicalNode>>) =>
                                         setEditorState(value)
                                     }
+                                    onChangeHtml={(html) => setEditorHtmlState(html)}
                                 />
 
                                 <InputError message={errors.content} />

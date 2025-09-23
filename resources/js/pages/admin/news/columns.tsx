@@ -5,7 +5,7 @@ import { News } from '@/types';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 
-import { edit } from '@/routes/admin/news';
+import { edit, show } from '@/routes/admin/news';
 import { Link } from '@inertiajs/react';
 import dayjs from 'dayjs';
 
@@ -63,11 +63,15 @@ export const columns: ColumnDef<News>[] = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem asChild>
+                            <Link className="hover:cursor-pointer" href={show(row.original.id).url}>
+                                View
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
                             <Link className="hover:cursor-pointer" href={edit(row.original.id).url}>
                                 Edit
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>View payment details</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

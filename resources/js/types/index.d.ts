@@ -72,6 +72,7 @@ export interface News {
     type: 0 | 1; // 0 = news, 1 = promotion
     title: string;
     content: string;
+    html_content: string;
     is_published: boolean;
     published_at: string | null;
     published_time: string | null;
@@ -79,5 +80,6 @@ export interface News {
     image: string | null;
     created_at: string;
     updated_at: string;
+    image_url?: string | null;
     [key: string]: unknown; // This allows for additional properties...
 }

@@ -61,9 +61,15 @@ class NewsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(News $news)
     {
-        //
+        transform($news, function ($item) {
+            $item->image_url = $item->image ? asset('storage/' . $item->image) : null;
+        });
+
+        return Inertia::render('admin/news/show', [
+            'news' => $news,
+        ]);
     }
 
     /**

@@ -20,6 +20,7 @@ class News extends Model
         'image',
         'title',
         'content',
+        'html_content',
         'is_published',
         'published_at',
     ];

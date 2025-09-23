@@ -26,6 +26,7 @@ class NewsUpdateRequest extends FormRequest
             'type' => ['required', 'integer', 'in:0,1'], // 0: News, 1: Promotion
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
+            'html_content' => ['required', 'string'],
             'published_date' => ['nullable', 'date_format:d-m-Y'],
             'published_time' => ['nullable', 'date_format:H:i:s'],
         ];

@@ -52,6 +52,7 @@ export default function News() {
         },
     } as unknown as SerializedEditorState;
     const [editorState, setEditorState] = useState<SerializedEditorState>(initialValue);
+    const [editorHtmlState, setEditorHtmlState] = useState<string>('');
 
     const [open, setOpen] = useState(false);
     const [date, setDate] = useState<Date | undefined>(undefined);
@@ -71,6 +72,7 @@ export default function News() {
                     transform={(data) => ({
                         ...data,
                         content: JSON.stringify(editorState),
+                        html_content: editorHtmlState,
                         published_date: date ? dayjs(date).format('DD-MM-YYYY') : null,
                     })}
                     className="space-y-6"
@@ -117,6 +119,7 @@ export default function News() {
                                     onSerializedChange={(value: SetStateAction<SerializedEditorState<SerializedLexicalNode>>) =>
                                         setEditorState(value)
                                     }
+                                    onChangeHtml={(html) => setEditorHtmlState(html)}
                                 />
 
                                 <InputError message={errors.content} />

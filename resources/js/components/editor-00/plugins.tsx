@@ -87,7 +87,7 @@ export function Plugins() {
                 )}
             </ToolbarPlugin>
 
-            <div className="relative h-96">
+            <div className="relative">
                 <RichTextPlugin
                     contentEditable={
                         <div className="">
