@@ -56,4 +56,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Address::class);
     }
+
+    /**
+     * Get the health reportss associated with the user.
+     */
+    public function healthReports(): HasMany
+    {
+        return $this->hasMany(HealthReport::class);
+    }
 }

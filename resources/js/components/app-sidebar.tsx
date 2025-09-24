@@ -5,11 +5,13 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { index as indexNews } from '@/routes/admin/news';
 import { index } from '@/routes/devices';
+import { index as indexHealthReports } from '@/routes/health-reports';
 import { index as indexNewsCustomer } from '@/routes/news';
 import { index as indexOrderHistory } from '@/routes/order-history';
+import { index as indexUsageHistory } from '@/routes/usage-history';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { FileClock, LayoutGrid, Newspaper, TabletSmartphone } from 'lucide-react';
+import { FileBox, FileClock, LayoutGrid, Newspaper, TabletSmartphone } from 'lucide-react';
 import AppLogo from './app-logo';
 import { NavManagement } from './nav-management';
 
@@ -18,6 +20,20 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Personal Health',
+        icon: FileBox,
+        children: [
+            {
+                title: 'Health Reports',
+                href: indexHealthReports(),
+            },
+            {
+                title: 'Usage History',
+                href: indexUsageHistory(),
+            },
+        ],
     },
     {
         title: 'Devices',

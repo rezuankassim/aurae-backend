@@ -17,9 +17,10 @@ export interface NavGroup {
 
 export interface NavItem {
     title: string;
-    href: NonNullable<InertiaLinkProps['href']>;
+    href?: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    children?: NavItem[];
 }
 
 export interface SharedData {
@@ -81,5 +82,24 @@ export interface News {
     created_at: string;
     updated_at: string;
     image_url?: string | null;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface HealthReport {
+    id: number;
+    user_id: number;
+    file: string;
+    file_url: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface UsageHistory {
+    id: string;
+    content: string;
+    user_id: number;
+    created_at: string;
+    updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
