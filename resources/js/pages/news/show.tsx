@@ -3,7 +3,7 @@ import { News, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 import Heading from '@/components/heading';
-import news from '@/routes/customers/news';
+import news from '@/routes/customers/news-promotions';
 
 import dayjs from 'dayjs';
 import { Clock } from 'lucide-react';

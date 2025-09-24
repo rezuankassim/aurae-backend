@@ -17,8 +17,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('order-history', [OrderHistoryController::class, 'index'])->name('order-history.index');
 
-    Route::get('news', [NewsController::class, 'index'])->name('customers.news.index');
-    Route::get('news/{news}', [NewsController::class, 'show'])->name('customers.news.show');
+    Route::get('news', [NewsController::class, 'index'])->name('customers.news-promotions.index');
+    Route::get('news/{news}', [NewsController::class, 'show'])->name('customers.news-promotions.show');
 });
 
 require __DIR__.'/admin.php';
