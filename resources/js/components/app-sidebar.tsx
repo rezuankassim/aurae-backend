@@ -4,6 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as indexNews } from '@/routes/admin/news';
+import { index as indexDeviceMaintenance } from '@/routes/device-maintenance';
 import { index } from '@/routes/devices';
 import { index as indexHealthReports } from '@/routes/health-reports';
 import { index as indexNewsCustomer } from '@/routes/news';
@@ -11,7 +12,7 @@ import { index as indexOrderHistory } from '@/routes/order-history';
 import { index as indexUsageHistory } from '@/routes/usage-history';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { FileBox, FileClock, LayoutGrid, Newspaper, TabletSmartphone } from 'lucide-react';
+import { Construction, FileBox, FileClock, LayoutGrid, Newspaper, TabletSmartphone } from 'lucide-react';
 import AppLogo from './app-logo';
 import { NavManagement } from './nav-management';
 
@@ -34,6 +35,11 @@ const mainNavItems: NavItem[] = [
                 href: indexUsageHistory(),
             },
         ],
+    },
+    {
+        title: 'Device Maintenances',
+        href: indexDeviceMaintenance(),
+        icon: Construction,
     },
     {
         title: 'Devices',

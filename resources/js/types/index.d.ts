@@ -103,3 +103,24 @@ export interface UsageHistory {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface DeviceMaintenance {
+    id: number;
+    status: 0 | 1 | 2 | 3; // 0: pending, 1: pending_factory, 2: in_progress, 3: completed
+    user_id: number;
+    user: User;
+    maintenance_requested_at: string;
+    factory_maintenance_requested_at: string | null;
+    requested_at_changes: string | null;
+    created_at: string;
+    updated_at: string;
+    requested_at_changes_formatted: {
+        changed_at: string;
+        user: User;
+        previous_maintenance_requested_at: string;
+        new_maintenance_requested_at: string;
+        previous_factory_maintenance_requested_at: string;
+        new_factory_maintenance_requested_at: string | null;
+    }[];
+    [key: string]: unknown; // This allows for additional properties...
+}

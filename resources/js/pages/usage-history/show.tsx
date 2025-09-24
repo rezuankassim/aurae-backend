@@ -37,7 +37,7 @@ export default function UsageHistoryShow({ usageHistory }: { usageHistory: Usage
                         <h2 className="text-sm font-medium">Details</h2>
 
                         <pre className="w-full rounded-lg bg-muted p-4 text-sm">
-                            <code>{JSON.stringify(usageHistory, null, 2)}</code>
+                            <code>{JSON.stringify(usageHistory.content, null, 2)}</code>
                         </pre>
                     </div>
                 </div>

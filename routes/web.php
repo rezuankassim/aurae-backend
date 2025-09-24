@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\DeviceMaintenanceController;
 use App\Http\Controllers\HealthReportController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\OrderHistoryController;
@@ -29,6 +30,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('usage-history', [UsageHistoryController::class, 'index'])->name('usage-history.index');
     Route::get('usage-history/{usageHistory}', [UsageHistoryController::class, 'show'])->name('usage-history.show');
+
+    Route::get('device-maintenance', [DeviceMaintenanceController::class, 'index'])->name('device-maintenance.index');
+    Route::get('device-maintenance/create', [DeviceMaintenanceController::class, 'create'])->name('device-maintenance.create');
+    Route::post('device-maintenance', [DeviceMaintenanceController::class, 'store'])->name('device-maintenance.store');
+    Route::get('device-maintenance/{deviceMaintenance}', [DeviceMaintenanceController::class, 'show'])->name('device-maintenance.show');
+    Route::post('device-maintenance/{deviceMaintenance}/approve', [DeviceMaintenanceController::class, 'approve'])->name('device-maintenance.approve');
+    Route::get('device-maintenance/{deviceMaintenance}/edit', [DeviceMaintenanceController::class, 'edit'])->name('device-maintenance.edit');
+    Route::put('device-maintenance/{deviceMaintenance}', [DeviceMaintenanceController::class, 'update'])->name('device-maintenance.update');
 });
 
 require __DIR__.'/admin.php';
