@@ -2,7 +2,7 @@ import { DataTablePagination } from '@/components/datatable-pagination';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import news from '@/routes/customers/news-promotions';
+import news from '@/routes/news';
 import { Link } from '@inertiajs/react';
 import {
     ColumnDef,
