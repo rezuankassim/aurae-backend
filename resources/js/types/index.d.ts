@@ -124,3 +124,49 @@ export interface DeviceMaintenance {
     }[];
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Product {
+    id: number;
+    product_type_id: number;
+    status: 'draft' | 'published';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    attribute_data: Record<string, any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    brand: Record<string, any> | null;
+    variants: ProductVariant[];
+    product_type: ProductType;
+    tags: Tag[];
+    tags_array: number[]; // Array of tag IDs
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface ProductVariant {
+    id: number;
+    product_id: number;
+    tax_class_id: number;
+    tax_ref: string | null;
+    unit_quantity: number;
+    sku: string | null;
+    gtin: string | null;
+    mpn: string | null;
+    ean: string | null;
+    stock: number;
+}
+
+export interface ProductType {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface Tag {
+    id: number;
+    value: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
+}

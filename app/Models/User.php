@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Lunar\Base\LunarUser as LunarUserInterface;
+use Lunar\Base\Traits\LunarUser;
 
-class User extends Authenticatable
+class User extends Authenticatable implements LunarUserInterface
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, LunarUser;
 
     /**
      * The attributes that are mass assignable.
