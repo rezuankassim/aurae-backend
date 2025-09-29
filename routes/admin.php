@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductMediaController;
 use App\Http\Middleware\EnsureIsAdmin;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
 
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::get('/products/{product}/media', [ProductMediaController::class, 'index'])->name('products.media.index');
+    Route::delete('/products/{product}/media/{media}', [ProductMediaController::class, 'destroy'])->name('products.media.destroy');
 });

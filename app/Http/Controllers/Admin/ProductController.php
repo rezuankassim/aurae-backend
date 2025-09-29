@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ProductUpdateRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Lunar\FieldTypes\Text;
+use Lunar\FieldTypes\TranslatedText;
 use Lunar\Models\Product;
 use Lunar\Models\ProductType;
 use Lunar\Models\Tag;
@@ -45,5 +48,33 @@ class ProductController extends Controller
             'productTypes' => $productTypes,
             'tags' => $tags,
         ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(ProductUpdateRequest $request, Product $product)
+    {
+        $validated = $request->validated();
+
+        $description = $validated['content'] ?? '';
+        $htmlDescription = $validated['html_content'] ?? '';
+
+        $product->update([
+            'product_type_id' => $validated['type'],
+            'attribute_data' => [
+                'name' => new TranslatedText(collect([
+                    'en' => new Text($validated['name'])
+                ])),
+                'description' => new TranslatedText(collect([
+                    'en' => new Text($htmlDescription)
+                ])),
+                'ori_description' => new TranslatedText(collect([
+                    'en' => new Text($description)
+                ])),
+            ]
+        ]);
+
+        return to_route('admin.products.index')->with('success', 'Product updated successfully');
     }
 }

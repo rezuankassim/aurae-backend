@@ -170,3 +170,16 @@ export interface Tag {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Media {
+    id: number;
+    model_id: number;
+    uuid: string;
+    collection_name: string;
+    file_name: string;
+    custom_properties: Record<string, unknown>;
+    created_at: string;
+    updated_at: string;
+    url: string;
+    [key: string]: unknown; // This allows for additional properties...
+}

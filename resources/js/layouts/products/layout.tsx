@@ -2,42 +2,35 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { index } from '@/routes/address';
-import { edit as editAppearance } from '@/routes/appearance';
-import { edit as editPassword } from '@/routes/password';
-import { edit } from '@/routes/profile';
+import { edit } from '@/routes/admin/products';
+import { index as mediaIndex } from '@/routes/admin/products/media';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Profile',
-        href: edit(),
-        icon: null,
-    },
-    {
-        title: 'Password',
-        href: editPassword(),
-        icon: null,
-    },
-    {
-        title: 'Address',
-        href: index(),
-        icon: null,
-    },
-    {
-        title: 'Appearance',
-        href: editAppearance(),
-        icon: null,
-    },
-];
-
-export default function SettingsLayout({ children }: PropsWithChildren) {
+export default function ProductsLayout({
+    children,
+    id_record,
+}: PropsWithChildren<{
+    id_record: number;
+}>) {
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
         return null;
     }
+
+    const sidebarNavItems: NavItem[] = [
+        {
+            title: 'Basic Information',
+            href: edit(id_record),
+            icon: null,
+        },
+        {
+            title: 'Media',
+            href: mediaIndex(id_record),
+            icon: null,
+        },
+    ];
 
     const currentPath = window.location.pathname;
 
@@ -69,8 +62,8 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
                 <Separator className="my-6 lg:hidden" />
 
-                <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12">{children}</section>
+                <div className="flex-1 md:max-w-3xl">
+                    <section className="max-w-3xl space-y-12">{children}</section>
                 </div>
             </div>
         </div>

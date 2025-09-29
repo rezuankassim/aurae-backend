@@ -2,8 +2,6 @@ import AppLayout from '@/layouts/app-layout';
 import { Product, ProductType, Tag, type BreadcrumbItem } from '@/types';
 import { Form, Head, Link } from '@inertiajs/react';
 
-import NewsController from '@/actions/App/Http/Controllers/Admin/NewsController';
-import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,10 +13,12 @@ import { SerializedEditorState, SerializedLexicalNode } from 'lexical';
 import { CheckIcon } from 'lucide-react';
 import { SetStateAction, useState } from 'react';
 
+import ProductController from '@/actions/App/Http/Controllers/Admin/ProductController';
+import HeadingSmall from '@/components/heading-small';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tags, TagsContent, TagsEmpty, TagsGroup, TagsInput, TagsItem, TagsList, TagsTrigger, TagsValue } from '@/components/ui/tags';
-import dayjs from 'dayjs';
+import ProductsLayout from '@/layouts/products/layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -32,30 +32,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function EditProducts({ product, productTypes, tags }: { product: Product; productTypes: ProductType[]; tags: Tag[] }) {
-    const initialValue = {
-        root: {
-            children: [
-                {
-                    children: [],
-                    direction: 'ltr',
-                    format: '',
-                    indent: 0,
-                    type: 'paragraph',
-                    version: 1,
-                },
-            ],
-            direction: 'ltr',
-            format: '',
-            indent: 0,
-            type: 'root',
-            version: 1,
-        },
-    } as unknown as SerializedEditorState;
+    const initialValue = JSON.parse(product.attribute_data.ori_description.en) as unknown as SerializedEditorState;
     const [editorState, setEditorState] = useState<SerializedEditorState>(initialValue);
     const [editorHtmlState, setEditorHtmlState] = useState<string>('');
 
-    const [open, setOpen] = useState(false);
-    const [date, setDate] = useState<Date | undefined>(product.published_at ? new Date(product.published_at) : undefined);
     const [selectedTags, setSelectedTags] = useState<string[]>(product.tags_array.map((tag) => String(tag)));
 
     const handleRemove = (value: string) => {
@@ -78,117 +58,119 @@ export default function EditProducts({ product, productTypes, tags }: { product:
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit product" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl px-4 py-6">
-                <Heading title="Edit product" description="Manage system's product, edit or publish" />
 
-                <Form
-                    {...NewsController.update.form(product.id)}
-                    options={{
-                        preserveScroll: true,
-                    }}
-                    resetOnSuccess
-                    transform={(data) => ({
-                        ...data,
-                        content: JSON.stringify(editorState),
-                        html_content: editorHtmlState,
-                        published_date: date ? dayjs(date).format('DD-MM-YYYY') : null,
-                    })}
-                    className="space-y-6"
-                >
-                    {({ processing, errors }) => (
-                        <>
-                            <Card>
-                                <CardContent className="space-y-6">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="product_type">Product Type</Label>
+            <ProductsLayout id_record={product.id}>
+                <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto">
+                    <HeadingSmall title="Edit product" description="Manage system's product, edit or publish" />
 
-                                        <Select name="type" defaultValue={String(product.product_type_id)}>
-                                            <SelectTrigger id="product_type" name="product_type">
-                                                <SelectValue placeholder="Select product type" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {productTypes.map((type) => (
-                                                    <SelectItem key={type.id} value={String(type.id)}>
-                                                        {type.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                    <Form
+                        {...ProductController.update.form(product.id)}
+                        options={{
+                            preserveScroll: true,
+                        }}
+                        resetOnSuccess
+                        transform={(data) => ({
+                            ...data,
+                            content: JSON.stringify(editorState),
+                            html_content: editorHtmlState,
+                        })}
+                        className="space-y-6"
+                    >
+                        {({ processing, errors }) => (
+                            <>
+                                <Card className="mt-0">
+                                    <CardContent className="space-y-6">
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="product_type">Product Type</Label>
 
-                                        <InputError message={errors.type} />
-                                    </div>
+                                            <Select name="type" defaultValue={String(product.product_type_id)}>
+                                                <SelectTrigger id="product_type" name="product_type">
+                                                    <SelectValue placeholder="Select product type" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {productTypes.map((type) => (
+                                                        <SelectItem key={type.id} value={String(type.id)}>
+                                                            {type.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
 
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="tags">Tags</Label>
+                                            <InputError message={errors.type} />
+                                        </div>
 
-                                        <Tags>
-                                            <TagsTrigger id="tags" name="tags">
-                                                {selectedTags.map((tag) => (
-                                                    <TagsValue key={tag} onRemove={() => handleRemove(String(tag))}>
-                                                        {String(tags.find((t) => t.id === Number(tag))?.value || '')}
-                                                    </TagsValue>
-                                                ))}
-                                            </TagsTrigger>
-                                            <TagsContent>
-                                                <TagsInput placeholder="Search tag..." />
-                                                <TagsList>
-                                                    <TagsEmpty />
-                                                    <TagsGroup>
-                                                        {tags.map((tag) => (
-                                                            <TagsItem key={tag.id} onSelect={handleSelect} value={String(tag.id)}>
-                                                                {tag.value}
-                                                                {selectedTags.includes(String(tag.id)) && (
-                                                                    <CheckIcon className="text-muted-foreground" size={14} />
-                                                                )}
-                                                            </TagsItem>
-                                                        ))}
-                                                    </TagsGroup>
-                                                </TagsList>
-                                            </TagsContent>
-                                        </Tags>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="tags">Tags</Label>
 
-                            <Card>
-                                <CardContent className="space-y-6">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="name">Name</Label>
+                                            <Tags>
+                                                <TagsTrigger id="tags" name="tags">
+                                                    {selectedTags.map((tag) => (
+                                                        <TagsValue key={tag} onRemove={() => handleRemove(String(tag))}>
+                                                            {String(tags.find((t) => t.id === Number(tag))?.value || '')}
+                                                        </TagsValue>
+                                                    ))}
+                                                </TagsTrigger>
+                                                <TagsContent>
+                                                    <TagsInput placeholder="Search tag..." />
+                                                    <TagsList>
+                                                        <TagsEmpty />
+                                                        <TagsGroup>
+                                                            {tags.map((tag) => (
+                                                                <TagsItem key={tag.id} onSelect={handleSelect} value={String(tag.id)}>
+                                                                    {tag.value}
+                                                                    {selectedTags.includes(String(tag.id)) && (
+                                                                        <CheckIcon className="text-muted-foreground" size={14} />
+                                                                    )}
+                                                                </TagsItem>
+                                                            ))}
+                                                        </TagsGroup>
+                                                    </TagsList>
+                                                </TagsContent>
+                                            </Tags>
+                                        </div>
+                                    </CardContent>
+                                </Card>
 
-                                        <Input id="name" name="name" placeholder="Name" defaultValue={product.attribute_data.name.en} />
+                                <Card>
+                                    <CardContent className="space-y-6">
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="name">Name</Label>
 
-                                        <InputError message={errors.name} />
-                                    </div>
+                                            <Input id="name" name="name" placeholder="Name" defaultValue={product.attribute_data.name.en} />
 
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="description">Description</Label>
+                                            <InputError message={errors.name} />
+                                        </div>
 
-                                        <Editor
-                                            editorSerializedState={editorState}
-                                            onSerializedChange={(value: SetStateAction<SerializedEditorState<SerializedLexicalNode>>) =>
-                                                setEditorState(value)
-                                            }
-                                            onChangeHtml={(html) => setEditorHtmlState(html)}
-                                        />
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="description">Description</Label>
 
-                                        <InputError message={errors.description} />
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                            <Editor
+                                                editorSerializedState={editorState}
+                                                onSerializedChange={(value: SetStateAction<SerializedEditorState<SerializedLexicalNode>>) =>
+                                                    setEditorState(value)
+                                                }
+                                                onChangeHtml={(html) => setEditorHtmlState(html)}
+                                            />
 
-                            <div className="flex gap-2">
-                                <Button type="submit" disabled={processing}>
-                                    Submit
-                                </Button>
+                                            <InputError message={errors.description} />
+                                        </div>
+                                    </CardContent>
+                                </Card>
 
-                                <Button type="button" variant="outline" asChild>
-                                    <Link href={index().url}>Cancel</Link>
-                                </Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
-            </div>
+                                <div className="flex gap-2">
+                                    <Button type="submit" disabled={processing}>
+                                        Submit
+                                    </Button>
+
+                                    <Button type="button" variant="outline" asChild>
+                                        <Link href={index().url}>Cancel</Link>
+                                    </Button>
+                                </div>
+                            </>
+                        )}
+                    </Form>
+                </div>
+            </ProductsLayout>
         </AppLayout>
     );
 }
