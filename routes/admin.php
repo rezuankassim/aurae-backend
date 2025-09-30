@@ -19,5 +19,8 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::get('/products/{product}/media', [ProductMediaController::class, 'index'])->name('products.media.index');
+    Route::post('/products/{product}/media', [ProductMediaController::class, 'store'])->name('products.media.store');
     Route::delete('/products/{product}/media/{media}', [ProductMediaController::class, 'destroy'])->name('products.media.destroy');
+    Route::get('/products/{product}/media/reorder', [ProductMediaController::class, 'reorder'])->name('products.media.reorder');
+    Route::post('/products/{product}/media/save-reorder', [ProductMediaController::class, 'saveReorder'])->name('products.media.save-reorder');
 });
