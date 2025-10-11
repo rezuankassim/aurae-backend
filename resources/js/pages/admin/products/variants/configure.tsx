@@ -66,7 +66,7 @@ export default function ProductVariantsConfigure({ product, options }: { product
                                 <Sortable value={optionOrder} onValueChange={setOptionOrder} getItemValue={(item) => item.id}>
                                     <SortableContent asChild>
                                         <div className="grid gap-2">
-                                            {optionOrder.map((option, index) => (
+                                            {optionOrder.map((option) => (
                                                 <>
                                                     <SortableItem key={option.id} value={option.id} asChild>
                                                         <div className="flex items-start gap-2">

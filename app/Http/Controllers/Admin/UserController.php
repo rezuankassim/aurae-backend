@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserCreateRequest;
 use App\Http\Requests\Admin\UserUpdateRequest;
 use App\Models\User;
-use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
@@ -44,7 +42,7 @@ class UserController extends Controller
 
         $validated['password'] = Hash::make($validated['password']);
         $validated['is_admin'] = $validated['type'] == 1 ? true : false;
-        
+
         $user = User::create($validated);
 
         return to_route('admin.users.show', $user->id)->with('success', 'User created successfully.');
