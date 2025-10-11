@@ -4,6 +4,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { edit } from '@/routes/admin/products';
 import { index as mediaIndex } from '@/routes/admin/products/media';
+import { index as pricingIndex } from '@/routes/admin/products/pricing';
 import { index as variantIndex } from '@/routes/admin/products/variants';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
@@ -12,8 +13,10 @@ import { type PropsWithChildren } from 'react';
 export default function ProductsLayout({
     children,
     id_record,
+    with_variants = false,
 }: PropsWithChildren<{
     id_record: number;
+    with_variants?: boolean;
 }>) {
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
@@ -37,6 +40,18 @@ export default function ProductsLayout({
             icon: null,
         },
     ];
+
+    if (!with_variants) {
+        const extraSidebarNavItems: NavItem[] = [
+            {
+                title: 'Pricing',
+                href: pricingIndex(id_record),
+                icon: null,
+            },
+        ];
+
+        extraSidebarNavItems.forEach((item) => sidebarNavItems.push(item));
+    }
 
     const currentPath = window.location.pathname;
 

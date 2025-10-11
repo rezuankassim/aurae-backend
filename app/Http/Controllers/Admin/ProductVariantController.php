@@ -39,10 +39,13 @@ class ProductVariantController extends Controller
             ->whereHas('basePrices')
             ->get();
 
+        $with_variants = $product->productOptions()->count() > 0;
+
         return Inertia::render('admin/products/variants/index', [
             'product' => $product,
             'options' => $options,
             'variants' => $variants,
+            'withVariants' => $with_variants,
         ]);
     }
 
@@ -54,6 +57,7 @@ class ProductVariantController extends Controller
         return Inertia::render('admin/products/variants/configure', [
             'product' => $product,
             'options' => $product->productOptions()->with('values')->get(),
+            'withVariants' => $product->productOptions()->count() > 0,
         ]);
     }
 

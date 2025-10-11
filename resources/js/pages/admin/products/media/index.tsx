@@ -24,14 +24,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function ProductMediaIndex({ product, images }: { product: Product; images: Media[] }) {
+export default function ProductMediaIndex({ product, images, withVariants }: { product: Product; images: Media[]; withVariants: boolean }) {
     const [open, setOpen] = useState(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Product Media" />
 
-            <ProductsLayout id_record={product.id}>
+            <ProductsLayout id_record={product.id} with_variants={withVariants}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto">
                     <div className="flex items-center justify-between">
                         <HeadingSmall title="Product Media" description="Manage product's media, upload new or reorder" />

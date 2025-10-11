@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductMediaController;
+use App\Http\Controllers\Admin\ProductPricingController;
 use App\Http\Controllers\Admin\ProductVariantController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserLoginActivityController;
@@ -33,6 +34,9 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/product/{product}/variants/configure', [ProductVariantController::class, 'configure'])->name('products.variants.configure');
     Route::post('/product/{product}/variants', [ProductVariantController::class, 'store'])->name('products.variants.store');
     Route::post('/product/{product}/variants/update-all', [ProductVariantController::class, 'updateAll'])->name('products.variants.update');
+
+    Route::get('/product/{product}/pricing', [ProductPricingController::class, 'index'])->name('products.pricing.index');
+    Route::post('/product/{product}/pricing', [ProductPricingController::class, 'store'])->name('products.pricing.store');
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');

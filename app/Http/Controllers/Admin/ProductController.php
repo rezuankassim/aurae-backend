@@ -97,6 +97,7 @@ class ProductController extends Controller
             'product' => $product,
             'productTypes' => $productTypes,
             'tags' => $tags,
+            'withVariants' => $product->productOptions()->count() > 0,
         ]);
     }
 

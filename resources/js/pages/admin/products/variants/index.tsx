@@ -23,16 +23,18 @@ export default function ProductVariantsIndex({
     product,
     options,
     variants,
+    withVariants,
 }: {
     product: Product;
     options: ProductOption[];
     variants: ProductVariant[];
+    withVariants: boolean;
 }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Product Variant" />
 
-            <ProductsLayout id_record={product.id}>
+            <ProductsLayout id_record={product.id} with_variants={withVariants}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto">
                     <div className="flex items-center justify-between">
                         <HeadingSmall title="Product Variant" description="Manage product's variants, create new" />

@@ -23,7 +23,15 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function ProductVariantsConfigure({ product, options }: { product: Product; options: ProductOption[] }) {
+export default function ProductVariantsConfigure({
+    product,
+    options,
+    withVariants,
+}: {
+    product: Product;
+    options: ProductOption[];
+    withVariants: boolean;
+}) {
     const [optionOrder, setOptionOrder] = useState(options);
 
     const deleteOrder = (id: number) => {
@@ -46,7 +54,7 @@ export default function ProductVariantsConfigure({ product, options }: { product
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Product Variant" />
 
-            <ProductsLayout id_record={product.id}>
+            <ProductsLayout id_record={product.id} with_variants={withVariants}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto">
                     <div className="flex items-center justify-between">
                         <HeadingSmall title="Product Variant" description="Manage product's variants, create new" />

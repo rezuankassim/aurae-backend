@@ -31,7 +31,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function EditProducts({ product, productTypes, tags }: { product: Product; productTypes: ProductType[]; tags: Tag[] }) {
+export default function EditProducts({
+    product,
+    productTypes,
+    tags,
+    withVariants,
+}: {
+    product: Product;
+    productTypes: ProductType[];
+    tags: Tag[];
+    withVariants: boolean;
+}) {
     const initialValue = product.attribute_data.ori_description?.en
         ? JSON.parse(product.attribute_data.ori_description.en)
         : ({
@@ -79,7 +89,7 @@ export default function EditProducts({ product, productTypes, tags }: { product:
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit product" />
 
-            <ProductsLayout id_record={product.id}>
+            <ProductsLayout id_record={product.id} with_variants={withVariants}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto">
                     <HeadingSmall title="Edit product" description="Manage system's product, edit or publish" />
 

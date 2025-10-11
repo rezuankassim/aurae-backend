@@ -140,6 +140,7 @@ export interface Product {
     tags_array: number[]; // Array of tag IDs
     created_at: string;
     updated_at: string;
+    prices?: Price[];
     [key: string]: unknown; // This allows for additional properties...
 }
 
@@ -156,6 +157,7 @@ export interface ProductVariant {
     stock: number;
     values: ProductOptionValue[];
     base_prices?: Price[];
+    tax_class?: TaxClass;
 }
 
 export interface ProductType {
@@ -215,9 +217,9 @@ export interface Price {
     id: number;
     currency: Currency;
     currency_id: number;
-    price: PriceV;
+    price: PriceV | number;
     min_quantity: number;
-    compare_price: PriceV;
+    compare_price: PriceV | number;
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
@@ -252,5 +254,14 @@ export interface LoginActivity {
     succeeded: number;
     created_at: string;
     updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface TaxClass {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+    default: boolean;
     [key: string]: unknown; // This allows for additional properties...
 }
