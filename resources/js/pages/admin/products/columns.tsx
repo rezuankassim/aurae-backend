@@ -62,7 +62,7 @@ export const columns: ColumnDef<Product>[] = [
             return andstring ? (
                 <Tooltip>
                     <TooltipTrigger>
-                        <div className="flex flex-col">
+                        <div className="flex flex-col items-start">
                             <p>{firstsku}</p>
                             <p className="text-muted-foreground">{andstring}</p>
                         </div>

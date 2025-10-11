@@ -32,7 +32,27 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function EditProducts({ product, productTypes, tags }: { product: Product; productTypes: ProductType[]; tags: Tag[] }) {
-    const initialValue = JSON.parse(product.attribute_data.ori_description.en) as unknown as SerializedEditorState;
+    const initialValue = product.attribute_data.ori_description?.en
+        ? JSON.parse(product.attribute_data.ori_description.en)
+        : ({
+              root: {
+                  children: [
+                      {
+                          children: [],
+                          direction: 'ltr',
+                          format: '',
+                          indent: 0,
+                          type: 'paragraph',
+                          version: 1,
+                      },
+                  ],
+                  direction: 'ltr',
+                  format: '',
+                  indent: 0,
+                  type: 'root',
+                  version: 1,
+              },
+          } as unknown as SerializedEditorState);
     const [editorState, setEditorState] = useState<SerializedEditorState>(initialValue);
     const [editorHtmlState, setEditorHtmlState] = useState<string>('');
 

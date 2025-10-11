@@ -153,6 +153,8 @@ export interface ProductVariant {
     mpn: string | null;
     ean: string | null;
     stock: number;
+    values: ProductOptionValue[];
+    base_prices?: Price[];
 }
 
 export interface ProductType {
@@ -182,4 +184,57 @@ export interface Media {
     updated_at: string;
     url: string;
     [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface ProductOption {
+    id: number;
+    name: { en: string; [key: string]: string };
+    label: { en: string; [key: string]: string };
+    shared: boolean;
+    handle: string;
+    pivot: { product_id: number; product_option_id: number; position: 1 };
+    created_at: string;
+    updated_at: string;
+    values: ProductOptionValue[];
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface ProductOptionValue {
+    id: number;
+    name: { en: string; [key: string]: string };
+    option: ProductOption;
+    position: number;
+    product_option_id: number;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface Price {
+    id: number;
+    currency: Currency;
+    currency_id: number;
+    price: PriceV;
+    min_quantity: number;
+    compare_price: PriceV;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface Currency {
+    id: number;
+    name: string;
+    code: string;
+    decimal_places: number;
+    default: boolean;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface PriceV {
+    currency: Currency;
+    unitQty: number;
+    value: number;
 }

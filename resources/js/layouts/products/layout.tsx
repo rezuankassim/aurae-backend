@@ -4,6 +4,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { edit } from '@/routes/admin/products';
 import { index as mediaIndex } from '@/routes/admin/products/media';
+import { index as variantIndex } from '@/routes/admin/products/variants';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
@@ -28,6 +29,11 @@ export default function ProductsLayout({
         {
             title: 'Media',
             href: mediaIndex(id_record),
+            icon: null,
+        },
+        {
+            title: 'Variants',
+            href: variantIndex(id_record),
             icon: null,
         },
     ];
