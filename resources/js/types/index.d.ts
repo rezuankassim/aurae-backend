@@ -155,6 +155,10 @@ export interface ProductVariant {
     mpn: string | null;
     ean: string | null;
     stock: number;
+    backorder: number;
+    purchasable: 'always' | 'in_stock' | 'in_stock_or_on_backorder';
+    quantity_increment: number;
+    min_quantity: number;
     values: ProductOptionValue[];
     base_prices?: Price[];
     tax_class?: TaxClass;

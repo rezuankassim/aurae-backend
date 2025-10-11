@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductIdentifierController;
+use App\Http\Controllers\Admin\ProductInventoryController;
 use App\Http\Controllers\Admin\ProductMediaController;
 use App\Http\Controllers\Admin\ProductPricingController;
 use App\Http\Controllers\Admin\ProductVariantController;
@@ -37,6 +39,12 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
 
     Route::get('/product/{product}/pricing', [ProductPricingController::class, 'index'])->name('products.pricing.index');
     Route::post('/product/{product}/pricing', [ProductPricingController::class, 'store'])->name('products.pricing.store');
+
+    Route::get('/products/{product}/product-identifiers', [ProductIdentifierController::class, 'index'])->name('products.identifiers.index');
+    Route::post('/products/{product}/product-identifiers', [ProductIdentifierController::class, 'store'])->name('products.identifiers.store');
+
+    Route::get('/product/{product}/inventory', [ProductInventoryController::class, 'index'])->name('products.inventory.index');
+    Route::post('/product/{product}/inventory', [ProductInventoryController::class, 'store'])->name('products.inventory.store');
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');

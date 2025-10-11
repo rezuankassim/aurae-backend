@@ -15,7 +15,7 @@
     - [ ] Setup auto-replenishment
 5. [ ] E-commerce Admin
     - [x] Product CRUD (Create, Read, Update, Delete)
-    - [ ] Category & stock management
+    - [x] Category & stock management
     - [ ] View and manage orders
     - [ ] Process shipping & status updates
 6. [ ] Rental Service Management
