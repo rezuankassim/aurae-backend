@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductMediaController;
 use App\Http\Controllers\Admin\ProductVariantController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserLoginActivityController;
 use App\Http\Middleware\EnsureIsAdmin;
 use Illuminate\Support\Facades\Route;
 
@@ -31,4 +33,11 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/product/{product}/variants/configure', [ProductVariantController::class, 'configure'])->name('products.variants.configure');
     Route::post('/product/{product}/variants', [ProductVariantController::class, 'store'])->name('products.variants.store');
     Route::post('/product/{product}/variants/update-all', [ProductVariantController::class, 'updateAll'])->name('products.variants.update');
+
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+
+    Route::get('/users/{user}/login-activities', [UserLoginActivityController::class, 'index'])->name('users.login-activities.index');
 });

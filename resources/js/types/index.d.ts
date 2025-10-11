@@ -43,6 +43,7 @@ export interface User {
     created_at: string;
     updated_at: string;
     is_admin: boolean;
+    status: boolean;
     [key: string]: unknown; // This allows for additional properties...
 }
 
@@ -237,4 +238,19 @@ export interface PriceV {
     currency: Currency;
     unitQty: number;
     value: number;
+}
+
+export interface LoginActivity {
+    id: number;
+    user_id: number;
+    guard: string;
+    session_id: string | null;
+    ip_address: string | null;
+    user_agent: string | null;
+    occurred_at: string | null;
+    logout_at: string | null;
+    succeeded: number;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
 }

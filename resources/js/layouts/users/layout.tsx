@@ -2,14 +2,13 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { edit } from '@/routes/admin/products';
-import { index as mediaIndex } from '@/routes/admin/products/media';
-import { index as variantIndex } from '@/routes/admin/products/variants';
+import { show } from '@/routes/admin/users';
+import { index } from '@/routes/admin/users/login-activities';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-export default function ProductsLayout({
+export default function UsersLayout({
     children,
     id_record,
 }: PropsWithChildren<{
@@ -23,17 +22,12 @@ export default function ProductsLayout({
     const sidebarNavItems: NavItem[] = [
         {
             title: 'Basic Information',
-            href: edit(id_record),
+            href: show(id_record),
             icon: null,
         },
         {
-            title: 'Media',
-            href: mediaIndex(id_record),
-            icon: null,
-        },
-        {
-            title: 'Variants',
-            href: variantIndex(id_record),
+            title: 'Login Activities',
+            href: index(id_record),
             icon: null,
         },
     ];
@@ -42,7 +36,7 @@ export default function ProductsLayout({
 
     return (
         <div className="px-4 py-6">
-            <Heading title="Product Management" description="Manage system's products" />
+            <Heading title="User Information" description="Manage and view system's users" />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">

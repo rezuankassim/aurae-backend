@@ -5,8 +5,8 @@ import { Head, Link } from '@inertiajs/react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { create, index } from '@/routes/admin/news';
+import { DataTable } from '../users/data-table';
 import { columns } from './columns';
-import { DataTable } from './data-table';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

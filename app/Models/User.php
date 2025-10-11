@@ -26,6 +26,7 @@ class User extends Authenticatable implements LunarUserInterface
         'email',
         'password',
         'phone',
+        'status'
     ];
 
     /**
