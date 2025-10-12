@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CollectionGroupCollectionController;
 use App\Http\Controllers\Admin\CollectionGroupController;
+use App\Http\Controllers\Admin\KnowledgeController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\ProductCollectionController;
 use App\Http\Controllers\Admin\ProductController;
@@ -35,23 +36,23 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/products/{product}/media/reorder', [ProductMediaController::class, 'reorder'])->name('products.media.reorder');
     Route::post('/products/{product}/media/save-reorder', [ProductMediaController::class, 'saveReorder'])->name('products.media.save-reorder');
 
-    Route::get('/product/{product}/variants', [ProductVariantController::class, 'index'])->name('products.variants.index');
-    Route::get('/product/{product}/variants/configure', [ProductVariantController::class, 'configure'])->name('products.variants.configure');
-    Route::post('/product/{product}/variants', [ProductVariantController::class, 'store'])->name('products.variants.store');
-    Route::post('/product/{product}/variants/update-all', [ProductVariantController::class, 'updateAll'])->name('products.variants.update');
+    Route::get('/products/{product}/variants', [ProductVariantController::class, 'index'])->name('products.variants.index');
+    Route::get('/products/{product}/variants/configure', [ProductVariantController::class, 'configure'])->name('products.variants.configure');
+    Route::post('/products/{product}/variants', [ProductVariantController::class, 'store'])->name('products.variants.store');
+    Route::post('/products/{product}/variants/update-all', [ProductVariantController::class, 'updateAll'])->name('products.variants.update');
 
-    Route::get('/product/{product}/pricing', [ProductPricingController::class, 'index'])->name('products.pricing.index');
-    Route::post('/product/{product}/pricing', [ProductPricingController::class, 'store'])->name('products.pricing.store');
+    Route::get('/products/{product}/pricing', [ProductPricingController::class, 'index'])->name('products.pricing.index');
+    Route::post('/products/{product}/pricing', [ProductPricingController::class, 'store'])->name('products.pricing.store');
 
     Route::get('/products/{product}/product-identifiers', [ProductIdentifierController::class, 'index'])->name('products.identifiers.index');
     Route::post('/products/{product}/product-identifiers', [ProductIdentifierController::class, 'store'])->name('products.identifiers.store');
 
-    Route::get('/product/{product}/inventory', [ProductInventoryController::class, 'index'])->name('products.inventory.index');
-    Route::post('/product/{product}/inventory', [ProductInventoryController::class, 'store'])->name('products.inventory.store');
+    Route::get('/products/{product}/inventory', [ProductInventoryController::class, 'index'])->name('products.inventory.index');
+    Route::post('/products/{product}/inventory', [ProductInventoryController::class, 'store'])->name('products.inventory.store');
 
-    Route::get('/product/{product}/collections', [ProductCollectionController::class, 'index'])->name('products.collections.index');
-    Route::post('/product/{product}/collections', [ProductCollectionController::class, 'store'])->name('products.collections.store');
-    Route::delete('/product/{product}/collections/{collection}', [ProductCollectionController::class, 'destroy'])->name('products.collections.destroy');
+    Route::get('/products/{product}/collections', [ProductCollectionController::class, 'index'])->name('products.collections.index');
+    Route::post('/products/{product}/collections', [ProductCollectionController::class, 'store'])->name('products.collections.store');
+    Route::delete('/products/{product}/collections/{collection}', [ProductCollectionController::class, 'destroy'])->name('products.collections.destroy');
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
@@ -70,4 +71,15 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
 
     Route::post('/collection-groups/{collectionGroup}/collections', [CollectionGroupCollectionController::class, 'store'])->name('collection-groups.collections.store');
     Route::delete('/collection-groups/{collectionGroup}/collections/{collection}', [CollectionGroupCollectionController::class, 'destroy'])->name('collection-groups.collections.destroy');
+
+    Route::get('/social-media', [\App\Http\Controllers\Admin\SocialMediaController::class, 'edit'])->name('social-media.edit');
+    Route::put('/social-media', [\App\Http\Controllers\Admin\SocialMediaController::class, 'update'])->name('social-media.update');
+
+    Route::get('/knowledge', [KnowledgeController::class, 'index'])->name('knowledge.index');
+    Route::get('/knowledge/create', [KnowledgeController::class, 'create'])->name('knowledge.create');
+    Route::post('/knowledge', [KnowledgeController::class, 'store'])->name('knowledge.store');
+    Route::get('/knowledge/{knowledge}', [KnowledgeController::class, 'show'])->name('knowledge.show');
+    Route::get('/knowledge/{knowledge}/edit', [KnowledgeController::class, 'edit'])->name('knowledge.edit');
+    Route::put('/knowledge/{knowledge}', [KnowledgeController::class, 'update'])->name('knowledge.update');
+    Route::delete('/knowledge/{knowledge}', [KnowledgeController::class, 'destroy'])->name('knowledge.destroy');
 });

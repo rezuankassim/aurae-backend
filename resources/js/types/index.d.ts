@@ -86,6 +86,20 @@ export interface News {
     [key: string]: unknown; // This allows for additional properties...
 }
 
+export interface Knowledge {
+    id: number;
+    title: string;
+    content: string;
+    html_content: string;
+    is_published: boolean;
+    published_at: string | null;
+    published_time: string | null;
+    published_date: string | null;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
 export interface HealthReport {
     id: number;
     user_id: number;
@@ -296,5 +310,13 @@ export interface Collection {
     updated_at: string;
     deleted_at: string | null;
     pivot: { product_id: number; collection_id: number; position: number };
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface SocialMedia {
+    id: number;
+    links: Record<string, string>;
+    created_at: string;
+    updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }

@@ -33,15 +33,15 @@
     - [ ] System usage statistics
     - [ ] Health & essence data trends
     - [ ] Daily / monthly active user analytics
-10. [ ] Music Therapy Mode Management
-    - [ ] Create & manage therapy templates
-    - [ ] Define light/music/temp/duration per mode
+10. [x] Music Therapy Mode Management
+    - [x] Create & manage therapy templates
+    - [x] Define light/music/temp/duration per mode
 11. [ ] Device Management
     - [ ] Tablet linking
     - [ ] GPS tracking
 12. [ ] Notification System
     - [ ] Send push to apps - Firebase
-13. [ ] Knowledge Center Management
-    - [ ] Add/edit content, videos, categories for tablets
+13. [x] Knowledge Center Management
+    - [x] Add/edit content, videos, categories for tablets
 14. [x] Social Media Link Configuration
     - [x] Facebook / Instagram / Xiaohongshu URLs

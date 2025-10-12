@@ -1,10 +1,10 @@
 import { Check, ChevronsUpDown } from 'lucide-react';
-import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { useEffect, useRef, useState } from 'react';
 
 const frameworks = [
     {
@@ -36,17 +36,37 @@ interface ComboboxProps {
 }
 
 export function Combobox({ value, onValueChange, options }: ComboboxProps) {
-    const [open, setOpen] = React.useState(false);
+    const buttonRef = useRef<HTMLDivElement>(null);
+    const [open, setOpen] = useState(false);
+    const [width, setWidth] = useState<number>();
+
+    useEffect(() => {
+        if (!buttonRef.current) {
+            return;
+        }
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            setWidth(entries[0].contentRect.width);
+        });
+
+        resizeObserver.observe(buttonRef.current);
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
-                    {value ? options.find((options) => options.value == value)?.label : 'Select options...'}
-                    <ChevronsUpDown className="opacity-50" />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-full p-0">
+            <div className="relative w-full" ref={buttonRef}>
+                <PopoverTrigger asChild>
+                    <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
+                        {value ? options.find((options) => options.value == value)?.label : 'Select options...'}
+                        <ChevronsUpDown className="opacity-50" />
+                    </Button>
+                </PopoverTrigger>
+            </div>
+            <PopoverContent align="start" className="p-0" style={{ width }}>
                 <Command>
                     <CommandInput placeholder="Search options..." className="h-9" />
                     <CommandList>
