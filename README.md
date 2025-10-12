@@ -33,9 +33,9 @@
     - [ ] System usage statistics
     - [ ] Health & essence data trends
     - [ ] Daily / monthly active user analytics
-10. [x] Music Therapy Mode Management
-    - [x] Create & manage therapy templates
-    - [x] Define light/music/temp/duration per mode
+10. [ ] Music Therapy Mode Management
+    - [ ] Create & manage therapy templates
+    - [ ] Define light/music/temp/duration per mode
 11. [ ] Device Management
     - [ ] Tablet linking
     - [ ] GPS tracking

@@ -1,11 +1,11 @@
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { Knowledge, type BreadcrumbItem } from '@/types';
 import { Form, Head } from '@inertiajs/react';
 
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { create, index } from '@/routes/admin/news';
+import { index } from '@/routes/admin/knowledge';
 
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -26,45 +26,27 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: index().url,
     },
     {
-        title: 'Create news',
-        href: create().url,
+        title: 'Edit knowledge',
+        href: '#',
     },
 ];
 
-export default function KnowledgeCreate() {
-    const initialValue = {
-        root: {
-            children: [
-                {
-                    children: [],
-                    direction: 'ltr',
-                    format: '',
-                    indent: 0,
-                    type: 'paragraph',
-                    version: 1,
-                },
-            ],
-            direction: 'ltr',
-            format: '',
-            indent: 0,
-            type: 'root',
-            version: 1,
-        },
-    } as unknown as SerializedEditorState;
+export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
+    const initialValue = JSON.parse(knowledge.content) as unknown as SerializedEditorState;
     const [editorState, setEditorState] = useState<SerializedEditorState>(initialValue);
-    const [editorHtmlState, setEditorHtmlState] = useState<string>('');
+    const [editorHtmlState, setEditorHtmlState] = useState<string>(knowledge.html_content);
 
     const [open, setOpen] = useState(false);
-    const [date, setDate] = useState<Date | undefined>(undefined);
+    const [date, setDate] = useState<Date | undefined>(knowledge.published_at ? new Date(knowledge.published_at) : undefined);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Create knowledge" />
+            <Head title="Edit knowledge" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl px-4 py-6">
-                <Heading title="Create knowledge" description="Create new knowledge for the system" />
+                <Heading title="Edit knowledge" description="Edit knowledge for the system" />
 
                 <Form
-                    {...KnowledgeController.store.form()}
+                    {...KnowledgeController.update.form(knowledge.id)}
                     options={{
                         preserveScroll: true,
                     }}
@@ -85,7 +67,7 @@ export default function KnowledgeCreate() {
                                         <FieldLegend className="sr-only">Knowledge</FieldLegend>
                                         <Field>
                                             <FieldLabel htmlFor="title">Title</FieldLabel>
-                                            <Input id="title" name="title" placeholder="Title" />
+                                            <Input id="title" name="title" placeholder="Title" defaultValue={knowledge.title} />
 
                                             {errors.title ? <FieldError>{errors.title}</FieldError> : null}
                                         </Field>
@@ -115,7 +97,7 @@ export default function KnowledgeCreate() {
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </FieldLabel>
-                                            <Input id="video_url" name="video_url" placeholder="Video URL" />
+                                            <Input id="video_url" name="video_url" placeholder="Video URL" defaultValue={knowledge.video_url || ''} />
 
                                             <FieldDescription>
                                                 Use youtube link and copy the link from the clicking "Share" button and click "Embed" and copy the
@@ -154,6 +136,7 @@ export default function KnowledgeCreate() {
                                             <Field>
                                                 <FieldLabel htmlFor="published_time">Published Time</FieldLabel>
                                                 <Input
+                                                    defaultValue={knowledge.published_time ?? ''}
                                                     type="time"
                                                     id="published_time"
                                                     name="published_time"
