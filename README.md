@@ -7,7 +7,7 @@
     - [x] View activity/login records
 3. [ ] Health Report Management
     - [x] Upload and manage reports
-    - View/download historical data
+    - [ ] View/download historical data
 4. [ ] Essence Inventory & Validation
     - [ ] Track inventory
     - [ ] View usage logs and scan verification
