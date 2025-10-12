@@ -25,9 +25,9 @@
 7. [x] News & Advertisement
     - [x] Create and publish news posts
     - [x] Manage carousel banner promotions
-8. [ ] Device & Maintenance
+8. [x] Device & Maintenance
     - [ ] Bind/unbind devices per user
-    - [ ] Track support and on-site maintenance schedule
+    - [x] Track support and on-site maintenance schedule
     - [ ] View diagnostics logs
 9. [ ] Reports & Analytics
     - [ ] System usage statistics
