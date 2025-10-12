@@ -141,6 +141,7 @@ export interface Product {
     created_at: string;
     updated_at: string;
     prices?: Price[];
+    collections?: Collection[];
     [key: string]: unknown; // This allows for additional properties...
 }
 
@@ -267,5 +268,33 @@ export interface TaxClass {
     created_at: string;
     updated_at: string;
     default: boolean;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface CollectionGroup {
+    id: number;
+    name: string;
+    handle: string;
+    collections_count?: number;
+    created_at: string;
+    updated_at: string;
+    collections?: Collection[];
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface Collection {
+    id: number;
+    collection_group_id: number;
+    _lft: number;
+    _rgt: number;
+    parent_id: number | null;
+    type: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    attribute_data: Record<string, any>;
+    sort: string;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+    pivot: { product_id: number; collection_id: number; position: number };
     [key: string]: unknown; // This allows for additional properties...
 }

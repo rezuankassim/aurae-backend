@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\CollectionGroupCollectionController;
+use App\Http\Controllers\Admin\CollectionGroupController;
 use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Admin\ProductCollectionController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductIdentifierController;
 use App\Http\Controllers\Admin\ProductInventoryController;
@@ -46,6 +49,10 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/product/{product}/inventory', [ProductInventoryController::class, 'index'])->name('products.inventory.index');
     Route::post('/product/{product}/inventory', [ProductInventoryController::class, 'store'])->name('products.inventory.store');
 
+    Route::get('/product/{product}/collections', [ProductCollectionController::class, 'index'])->name('products.collections.index');
+    Route::post('/product/{product}/collections', [ProductCollectionController::class, 'store'])->name('products.collections.store');
+    Route::delete('/product/{product}/collections/{collection}', [ProductCollectionController::class, 'destroy'])->name('products.collections.destroy');
+
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
@@ -54,4 +61,13 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
 
     Route::get('/users/{user}/login-activities', [UserLoginActivityController::class, 'index'])->name('users.login-activities.index');
+
+    Route::get('/collection-groups', [CollectionGroupController::class, 'index'])->name('collection-groups.index');
+    Route::post('/collection-groups', [CollectionGroupController::class, 'store'])->name('collection-groups.store');
+    Route::get('/collection-groups/{collectionGroup}/edit', [CollectionGroupController::class, 'edit'])->name('collection-groups.edit');
+    Route::put('/collection-groups/{collectionGroup}', [CollectionGroupController::class, 'update'])->name('collection-groups.update');
+    Route::delete('/collection-groups/{collectionGroup}', [CollectionGroupController::class, 'destroy'])->name('collection-groups.destroy');
+
+    Route::post('/collection-groups/{collectionGroup}/collections', [CollectionGroupCollectionController::class, 'store'])->name('collection-groups.collections.store');
+    Route::delete('/collection-groups/{collectionGroup}/collections/{collection}', [CollectionGroupCollectionController::class, 'destroy'])->name('collection-groups.collections.destroy');
 });

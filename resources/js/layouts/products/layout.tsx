@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { edit } from '@/routes/admin/products';
+import { index as collectionsIndex } from '@/routes/admin/products/collections';
 import { index as productIdentifiersIndex } from '@/routes/admin/products/identifiers';
 import { index as inventoryIndex } from '@/routes/admin/products/inventory';
 import { index as mediaIndex } from '@/routes/admin/products/media';
@@ -39,6 +40,11 @@ export default function ProductsLayout({
         {
             title: 'Variants',
             href: variantIndex(id_record),
+            icon: null,
+        },
+        {
+            title: 'Collections',
+            href: collectionsIndex(id_record),
             icon: null,
         },
     ];

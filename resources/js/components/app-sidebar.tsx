@@ -3,6 +3,7 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as indexCollectionGroups } from '@/routes/admin/collection-groups';
 import { index as indexNews } from '@/routes/admin/news';
 import { index as indexProducts } from '@/routes/admin/products';
 import { index as indexUsers } from '@/routes/admin/users';
@@ -78,6 +79,10 @@ const managementNavItems: NavItem[] = [
             {
                 title: 'Products',
                 href: indexProducts(),
+            },
+            {
+                title: 'Collection Groups',
+                href: indexCollectionGroups(),
             },
         ],
     },
