@@ -8,6 +8,8 @@ use App\Http\Requests\Admin\UserUpdateRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Lunar\Models\Customer;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -45,6 +47,13 @@ class UserController extends Controller
 
         $user = User::create($validated);
 
+        $customer = Customer::create([
+            'first_name' => Str::before($validated['name'], ' '),
+            'last_name' => Str::afterLast($validated['name'], ' '),
+        ]);
+
+        $customer->users()->attach($user->id);
+
         return to_route('admin.users.show', $user->id)->with('success', 'User created successfully.');
     }
 
@@ -76,6 +85,13 @@ class UserController extends Controller
         $validated = $request->validated();
 
         $user->update($validated);
+
+        $customer = $user->customers()->first();
+        if ($customer) {
+            $customer->first_name = Str::before($validated['name'], ' ');
+            $customer->last_name = Str::afterLast($validated['name'], ' ');
+            $customer->save();
+        }
 
         return to_route('admin.users.show', $user->id)->with('success', 'User updated successfully.');
     }
