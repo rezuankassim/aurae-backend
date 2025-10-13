@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { index } from '@/routes/address';
@@ -48,13 +47,13 @@ export default function EditAddress({
     );
 
     const [isDefault, setIsDefault] = useState(false);
-    const [type, setType] = useState<'0' | '1' | '2'>('0');
+    const [isBillingDefault, setIsBillingDefault] = useState(false);
 
     useEffect(() => {
-        onCountryChange(address.country);
-        setIsDefault(address.is_default);
-        setType(address.type.toString() as '0' | '1' | '2');
-    }, [address.country, onCountryChange, address.is_default, address.type]);
+        onCountryChange(address.country.iso3);
+        setIsDefault(address.shipping_default);
+        setIsBillingDefault(address.billing_default);
+    }, [address.country, onCountryChange, address.shipping_default, address.billing_default]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -71,15 +70,28 @@ export default function EditAddress({
                         }}
                         resetOnSuccess
                         className="space-y-6"
-                        transform={(data) => ({ ...data, type: parseInt(type), is_default: isDefault })}
+                        transform={(data) => ({ ...data, is_default: isDefault, is_billing_default: isBillingDefault })}
                     >
                         {({ processing, errors }) => (
                             <>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="title">Title</Label>
+
+                                    <Input id="title" name="title" placeholder="Title" defaultValue={address.title || ''} />
+
+                                    <InputError message={errors.title} />
+                                </div>
+
                                 <div className="grid grid-flow-col gap-2">
                                     <div className="grid gap-2">
                                         <Label htmlFor="name">Full name</Label>
 
-                                        <Input id="name" name="name" placeholder="Full name" defaultValue={address.name} />
+                                        <Input
+                                            id="name"
+                                            name="name"
+                                            placeholder="Full name"
+                                            defaultValue={address.first_name + ' ' + address.last_name}
+                                        />
 
                                         <InputError message={errors.name} />
                                     </div>
@@ -87,7 +99,7 @@ export default function EditAddress({
                                     <div className="grid gap-2">
                                         <Label htmlFor="phone">Phone number</Label>
 
-                                        <Input id="phone" name="phone" placeholder="Phone number" defaultValue={address.phone} />
+                                        <Input id="phone" name="phone" placeholder="Phone number" defaultValue={address.contact_phone} />
 
                                         <InputError message={errors.phone} />
                                     </div>
@@ -96,7 +108,7 @@ export default function EditAddress({
                                 <div className="grid gap-2">
                                     <Label htmlFor="line1">Line 1</Label>
 
-                                    <Input id="line1" name="line1" placeholder="Line 1" defaultValue={address.line1} />
+                                    <Input id="line1" name="line1" placeholder="Line 1" defaultValue={address.line_one} />
 
                                     <InputError message={errors.line1} />
                                 </div>
@@ -104,7 +116,7 @@ export default function EditAddress({
                                 <div className="grid gap-2">
                                     <Label htmlFor="line2">Line 2</Label>
 
-                                    <Input id="line2" name="line2" placeholder="Line 2" defaultValue={address.line2 || ''} />
+                                    <Input id="line2" name="line2" placeholder="Line 2" defaultValue={address.line_two || ''} />
 
                                     <InputError message={errors.line2} />
                                 </div>
@@ -112,7 +124,7 @@ export default function EditAddress({
                                 <div className="grid gap-2">
                                     <Label htmlFor="line3">Line 3 (Optional)</Label>
 
-                                    <Input id="line3" name="line3" placeholder="Line 3" defaultValue={address.line3 || ''} />
+                                    <Input id="line3" name="line3" placeholder="Line 3" defaultValue={address.line_three || ''} />
 
                                     <InputError message={errors.line3} />
                                 </div>
@@ -121,7 +133,7 @@ export default function EditAddress({
                                     <div className="grid gap-2">
                                         <Label htmlFor="postal_code">Postcode</Label>
 
-                                        <Input id="postal_code" name="postal_code" placeholder="Postcode" defaultValue={address.postal_code} />
+                                        <Input id="postal_code" name="postal_code" placeholder="Postcode" defaultValue={address.postcode} />
 
                                         <InputError message={errors.postal_code} />
                                     </div>
@@ -138,7 +150,7 @@ export default function EditAddress({
                                 <div className="grid gap-2">
                                     <Label htmlFor="country">Country</Label>
 
-                                    <Select name="country" onValueChange={onCountryChange} defaultValue={address.country}>
+                                    <Select name="country" onValueChange={onCountryChange} defaultValue={address.country.iso3}>
                                         <SelectTrigger id="country">
                                             <SelectValue placeholder="Select country" />
                                         </SelectTrigger>
@@ -174,25 +186,15 @@ export default function EditAddress({
                                 </div>
 
                                 <div className="flex items-center justify-between">
-                                    <Label htmlFor="default">Set as Default Address</Label>
+                                    <Label htmlFor="default">Set as Shipping Default Address</Label>
 
                                     <Switch checked={isDefault} onCheckedChange={(checked) => setIsDefault(checked)} />
                                 </div>
 
                                 <div className="flex items-center justify-between">
-                                    <Label htmlFor="type">Label As</Label>
+                                    <Label htmlFor="default">Set as Billing Default Address</Label>
 
-                                    <ToggleGroup value={type} onValueChange={(type) => setType(type as '0' | '1' | '2')} type="single">
-                                        <ToggleGroupItem value="0" aria-label="Home">
-                                            Home
-                                        </ToggleGroupItem>
-                                        <ToggleGroupItem value="1" aria-label="Work">
-                                            Work
-                                        </ToggleGroupItem>
-                                        <ToggleGroupItem value="2" aria-label="Other">
-                                            Other
-                                        </ToggleGroupItem>
-                                    </ToggleGroup>
+                                    <Switch checked={isBillingDefault} onCheckedChange={(checked) => setIsBillingDefault(checked)} />
                                 </div>
 
                                 <Button disabled={processing} asChild>

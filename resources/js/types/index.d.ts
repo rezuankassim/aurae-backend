@@ -49,23 +49,28 @@ export interface User {
 
 export interface Address {
     id: number;
-    is_default: boolean;
-    type: string;
-    name: string;
-    phone: string;
-    line1: string;
-    line2: string | null;
-    line3: string | null;
+    shipping_default: boolean;
+    billing_default: boolean;
+    title: string | null;
+    delivery_instructions: string | null;
+    first_name: string;
+    last_name: string;
+    contact_email: string;
+    contact_phone: string;
+    line_one: string;
+    line_two: string | null;
+    line_three: string | null;
     city: string;
     state: string | null;
-    postal_code: string;
-    country: string;
+    postcode: string;
+    country: { id: number; name: string; iso3: string; iso3: string };
     user_id: number;
     country_label: string;
     state_label: string;
     type_label: string;
     created_at: string;
     updated_at: string;
+    stateData: { id: number; name: string; code: string; country_id: number };
     [key: string]: unknown; // This allows for additional properties...
 }
 

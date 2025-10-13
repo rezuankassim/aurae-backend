@@ -12,9 +12,8 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { index } from '@/routes/address';
@@ -46,7 +45,7 @@ export default function Appearance({
 
     const [newAddressModalOpen, setNewAddressModalOpen] = useState(false);
     const [isDefault, setIsDefault] = useState(false);
-    const [type, setType] = useState<'0' | '1' | '2'>('0');
+    const [isBillingDefault, setIsBillingDefault] = useState(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -73,128 +72,148 @@ export default function Appearance({
                                     resetOnSuccess
                                     onSuccess={() => setNewAddressModalOpen(false)}
                                     className="space-y-6"
-                                    transform={(data) => ({ ...data, type: parseInt(type), is_default: isDefault })}
+                                    transform={(data) => ({ ...data, is_default: isDefault, is_billing_default: isBillingDefault })}
                                 >
                                     {({ resetAndClearErrors, processing, errors }) => (
                                         <>
-                                            <div className="flex items-center gap-2">
+                                            <div className="max-h-[560px] space-y-6 overflow-y-auto">
                                                 <div className="grid gap-2">
-                                                    <Label htmlFor="name">Full name</Label>
+                                                    <Label htmlFor="title">Title</Label>
 
-                                                    <Input id="name" name="name" placeholder="Full name" />
+                                                    <Input id="title" name="title" placeholder="Title" />
 
-                                                    <InputError message={errors.name} />
+                                                    <InputError message={errors.title} />
+                                                </div>
+
+                                                <div className="flex items-center gap-2">
+                                                    <div className="grid gap-2">
+                                                        <Label htmlFor="name">Full name</Label>
+
+                                                        <Input id="name" name="name" placeholder="Full name" />
+
+                                                        <InputError message={errors.name} />
+                                                    </div>
+
+                                                    <div className="grid gap-2">
+                                                        <Label htmlFor="phone">Phone number</Label>
+
+                                                        <Input id="phone" name="phone" placeholder="Phone number" />
+
+                                                        <InputError message={errors.phone} />
+                                                    </div>
                                                 </div>
 
                                                 <div className="grid gap-2">
-                                                    <Label htmlFor="phone">Phone number</Label>
+                                                    <Label htmlFor="email">Email Address</Label>
 
-                                                    <Input id="phone" name="phone" placeholder="Phone number" />
+                                                    <Input id="email" name="email" placeholder="Email Address" />
 
-                                                    <InputError message={errors.phone} />
-                                                </div>
-                                            </div>
-
-                                            <div className="grid gap-2">
-                                                <Label htmlFor="line1">Line 1</Label>
-
-                                                <Input id="line1" name="line1" placeholder="Line 1" />
-
-                                                <InputError message={errors.line1} />
-                                            </div>
-
-                                            <div className="grid gap-2">
-                                                <Label htmlFor="line2">Line 2</Label>
-
-                                                <Input id="line2" name="line2" placeholder="Line 2" />
-
-                                                <InputError message={errors.line2} />
-                                            </div>
-
-                                            <div className="grid gap-2">
-                                                <Label htmlFor="line3">Line 3 (Optional)</Label>
-
-                                                <Input id="line3" name="line3" placeholder="Line 3" />
-
-                                                <InputError message={errors.line3} />
-                                            </div>
-
-                                            <div className="flex items-center gap-2">
-                                                <div className="grid gap-2">
-                                                    <Label htmlFor="postal_code">Postcode</Label>
-
-                                                    <Input id="postal_code" name="postal_code" placeholder="Postcode" />
-
-                                                    <InputError message={errors.postal_code} />
+                                                    <InputError message={errors.email} />
                                                 </div>
 
                                                 <div className="grid gap-2">
-                                                    <Label htmlFor="city">City</Label>
+                                                    <Label htmlFor="line1">Line 1</Label>
 
-                                                    <Input id="city" name="city" placeholder="City" />
+                                                    <Input id="line1" name="line1" placeholder="Line 1" />
 
-                                                    <InputError message={errors.city} />
+                                                    <InputError message={errors.line1} />
                                                 </div>
-                                            </div>
 
-                                            <div className="grid gap-2">
-                                                <Label htmlFor="country">Country</Label>
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="line2">Line 2</Label>
 
-                                                <Select name="country" onValueChange={onCountryChange}>
-                                                    <SelectTrigger id="country">
-                                                        <SelectValue placeholder="Select country" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {countries.map((country) => (
-                                                            <SelectItem key={country.code} value={country.code}>
-                                                                {country.name}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                                    <Input id="line2" name="line2" placeholder="Line 2" />
 
-                                                <InputError message={errors.country} />
-                                            </div>
+                                                    <InputError message={errors.line2} />
+                                                </div>
 
-                                            <div className="grid gap-2">
-                                                <Label htmlFor="state">State</Label>
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="line3">Line 3 (Optional)</Label>
 
-                                                <Select name="state">
-                                                    <SelectTrigger id="state">
-                                                        <SelectValue placeholder="Select state" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {states.map((state) => (
-                                                            <SelectItem key={state.state_code} value={state.state_code}>
-                                                                {state.name}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                                    <Input id="line3" name="line3" placeholder="Line 3" />
 
-                                                <InputError message={errors.state} />
-                                            </div>
+                                                    <InputError message={errors.line3} />
+                                                </div>
 
-                                            <div className="flex items-center justify-between">
-                                                <Label htmlFor="default">Set as Default Address</Label>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="grid gap-2">
+                                                        <Label htmlFor="postal_code">Postcode</Label>
 
-                                                <Switch checked={isDefault} onCheckedChange={(checked) => setIsDefault(checked)} />
-                                            </div>
+                                                        <Input id="postal_code" name="postal_code" placeholder="Postcode" />
 
-                                            <div className="flex items-center justify-between">
-                                                <Label htmlFor="type">Label As</Label>
+                                                        <InputError message={errors.postal_code} />
+                                                    </div>
 
-                                                <ToggleGroup value={type} onValueChange={(type) => setType(type as '0' | '1' | '2')} type="single">
-                                                    <ToggleGroupItem value="0" aria-label="Home">
-                                                        Home
-                                                    </ToggleGroupItem>
-                                                    <ToggleGroupItem value="1" aria-label="Work">
-                                                        Work
-                                                    </ToggleGroupItem>
-                                                    <ToggleGroupItem value="2" aria-label="Other">
-                                                        Other
-                                                    </ToggleGroupItem>
-                                                </ToggleGroup>
+                                                    <div className="grid gap-2">
+                                                        <Label htmlFor="city">City</Label>
+
+                                                        <Input id="city" name="city" placeholder="City" />
+
+                                                        <InputError message={errors.city} />
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="country">Country</Label>
+
+                                                    <Select name="country" onValueChange={onCountryChange}>
+                                                        <SelectTrigger id="country">
+                                                            <SelectValue placeholder="Select country" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {countries.map((country) => (
+                                                                <SelectItem key={country.code} value={country.code}>
+                                                                    {country.name}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+
+                                                    <InputError message={errors.country} />
+                                                </div>
+
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="state">State</Label>
+
+                                                    <Select name="state">
+                                                        <SelectTrigger id="state">
+                                                            <SelectValue placeholder="Select state" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {states.map((state) => (
+                                                                <SelectItem key={state.state_code} value={state.state_code}>
+                                                                    {state.name}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+
+                                                    <InputError message={errors.state} />
+                                                </div>
+
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="delivery_instruction">Delivery Instruction</Label>
+
+                                                    <Textarea
+                                                        id="delivery_instruction"
+                                                        name="delivery_instruction"
+                                                        placeholder="Delivery Instruction"
+                                                    />
+
+                                                    <InputError message={errors.delivery_instruction} />
+                                                </div>
+
+                                                <div className="flex items-center justify-between">
+                                                    <Label htmlFor="default">Set as Shipping Default Address</Label>
+
+                                                    <Switch checked={isDefault} onCheckedChange={(checked) => setIsDefault(checked)} />
+                                                </div>
+
+                                                <div className="flex items-center justify-between">
+                                                    <Label htmlFor="default">Set as Billing Default Address</Label>
+
+                                                    <Switch checked={isBillingDefault} onCheckedChange={(checked) => setIsBillingDefault(checked)} />
+                                                </div>
                                             </div>
 
                                             <DialogFooter className="gap-2">
@@ -223,9 +242,9 @@ export default function Appearance({
                                 <CardHeader>
                                     <CardTitle className="flex items-center justify-between">
                                         <div className="grid grid-flow-col items-center gap-2">
-                                            <span>{address.name}</span>
-                                            <Separator orientation="vertical" />
-                                            <span>{address.phone}</span>
+                                            <div className="flex">
+                                                <span>{address.title}</span>
+                                            </div>
                                         </div>
 
                                         <div className="flex items-center gap-2">
@@ -254,16 +273,20 @@ export default function Appearance({
                                         </div>
                                     </CardTitle>
                                     <CardContent className="px-0 text-sm text-muted-foreground">
-                                        <p>{address.line1}</p>
-                                        {address.line2 && <p>{address.line2}</p>}
-                                        {address.line3 && <p>{address.line3}</p>}
                                         <p>
-                                            {address.postal_code}, {address.city}, {address.state_label}, {address.country_label}
+                                            {address.first_name} {address.last_name}
+                                        </p>
+                                        <p>{address.contact_phone}</p>
+                                        <p>{address.line_one}</p>
+                                        {address.line_two && <p>{address.line_two}</p>}
+                                        {address.line_three && <p>{address.line_three}</p>}
+                                        <p>
+                                            {address.postcode}, {address.city}, {address.stateData.name}, {address.country.name}
                                         </p>
 
                                         <div className="mt-2 flex items-center gap-2">
-                                            {address.is_default ? <Badge variant="default">Default</Badge> : null}
-                                            <Badge variant="outline">{address.type_label}</Badge>
+                                            {address.shipping_default ? <Badge variant="default">Shipping Default</Badge> : null}
+                                            {address.billing_default ? <Badge variant="secondary">Billing Default</Badge> : null}
                                         </div>
                                     </CardContent>
                                 </CardHeader>
