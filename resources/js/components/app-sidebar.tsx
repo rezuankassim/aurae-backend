@@ -8,6 +8,7 @@ import { index as indexKnowledge } from '@/routes/admin/knowledge';
 import { index as indexNews } from '@/routes/admin/news';
 import { index as indexProducts } from '@/routes/admin/products';
 import { edit as editSocialMedia } from '@/routes/admin/social-media';
+import { index as indexTherapies } from '@/routes/admin/therapies';
 import { index as indexUsers } from '@/routes/admin/users';
 import { index as indexDeviceMaintenance } from '@/routes/device-maintenance';
 import { index } from '@/routes/devices';
@@ -18,6 +19,7 @@ import { index as indexUsageHistory } from '@/routes/usage-history';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
+    BookHeart,
     BookOpenText,
     Construction,
     FileBox,
@@ -79,6 +81,11 @@ const managementNavItems: NavItem[] = [
         title: 'Users',
         href: indexUsers(),
         icon: UsersIcon,
+    },
+    {
+        title: 'Therapies',
+        href: indexTherapies(),
+        icon: BookHeart,
     },
     {
         title: 'News',

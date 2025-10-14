@@ -47,6 +47,21 @@ export interface User {
     [key: string]: unknown; // This allows for additional properties...
 }
 
+export interface Therapy {
+    id: number;
+    image: string | null;
+    name: string;
+    description: string | null;
+    music: string;
+    configuration: Record<string, string>;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    image_url?: string | null;
+    music_url?: string | null;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
 export interface Address {
     id: number;
     shipping_default: boolean;

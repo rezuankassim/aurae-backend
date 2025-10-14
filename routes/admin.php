@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ProductInventoryController;
 use App\Http\Controllers\Admin\ProductMediaController;
 use App\Http\Controllers\Admin\ProductPricingController;
 use App\Http\Controllers\Admin\ProductVariantController;
+use App\Http\Controllers\Admin\TherapyController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserLoginActivityController;
 use App\Http\Middleware\EnsureIsAdmin;
@@ -82,4 +83,11 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/knowledge/{knowledge}/edit', [KnowledgeController::class, 'edit'])->name('knowledge.edit');
     Route::put('/knowledge/{knowledge}', [KnowledgeController::class, 'update'])->name('knowledge.update');
     Route::delete('/knowledge/{knowledge}', [KnowledgeController::class, 'destroy'])->name('knowledge.destroy');
+
+    Route::get('/therapies', [TherapyController::class, 'index'])->name('therapies.index');
+    Route::get('/therapies/create', [TherapyController::class, 'create'])->name('therapies.create');
+    Route::post('/therapies', [TherapyController::class, 'store'])->name('therapies.store');
+    Route::get('/therapies/{therapy}/edit', [TherapyController::class, 'edit'])->name('therapies.edit');
+    Route::put('/therapies/{therapy}', [TherapyController::class, 'update'])->name('therapies.update');
+    Route::delete('/therapies/{therapy}', [TherapyController::class, 'destroy'])->name('therapies.destroy');
 });
