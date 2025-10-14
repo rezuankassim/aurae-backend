@@ -1,3 +1,7 @@
+### Deployments
+
+[![Laravel Forge Site Deployment Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fforge.laravel.com%2Fsite-badges%2F7bd8e650-b574-4ea8-9991-2771ed050e7d&style=plastic)](https://forge.laravel.com/rezuan-kassim/aurae-backend/2857918)
+
 ### Modules
 
 1. [x] Authentication Module
