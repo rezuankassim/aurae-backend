@@ -5,7 +5,7 @@ import { Form, Head } from '@inertiajs/react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { create, index } from '@/routes/admin/news';
+import { create, index } from '@/routes/admin/knowledge';
 
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -22,11 +22,11 @@ import dayjs from 'dayjs';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'News',
+        title: 'Knowledge Center Management',
         href: index().url,
     },
     {
-        title: 'Create news',
+        title: 'Create knowledge',
         href: create().url,
     },
 ];

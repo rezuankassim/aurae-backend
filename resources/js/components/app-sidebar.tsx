@@ -4,6 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as indexCollectionGroups } from '@/routes/admin/collection-groups';
+import { index as indexFAQs } from '@/routes/admin/faqs';
 import { index as indexKnowledge } from '@/routes/admin/knowledge';
 import { index as indexNews } from '@/routes/admin/news';
 import { index as indexProducts } from '@/routes/admin/products';
@@ -25,6 +26,7 @@ import {
     FileBox,
     FileClock,
     LayoutGrid,
+    MessageCircleQuestion,
     Newspaper,
     ShoppingBag,
     TabletSmartphone,
@@ -115,6 +117,11 @@ const managementNavItems: NavItem[] = [
         title: 'Knowledge Center Management',
         href: indexKnowledge(),
         icon: BookOpenText,
+    },
+    {
+        title: 'FAQs',
+        href: indexFAQs(),
+        icon: MessageCircleQuestion,
     },
 ];
 

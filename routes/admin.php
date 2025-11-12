@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CollectionGroupCollectionController;
 use App\Http\Controllers\Admin\CollectionGroupController;
+use App\Http\Controllers\Admin\FAQController;
 use App\Http\Controllers\Admin\KnowledgeController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\ProductCollectionController;
@@ -90,4 +91,12 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/therapies/{therapy}/edit', [TherapyController::class, 'edit'])->name('therapies.edit');
     Route::put('/therapies/{therapy}', [TherapyController::class, 'update'])->name('therapies.update');
     Route::delete('/therapies/{therapy}', [TherapyController::class, 'destroy'])->name('therapies.destroy');
+
+    Route::get('/faqs', [FAQController::class, 'index'])->name('faqs.index');
+    Route::get('/faqs/create', [FAQController::class, 'create'])->name('faqs.create');
+    Route::post('/faqs', [FAQController::class, 'store'])->name('faqs.store');
+    Route::get('/faqs/{faq}', [FAQController::class, 'show'])->name('faqs.show');
+    Route::get('/faqs/{faq}/edit', [FAQController::class, 'edit'])->name('faqs.edit');
+    Route::put('/faqs/{faq}', [FAQController::class, 'update'])->name('faqs.update');
+    Route::delete('/faqs/{faq}', [FAQController::class, 'destroy'])->name('faqs.destroy');
 });
