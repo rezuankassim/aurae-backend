@@ -5,15 +5,17 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 use Lunar\Base\LunarUser as LunarUserInterface;
 use Lunar\Base\Traits\LunarUser;
 
 class User extends Authenticatable implements LunarUserInterface
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, LunarUser;
+    use HasApiTokens, HasFactory, Notifiable, LunarUser;
 
     /**
      * The attributes that are mass assignable.
@@ -66,5 +68,13 @@ class User extends Authenticatable implements LunarUserInterface
     public function healthReports(): HasMany
     {
         return $this->hasMany(HealthReport::class);
+    }
+
+    /**
+     * Get the devices associated with the user.
+     */
+    public function userDevices(): MorphMany
+    {
+        return $this->morphMany(UserDevice::class, 'deviceable');
     }
 }
