@@ -32,6 +32,22 @@ class AuthenticationController extends Controller
         ]);
 
         $user->token = $user->createToken($request->device->udid)->plainTextToken;
-        return BaseResource::make($user);
+        return BaseResource::make($user)
+            ->additional([
+                'status' => 200,
+                'message' => 'Login successful.',
+            ]);
+    }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        $user->currentAccessToken()->delete();
+
+        return BaseResource::make(null)
+            ->additional([
+                'status' => 200,
+                'message' => 'Logout successful.',
+            ]);
     }
 }

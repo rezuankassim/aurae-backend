@@ -32,8 +32,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (Throwable $exception, Request $request) {
             if ($request->is('api/*')) {
                 return BaseResource::make([])
-                    ->setStatusCode(500)
-                    ->setMessage($exception->getMessage())
+                    ->additional([
+                        'status' => 500,
+                        'message' => $exception->getMessage(),
+                    ])
                     ->response();
             }
         });

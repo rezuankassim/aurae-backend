@@ -7,9 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class BaseResource extends JsonResource
 {
-    protected $status = 200;
-    protected $message = 'Success';
-
     /**
      * Transform the resource into an array.
      *
@@ -18,35 +15,6 @@ class BaseResource extends JsonResource
     public function toArray(Request $request): array
     {
         return parent::toArray($request);
-    }
-
-    /**
-     * Get additional data that should be returned with the resource array.
-     *
-     * @return array<string, mixed>
-     */
-    public function with(Request $request): array
-    {
-        return [
-            'meta' => [
-                'status' => $this->status ?? null,
-                'message' => $this->message ?? null,
-            ],
-        ];
-    }
-
-    public function setStatusCode(int $statusCode): static
-    {
-        $this->status = $statusCode;
-
-        return $this;
-    }
-
-    public function setMessage(string $message): static
-    {
-        $this->message = $message;
-
-        return $this;
     }
 
     public function toResponse($request)
