@@ -23,12 +23,14 @@ class User extends Authenticatable implements LunarUserInterface
      * @var list<string>
      */
     protected $fillable = [
+        'username',
         'is_admin',
         'name',
         'email',
         'password',
         'phone',
-        'status'
+        'status',
+        'phone_verified_at',
     ];
 
     /**
@@ -50,6 +52,7 @@ class User extends Authenticatable implements LunarUserInterface
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }

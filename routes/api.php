@@ -24,4 +24,7 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
     });
 
     Route::post('/login', [AuthenticationController::class, 'login'])->name('api.login');
+    Route::post('/register', [AuthenticationController::class, 'register'])->name('api.register');
+    Route::post('/send-verify', [AuthenticationController::class, 'sendVerify'])->name('api.send_verify');
+    Route::post('/verify-phone', [AuthenticationController::class, 'verifyPhone'])->name('api.verify_phone');
 });
