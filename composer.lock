@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8a80191b50b2a0ffbaf8ea9a30bf8965",
+    "content-hash": "42618e6b65bcb9430cfa13090d9dea02",
     "packages": [
         {
             "name": "algolia/algoliasearch-client-php",
@@ -10942,6 +10942,82 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.3.0"
             },
             "time": "2024-12-21T16:25:41+00:00"
+        },
+        {
+            "name": "tuncaybahadir/quar",
+            "version": "1.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tuncaybahadir/quar.git",
+                "reference": "4f46bb7e6b9979c294f423830408846b402e7ab0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tuncaybahadir/quar/zipball/4f46bb7e6b9979c294f423830408846b402e7ab0",
+                "reference": "4f46bb7e6b9979c294f423830408846b402e7ab0",
+                "shasum": ""
+            },
+            "require": {
+                "bacon/bacon-qr-code": "^3.0",
+                "ext-gd": "*",
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.26",
+                "roave/security-advisories": "dev-latest"
+            },
+            "suggest": {
+                "ext-imagick": "Allows the generation of PNG QrCodes.",
+                "illuminate/support": "Allows for use within Laravel."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Quar": "tbQuar\\Facades\\Quar"
+                    },
+                    "providers": [
+                        "tbQuar\\QuarServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "tbQuar\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tuncay Bahadır",
+                    "email": "tuncaybahadir@protonmail.com"
+                }
+            ],
+            "description": "A simple QR Code generation tool for your projects with Laravel 10, 11, 12 versions, php 8.2, 8.3, 8.4 and 8.5",
+            "homepage": "https://github.com/tuncaybahadir/quar",
+            "keywords": [
+                "generator",
+                "laravel",
+                "laravel 10",
+                "laravel 11",
+                "laravel 12",
+                "php",
+                "php 8.2",
+                "php 8.3",
+                "php 8.4",
+                "php 8.5",
+                "qr",
+                "qrcode",
+                "quar"
+            ],
+            "support": {
+                "issues": "https://github.com/tuncaybahadir/quar/issues",
+                "source": "https://github.com/tuncaybahadir/quar/tree/1.7.0"
+            },
+            "time": "2025-11-27T20:05:11+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

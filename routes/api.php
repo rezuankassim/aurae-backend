@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthenticationController;
+use App\Http\Controllers\Api\DeviceController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Middleware\EnsureDevice;
 use App\Http\Resources\BaseResource;
@@ -21,10 +22,14 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
 
         Route::get('/faqs', [FaqController::class, 'index'])->name('api.faqs.index');
         Route::get('/faqs/{faq}', [FaqController::class, 'show'])->name('api.faqs.show');
+
+        Route::get('/device-login', [DeviceController::class, 'login'])->name('api.device.login');
     });
 
     Route::post('/login', [AuthenticationController::class, 'login'])->name('api.login');
     Route::post('/register', [AuthenticationController::class, 'register'])->name('api.register');
     Route::post('/send-verify', [AuthenticationController::class, 'sendVerify'])->name('api.send_verify');
     Route::post('/verify-phone', [AuthenticationController::class, 'verifyPhone'])->name('api.verify_phone');
+
+    Route::get('/device-retrieve', [DeviceController::class, 'retrieve'])->name('api.device.retrieve');
 });
