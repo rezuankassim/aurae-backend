@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\DeviceResource;
 use App\Models\Device;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\RecordNotFoundException;
@@ -50,7 +51,11 @@ class DeviceController extends Controller
             'last_logged_in_at' => now(),
         ]);
 
-        return BaseResource::make(null)
+        // Pass user token to device
+        $token = $request->user()->createToken($device->uuid)->plainTextToken;
+        $device->token = $token;
+
+        return DeviceResource::make($device)
             ->additional([
                 'status' => 200,
                 'message' => 'Device logged in successfully.',

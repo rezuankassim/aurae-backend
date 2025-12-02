@@ -18,8 +18,8 @@ class DeviceSeeder extends Seeder
             'status' => 1,
             'uuid' => '86a2a25a-0eea-4f72-a4a5-79dcf01d4973',
             'name' => 'Olive MD v2',
-            'started_at' => '20/5/2025',
-            'should_end_at' => '21/5/2026',
+            'started_at' => '2025-05-20',
+            'should_end_at' => '2026-05-21',
             'last_used_at' => now(),
             'last_logged_in_at' => now(),
         ]);

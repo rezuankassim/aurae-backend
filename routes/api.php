@@ -23,7 +23,7 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
         Route::get('/faqs', [FaqController::class, 'index'])->name('api.faqs.index');
         Route::get('/faqs/{faq}', [FaqController::class, 'show'])->name('api.faqs.show');
 
-        Route::get('/device-login', [DeviceController::class, 'login'])->name('api.device.login');
+        Route::post('/device-login', [DeviceController::class, 'login'])->name('api.device.login');
     });
 
     Route::post('/login', [AuthenticationController::class, 'login'])->name('api.login');
