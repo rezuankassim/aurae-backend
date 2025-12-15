@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\TherapyCreateRequest;
 use App\Http\Requests\Admin\TherapyUpdateRequest;
 use App\Models\Therapy;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 

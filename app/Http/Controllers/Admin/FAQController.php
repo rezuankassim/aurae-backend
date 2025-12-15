@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\FaqCreateRequest;
 use App\Http\Requests\Admin\FaqUpdateRequest;
 use App\Models\Faq;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class FAQController extends Controller

@@ -5,9 +5,7 @@ namespace App\Http\Middleware;
 use App\Http\Resources\BaseResource;
 use App\Models\UserDevice;
 use Closure;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Validation\UnauthorizedException;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureDevice
@@ -23,9 +21,9 @@ class EnsureDevice
 
         if (empty($deviceUdid)) {
             return BaseResource::make(null)
-                    ->setStatusCode(400)
-                    ->setMessage('You need to specify your device details.')
-                    ->response();
+                ->setStatusCode(400)
+                ->setMessage('You need to specify your device details.')
+                ->response();
         }
 
         // We save the device details

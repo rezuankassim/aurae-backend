@@ -8,7 +8,7 @@ class Knowledge extends Model
 {
     /**
      * The attributes that are mass assignable.
-     * 
+     *
      * @var list<string>
      */
     protected $fillable = [
@@ -16,6 +16,7 @@ class Knowledge extends Model
         'content',
         'html_content',
         'video_url',
+        'video_path',
         'is_published',
         'published_at',
     ];

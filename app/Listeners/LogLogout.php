@@ -3,8 +3,6 @@
 namespace App\Listeners;
 
 use App\Models\LoginActivity;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
 class LogLogout
 {
@@ -33,14 +31,14 @@ class LogLogout
 
         // Also record a logout event row (optional)
         LoginActivity::create([
-            'user_id'    => optional($event->user)->id,
-            'event'      => 'logout',
-            'guard'      => $event->guard ?? null,
+            'user_id' => optional($event->user)->id,
+            'event' => 'logout',
+            'guard' => $event->guard ?? null,
             'session_id' => $sessionId,
             'ip_address' => request()->ip(),
             'user_agent' => substr(request()->userAgent() ?? '', 0, 500),
-            'succeeded'  => true,
-            'occurred_at'=> now(),
+            'succeeded' => true,
+            'occurred_at' => now(),
         ]);
     }
 }

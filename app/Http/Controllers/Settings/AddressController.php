@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\AddressCreateRequest;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Inertia\Inertia;
-use Lunar\Models\Country;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 use Lunar\Models\Address;
+use Lunar\Models\Country;
 use Lunar\Models\State;
 
 class AddressController extends Controller
@@ -39,6 +37,7 @@ class AddressController extends Controller
 
         $addresses->map(function ($address) {
             $address->stateData = State::where('code', $address->state)->where('country_id', $address->country_id)->first();
+
             return $address;
         });
 
@@ -128,7 +127,7 @@ class AddressController extends Controller
             'contact_phone' => $validated['phone'],
             'shipping_default' => $validated['is_default'] ?? false,
             'billing_default' => $validated['is_billing_default'] ?? false,
-        ]);;
+        ]);
 
         return to_route('address.index')->with('success', 'Address updated successfully');
     }

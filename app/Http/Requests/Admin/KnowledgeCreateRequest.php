@@ -28,6 +28,7 @@ class KnowledgeCreateRequest extends FormRequest
             'published_date' => ['nullable', 'date'],
             'published_time' => ['nullable', 'string'],
             'video_url' => ['nullable', 'url', 'max:255'],
+            'video' => ['nullable', 'file', 'mimes:mp4,mov,avi,wmv,flv,mkv,webm', 'max:5242880'], // 5GB = 5242880 KB
         ];
     }
 }

@@ -64,7 +64,7 @@ class ProductController extends Controller
             'product_type_id' => $request->type,
             'attribute_data' => [
                 'name' => new $nameAttribute(collect([
-                    'en' => new Text($request->name)
+                    'en' => new Text($request->name),
                 ])),
             ],
         ]);
@@ -115,15 +115,15 @@ class ProductController extends Controller
             'product_type_id' => $validated['type'],
             'attribute_data' => [
                 'name' => new TranslatedText(collect([
-                    'en' => new Text($validated['name'])
+                    'en' => new Text($validated['name']),
                 ])),
                 'description' => new TranslatedText(collect([
-                    'en' => new Text($htmlDescription)
+                    'en' => new Text($htmlDescription),
                 ])),
                 'ori_description' => new TranslatedText(collect([
-                    'en' => new Text($description)
+                    'en' => new Text($description),
                 ])),
-            ]
+            ],
         ]);
 
         return to_route('admin.products.index')->with('success', 'Product updated successfully');

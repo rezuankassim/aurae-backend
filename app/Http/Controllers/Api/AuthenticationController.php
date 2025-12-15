@@ -20,7 +20,7 @@ class AuthenticationController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
- 
+
         if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
@@ -33,6 +33,7 @@ class AuthenticationController extends Controller
         ]);
 
         $user->token = $user->createToken($request->device->udid)->plainTextToken;
+
         return BaseResource::make($user)
             ->additional([
                 'status' => 200,
@@ -65,6 +66,7 @@ class AuthenticationController extends Controller
         ]);
 
         $user->token = $user->createToken($request->device->udid)->plainTextToken;
+
         return BaseResource::make($user)
             ->additional([
                 'status' => 200,
@@ -97,8 +99,8 @@ class AuthenticationController extends Controller
 
         // Verify the phone number (e.g., send a verification code) here.
         return BaseResource::make([
-                'code' => Verification::where('phone', $request->phone)->first()->code,
-            ])
+            'code' => Verification::where('phone', $request->phone)->first()->code,
+        ])
             ->additional([
                 'status' => 200,
                 'message' => 'Phone verification initiated.',

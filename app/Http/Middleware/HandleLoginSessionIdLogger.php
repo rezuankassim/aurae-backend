@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
 use App\Models\LoginActivity;
+use Closure;
 
 class HandleLoginSessionIdLogger
 {
@@ -14,7 +14,9 @@ class HandleLoginSessionIdLogger
 
     public function terminate($request, $response)
     {
-        if (!auth()->check()) return; // only if user is now logged in
+        if (! auth()->check()) {
+            return;
+        } // only if user is now logged in
 
         $finalSid = $request->session()->getId();
 

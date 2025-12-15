@@ -41,7 +41,7 @@ class DeviceMaintenanceController extends Controller
 
         DeviceMaintenance::create([
             'status' => 1, // pending_factory
-            'maintenance_requested_at' => Carbon::parse($validated['maintenance_date'] . ' ' . $validated['maintenance_time']),
+            'maintenance_requested_at' => Carbon::parse($validated['maintenance_date'].' '.$validated['maintenance_time']),
             'user_id' => auth()->id(),
         ]);
 
@@ -53,7 +53,7 @@ class DeviceMaintenanceController extends Controller
      */
     public function show(DeviceMaintenance $deviceMaintenance)
     {
-        if ($deviceMaintenance->user_id !== auth()->id() || !auth()->user()->is_admin) {
+        if ($deviceMaintenance->user_id !== auth()->id() || ! auth()->user()->is_admin) {
             return to_route('device-maintenance.index')->with('error', 'You are not authorized to view this maintenance request.');
         }
 
@@ -68,7 +68,7 @@ class DeviceMaintenanceController extends Controller
                         'previous_maintenance_requested_at' => $value->previous_maintenance_requested_at,
                         'new_maintenance_requested_at' => $value->new_maintenance_requested_at,
                         'previous_factory_maintenance_requested_at' => $value->previous_factory_maintenance_requested_at,
-                        'new_factory_maintenance_requested_at' => $value->new_factory_maintenance_requested_at
+                        'new_factory_maintenance_requested_at' => $value->new_factory_maintenance_requested_at,
                     ];
                 })->values();
 
@@ -115,14 +115,14 @@ class DeviceMaintenanceController extends Controller
             now()->toDateTimeString() => [
                 'user_id' => auth()->id(),
                 'previous_maintenance_requested_at' => $deviceMaintenance->maintenance_requested_at->toDateTimeString(),
-                'new_maintenance_requested_at' => Carbon::parse($validated['maintenance_date'] . ' ' . $validated['maintenance_time'])->toDateTimeString(),
+                'new_maintenance_requested_at' => Carbon::parse($validated['maintenance_date'].' '.$validated['maintenance_time'])->toDateTimeString(),
                 'previous_factory_maintenance_requested_at' => $deviceMaintenance->factory_maintenance_requested_at ? $deviceMaintenance->factory_maintenance_requested_at->toDateTimeString() : null,
                 'new_factory_maintenance_requested_at' => null,
-            ]
+            ],
         ];
 
         $deviceMaintenance->update([
-            'maintenance_requested_at' => Carbon::parse($validated['maintenance_date'] . ' ' . $validated['maintenance_time']),
+            'maintenance_requested_at' => Carbon::parse($validated['maintenance_date'].' '.$validated['maintenance_time']),
             'factory_maintenance_requested_at' => null,
             'status' => 1, // pending_factory
             'is_user_approved' => false,
@@ -155,7 +155,7 @@ class DeviceMaintenanceController extends Controller
      * Client approves the maintenance request.
      */
     public function approve(DeviceMaintenance $deviceMaintenance)
-    {   
+    {
         abort_if($deviceMaintenance->user_id !== auth()->id(), 403);
         abort_if($deviceMaintenance->status !== 0, 400, 'This maintenance request is not pending approval.');
         abort_if($deviceMaintenance->is_user_approved, 400, 'You have already approved this maintenance request.');

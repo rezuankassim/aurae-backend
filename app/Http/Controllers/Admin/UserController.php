@@ -7,9 +7,9 @@ use App\Http\Requests\Admin\UserCreateRequest;
 use App\Http\Requests\Admin\UserUpdateRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Lunar\Models\Customer;
-use Illuminate\Support\Str;
 
 class UserController extends Controller
 {

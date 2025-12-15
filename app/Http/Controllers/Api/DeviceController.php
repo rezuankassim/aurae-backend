@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Http\Resources\DeviceResource;
 use App\Models\Device;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Http\Request;
 use tbQuar\Facades\Quar;
 
@@ -16,7 +14,7 @@ class DeviceController extends Controller
     public function retrieve(Request $request)
     {
         $request->validate([
-            'uuid' => ['required']
+            'uuid' => ['required'],
         ]);
 
         $device = Device::where('uuid', $request->uuid)
@@ -27,11 +25,11 @@ class DeviceController extends Controller
             ->generate(route('api.device.login', ['id' => $device->id, 'uuid' => $device->uuid]));
 
         return BaseResource::make([
-                'qr' => 'data:image/png;base64,' . base64_encode($qr)
-            ])
+            'qr' => 'data:image/png;base64,'.base64_encode($qr),
+        ])
             ->additional([
                 'status' => 200,
-                'message' => 'Device retrieved successfully.'
+                'message' => 'Device retrieved successfully.',
             ]);
     }
 
@@ -39,7 +37,7 @@ class DeviceController extends Controller
     {
         $request->validate([
             'id' => ['required'],
-            'uuid' => ['required']
+            'uuid' => ['required'],
         ]);
 
         $device = Device::where('id', $request->id)

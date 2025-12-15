@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { show } from '@/routes/usage-history';
@@ -14,6 +15,25 @@ export const columns: ColumnDef<UsageHistory>[] = [
         header: '#',
         cell: ({ row, table }) => {
             return (table.getSortedRowModel()?.flatRows?.findIndex((flatRow) => flatRow.id === row.id) || 0) + 1;
+        },
+    },
+    {
+        accessorKey: 'therapy.name',
+        header: 'Therapy',
+        cell: ({ row }) => {
+            return row.original.therapy?.name || 'N/A';
+        },
+    },
+    {
+        accessorKey: 'content',
+        header: 'Status',
+        cell: ({ row }) => {
+            const content = row.getValue('content') as { force_stopped?: boolean };
+            return content?.force_stopped ? (
+                <Badge variant="destructive">Force Stopped</Badge>
+            ) : (
+                <Badge className="bg-green-200 text-green-900">Completed</Badge>
+            );
         },
     },
     {

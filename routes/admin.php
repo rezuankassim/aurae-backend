@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CollectionGroupCollectionController;
 use App\Http\Controllers\Admin\CollectionGroupController;
 use App\Http\Controllers\Admin\FAQController;
+use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\KnowledgeController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\ProductCollectionController;
@@ -99,4 +100,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/faqs/{faq}/edit', [FAQController::class, 'edit'])->name('faqs.edit');
     Route::put('/faqs/{faq}', [FAQController::class, 'update'])->name('faqs.update');
     Route::delete('/faqs/{faq}', [FAQController::class, 'destroy'])->name('faqs.destroy');
+
+    Route::get('/feedbacks', [FeedbackController::class, 'index'])->name('feedbacks.index');
+    Route::get('/feedbacks/{feedback}', [FeedbackController::class, 'show'])->name('feedbacks.show');
 });

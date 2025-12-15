@@ -22,7 +22,7 @@ class HealthReportCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required', 'file', 'mimes:pdf', 'max:10240',],
+            'file' => ['required', 'file', 'mimes:pdf', 'max:10240'],
         ];
     }
 }

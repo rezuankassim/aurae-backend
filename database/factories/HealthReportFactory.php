@@ -17,7 +17,7 @@ class HealthReportFactory extends Factory
     public function definition(): array
     {
         return [
-            'file' => $this->faker->word . '.pdf',
+            'file' => $this->faker->word.'.pdf',
             'user_id' => \App\Models\User::factory(),
         ];
     }

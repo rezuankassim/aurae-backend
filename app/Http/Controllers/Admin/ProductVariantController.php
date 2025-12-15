@@ -5,16 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Inertia\Inertia;
-use Lunar\Models\Product;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
+use Lunar\Models\Contracts\ProductOption as ProductOptionContract;
+use Lunar\Models\Contracts\ProductVariant as ProductVariantContract;
 use Lunar\Models\Language;
+use Lunar\Models\Product;
 use Lunar\Models\ProductOption;
 use Lunar\Models\ProductOptionValue;
 use Lunar\Models\ProductVariant;
 use Lunar\Models\TaxClass;
-use Lunar\Models\Contracts\ProductOption as ProductOptionContract;
-use Lunar\Models\Contracts\ProductVariant as ProductVariantContract;
 
 // $variant = $product->variants()->create([
 //     'tax_class_id' => TaxClass::getDefault()->id,
@@ -61,7 +61,6 @@ class ProductVariantController extends Controller
         ]);
     }
 
-
     /**
      * Update all variants of the product.
      */
@@ -73,21 +72,21 @@ class ProductVariantController extends Controller
 
         foreach ($variants as $variant) {
             $variantData = [];
-            if (isset($data[$variant->id . '-sku'])) {
-                $variantData['sku'] = $data[$variant->id . '-sku'];
+            if (isset($data[$variant->id.'-sku'])) {
+                $variantData['sku'] = $data[$variant->id.'-sku'];
             }
 
-            if (isset($data[$variant->id . '-stock'])) {
-                $variantData['stock'] = (int)$data[$variant->id . '-stock'];
+            if (isset($data[$variant->id.'-stock'])) {
+                $variantData['stock'] = (int) $data[$variant->id.'-stock'];
             }
 
-            if (isset($data[$variant->id . '-price'])) {
-                $price = (int) ($data[$variant->id . '-price'] * 100);
+            if (isset($data[$variant->id.'-price'])) {
+                $price = (int) ($data[$variant->id.'-price'] * 100);
 
                 $variant->basePrices->first()->update(['price' => $price]);
             }
 
-            if (!empty($variantData)) {
+            if (! empty($variantData)) {
                 $variant->update($variantData);
             }
         }
@@ -105,7 +104,7 @@ class ProductVariantController extends Controller
         $language = Language::getDefault();
         $taxClass = TaxClass::getDefault();
 
-        $grouped = collect($data)->filter(fn ($item, $key) => !Str::endsWith($key, '-name'))->groupBy(function ($item, $key) {
+        $grouped = collect($data)->filter(fn ($item, $key) => ! Str::endsWith($key, '-name'))->groupBy(function ($item, $key) {
             return explode('-', $key)[0];
         })->toArray();
 
@@ -130,25 +129,24 @@ class ProductVariantController extends Controller
                 );
         }
 
-
         foreach ($grouped as $key => $values) {
-            if (!ProductOption::where('id', $key)->exists()) {
+            if (! ProductOption::where('id', $key)->exists()) {
                 $productOption = new ProductOption([
-                    'name' => [$language->code => $data[$key . '-name']],
-                    'handle' => Str::slug($data[$key . '-name']),
-                    'label' => [$language->code => $data[$key . '-name']],
+                    'name' => [$language->code => $data[$key.'-name']],
+                    'handle' => Str::slug($data[$key.'-name']),
+                    'label' => [$language->code => $data[$key.'-name']],
                 ]);
             } else {
                 $productOption = ProductOption::find($key);
-                $productOption->name = [$language->code => $data[$key . '-name']];
-                $productOption->handle = Str::slug($data[$key . '-name']);
-                $productOption->label = [$language->code => $data[$key . '-name']];
+                $productOption->name = [$language->code => $data[$key.'-name']];
+                $productOption->handle = Str::slug($data[$key.'-name']);
+                $productOption->label = [$language->code => $data[$key.'-name']];
             }
 
             $productOption->save();
             $optionsId[$productOption->id] = ['position' => $optionsOrder++];
 
-            $optionValues = collect($data)->filter(fn ($item, $k) => Str::startsWith($k, $key . '-value-'))->map(function ($item, $k) use ($language) {
+            $optionValues = collect($data)->filter(fn ($item, $k) => Str::startsWith($k, $key.'-value-'))->map(function ($item, $k) use ($language) {
                 return [
                     'id' => explode('-', $k)[2] ?? null,
                     'name' => [$language->code => $item],
@@ -190,11 +188,12 @@ class ProductVariantController extends Controller
                 )->toArray(),
             ];
         })->toArray();
-;
+
         foreach ($combinations as $combination) {
             // See if this combination already has a variant
             $exists = collect($variants)->first(function ($variant) use ($combination) {
                 $valueDifference = array_diff_assoc($combination, $variant['values']);
+
                 return count($valueDifference) == 0;
             });
             if ($exists) {
@@ -255,26 +254,28 @@ class ProductVariantController extends Controller
     protected function cartesian(array $input)
     {
         foreach ($input as $dimension) {
-            if (empty($dimension)) return [];
+            if (empty($dimension)) {
+                return [];
+            }
         }
-    
+
         $result = collect($input)->reduce(
             function (?Collection $carry, $items) {
                 $items = collect($items);
-    
+
                 // First dimension: seed with single-item arrays
                 if ($carry === null) {
-                    return $items->map(fn($i) => [$i]);
+                    return $items->map(fn ($i) => [$i]);
                 }
-    
+
                 // Combine previous combos with current items
                 return $carry->flatMap(
-                    fn($combo) => $items->map(fn($i) => array_merge($combo, [$i]))
+                    fn ($combo) => $items->map(fn ($i) => array_merge($combo, [$i]))
                 );
             },
             null // IMPORTANT: start with null, not collect()
         );
-    
+
         return $result ? $result->values()->toArray() : [];
     }
 }

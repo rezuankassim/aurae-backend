@@ -3,8 +3,6 @@
 namespace App\Listeners;
 
 use App\Models\LoginActivity;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
 class LogSuccessfulLogin
 {
@@ -23,16 +21,16 @@ class LogSuccessfulLogin
     {
         LoginActivity::firstOrCreate(
             [
-                'user_id'    => $event->user->id,
+                'user_id' => $event->user->id,
                 'session_id' => request()->session()->getId(),
                 'event' => 'login',
             ],
             [
-                'guard'      => $event->guard ?? null,
+                'guard' => $event->guard ?? null,
                 'ip_address' => request()->ip(),
                 'user_agent' => substr(request()->userAgent() ?? '', 0, 500),
-                'succeeded'  => true,
-                'occurred_at'=> now(),
+                'succeeded' => true,
+                'occurred_at' => now(),
             ]
         );
     }

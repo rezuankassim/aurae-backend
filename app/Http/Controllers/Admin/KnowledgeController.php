@@ -7,7 +7,7 @@ use App\Http\Requests\Admin\KnowledgeCreateRequest;
 use App\Http\Requests\Admin\KnowledgeUpdateRequest;
 use App\Models\Knowledge;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class KnowledgeController extends Controller
@@ -39,7 +39,12 @@ class KnowledgeController extends Controller
     {
         $validated = $request->validated();
 
-        $validated['published_at'] = isset($validated['published_date']) && isset($validated['published_time']) ? Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'] . ' ' . $validated['published_time']) : null;
+        // Handle video upload
+        if ($request->hasFile('video')) {
+            $validated['video_path'] = $request->file('video')->store('knowledge/videos', 'public');
+        }
+
+        $validated['published_at'] = isset($validated['published_date']) && isset($validated['published_time']) ? Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']) : null;
 
         if ($validated['published_at'] && $validated['published_at']->isFuture()) {
             $validated['is_published'] = false;
@@ -69,7 +74,7 @@ class KnowledgeController extends Controller
     {
         $knowledge->published_date = $knowledge->published_at ? $knowledge->published_at->format('d-m-Y') : null;
         $knowledge->published_time = $knowledge->published_at ? $knowledge->published_at->format('H:i:s') : null;
-        
+
         return Inertia::render('admin/knowledge/edit', [
             'knowledge' => $knowledge,
         ]);
@@ -82,7 +87,17 @@ class KnowledgeController extends Controller
     {
         $validated = $request->validated();
 
-        $validated['published_at'] = isset($validated['published_date']) && isset($validated['published_time']) ? Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'] . ' ' . $validated['published_time']) : null;
+        // Handle video upload
+        if ($request->hasFile('video')) {
+            // Delete old video if exists
+            if ($knowledge->video_path && Storage::disk('public')->exists($knowledge->video_path)) {
+                Storage::disk('public')->delete($knowledge->video_path);
+            }
+
+            $validated['video_path'] = $request->file('video')->store('knowledge/videos', 'public');
+        }
+
+        $validated['published_at'] = isset($validated['published_date']) && isset($validated['published_time']) ? Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']) : null;
 
         if ($validated['published_at'] && $validated['published_at']->isFuture()) {
             $validated['is_published'] = false;
@@ -100,6 +115,11 @@ class KnowledgeController extends Controller
      */
     public function destroy(Knowledge $knowledge)
     {
+        // Delete video file if exists
+        if ($knowledge->video_path && Storage::disk('public')->exists($knowledge->video_path)) {
+            Storage::disk('public')->delete($knowledge->video_path);
+        }
+
         $knowledge->delete();
 
         return to_route('admin.knowledge.index')->with('success', 'Knowledge entry deleted successfully.');

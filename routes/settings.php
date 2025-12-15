@@ -23,7 +23,6 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('settings/appearance');
     })->name('appearance.edit');
 
-
     Route::get('settings/address', [AddressController::class, 'index'])->name('address.index');
     Route::post('settings/address', [AddressController::class, 'store'])->name('address.store');
     Route::get('settings/address/{address}/edit', [AddressController::class, 'edit'])->name('address.edit');

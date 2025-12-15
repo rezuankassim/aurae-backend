@@ -21,11 +21,11 @@ class LoginActivity extends Model
 
     protected $casts = [
         'occurred_at' => 'datetime',
-        'logout_at'   => 'datetime',
-        'succeeded'   => 'boolean',
+        'logout_at' => 'datetime',
+        'succeeded' => 'boolean',
     ];
 
-     /**
+    /**
      * Get the user that owns the login activity.
      */
     public function user(): BelongsTo
@@ -33,19 +33,19 @@ class LoginActivity extends Model
         return $this->belongsTo(User::class);
     }
 
-     // Duration (in seconds) between login and logout for one session row (if available)
-     public function sessionDuration(): ?int
-     {
-         if ($this->event !== 'login' || ! $this->logout_at) {
-             return null;
-         }
- 
-         return $this->logout_at->diffInSeconds($this->occurred_at);
-     }
- 
-     // Quick check if the login session (this row) is still active
-     public function isActive(): bool
-     {
-         return $this->event === 'login' && is_null($this->logout_at);
-     }
+    // Duration (in seconds) between login and logout for one session row (if available)
+    public function sessionDuration(): ?int
+    {
+        if ($this->event !== 'login' || ! $this->logout_at) {
+            return null;
+        }
+
+        return $this->logout_at->diffInSeconds($this->occurred_at);
+    }
+
+    // Quick check if the login session (this row) is still active
+    public function isActive(): bool
+    {
+        return $this->event === 'login' && is_null($this->logout_at);
+    }
 }

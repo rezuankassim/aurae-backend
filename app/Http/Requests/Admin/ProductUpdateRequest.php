@@ -4,7 +4,6 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Lunar\Models\Product;
 use Lunar\Models\ProductType;
 
 class ProductUpdateRequest extends FormRequest

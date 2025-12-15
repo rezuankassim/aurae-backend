@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\News;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class NewsController extends Controller
@@ -19,7 +18,7 @@ class NewsController extends Controller
             ->get();
 
         $news->transform(function ($item) {
-            $item->image_url = $item->image ? asset('storage/' . $item->image) : null;
+            $item->image_url = $item->image ? asset('storage/'.$item->image) : null;
 
             return $item;
         });
@@ -34,10 +33,10 @@ class NewsController extends Controller
      */
     public function show(News $news)
     {
-        abort_if(!$news->is_published, 404);
+        abort_if(! $news->is_published, 404);
 
         transform($news, function ($item) {
-            $item->image_url = $item->image ? asset('storage/' . $item->image) : null;
+            $item->image_url = $item->image ? asset('storage/'.$item->image) : null;
         });
 
         return Inertia::render('news/show', [

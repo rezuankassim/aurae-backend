@@ -20,6 +20,7 @@ class ProductMediaController extends Controller
             'product' => $product,
             'images' => $product->getMedia('images')->map(function ($item) {
                 $item->url = $item->getUrl();
+
                 return $item;
             }),
             'withVariants' => $product->productOptions()->count() > 0,
@@ -45,7 +46,7 @@ class ProductMediaController extends Controller
         $product->addMedia($validated['image'])
             ->withCustomProperties([
                 'name' => $validated['name'] ?? null,
-                'primary' => $request->has('primary') ? (bool)$validated['primary'] : false,
+                'primary' => $request->has('primary') ? (bool) $validated['primary'] : false,
             ])
             ->toMediaCollection('images');
 
@@ -74,6 +75,7 @@ class ProductMediaController extends Controller
     {
         $images = $product->getMedia('images')->map(function ($item) {
             $item->url = $item->getUrl();
+
             return $item;
         });
 

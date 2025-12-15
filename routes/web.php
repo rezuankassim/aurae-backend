@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CustomTherapyController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceMaintenanceController;
 use App\Http\Controllers\HealthReportController;
@@ -38,6 +39,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('device-maintenance/{deviceMaintenance}/approve', [DeviceMaintenanceController::class, 'approve'])->name('device-maintenance.approve');
     Route::get('device-maintenance/{deviceMaintenance}/edit', [DeviceMaintenanceController::class, 'edit'])->name('device-maintenance.edit');
     Route::put('device-maintenance/{deviceMaintenance}', [DeviceMaintenanceController::class, 'update'])->name('device-maintenance.update');
+
+    Route::get('custom-therapies', [CustomTherapyController::class, 'index'])->name('custom-therapies.index');
+    Route::get('custom-therapies/{customTherapy}/edit', [CustomTherapyController::class, 'edit'])->name('custom-therapies.edit');
+    Route::put('custom-therapies/{customTherapy}', [CustomTherapyController::class, 'update'])->name('custom-therapies.update');
+    Route::delete('custom-therapies/{customTherapy}', [CustomTherapyController::class, 'destroy'])->name('custom-therapies.destroy');
 });
 
 require __DIR__.'/admin.php';

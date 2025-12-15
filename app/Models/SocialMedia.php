@@ -8,11 +8,11 @@ class SocialMedia extends Model
 {
     /**
      * The attributes that are mass assignable.
-     * 
+     *
      * @var list<string>
      */
     protected $fillable = [
-        'links'
+        'links',
     ];
 
     /**

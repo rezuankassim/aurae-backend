@@ -1,8 +1,16 @@
 <?php
 
 use App\Http\Controllers\Api\AuthenticationController;
+use App\Http\Controllers\Api\CustomTherapyController;
 use App\Http\Controllers\Api\DeviceController;
+use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\Api\FeedbackController;
+use App\Http\Controllers\Api\KnowledgeController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\TherapyController;
+use App\Http\Controllers\Api\UsageHistoryController;
+use App\Http\Controllers\Api\VideoStreamController;
 use App\Http\Middleware\EnsureDevice;
 use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
@@ -22,6 +30,23 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
 
         Route::get('/faqs', [FaqController::class, 'index'])->name('api.faqs.index');
         Route::get('/faqs/{faq}', [FaqController::class, 'show'])->name('api.faqs.show');
+
+        Route::get('/knowledge', [KnowledgeController::class, 'index'])->name('api.knowledge.index');
+        Route::get('/knowledge/{knowledge}', [KnowledgeController::class, 'show'])->name('api.knowledge.show');
+        Route::get('/knowledge/{knowledge}/video', [VideoStreamController::class, 'streamKnowledgeVideo'])->name('api.knowledge.video.stream');
+
+        Route::get('/therapies', [TherapyController::class, 'index'])->name('api.therapies.index');
+
+        Route::get('/custom-therapies', [CustomTherapyController::class, 'index'])->name('api.custom-therapies.index');
+        Route::post('/custom-therapies', [CustomTherapyController::class, 'store'])->name('api.custom-therapies.store');
+
+        Route::post('/usage-histories', [UsageHistoryController::class, 'store'])->name('api.usage-histories.store');
+
+        Route::post('/feedback', [FeedbackController::class, 'store'])->name('api.feedback.store');
+
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('api.notifications.index');
+
+        Route::post('/device/fcm-token', [DeviceTokenController::class, 'update'])->name('api.device.fcm-token.update');
 
         Route::post('/device-login', [DeviceController::class, 'login'])->name('api.device.login');
     });

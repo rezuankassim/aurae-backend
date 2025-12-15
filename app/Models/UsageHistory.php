@@ -13,10 +13,11 @@ class UsageHistory extends Model
 
     /**
      * The attributes that are mass assignable.
-     * 
+     *
      * @var list<string>
      */
     protected $fillable = [
+        'therapy_id',
         'content',
         'user_id',
     ];
@@ -31,5 +32,21 @@ class UsageHistory extends Model
         return [
             'content' => 'object',
         ];
+    }
+
+    /**
+     * Get the user that owns the usage history
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the therapy that was used
+     */
+    public function therapy()
+    {
+        return $this->belongsTo(Therapy::class);
     }
 }

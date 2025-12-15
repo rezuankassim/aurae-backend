@@ -8,16 +8,18 @@ class Therapy extends Model
 {
     /**
      * The attributes that are mass assignable.
-     * 
+     *
      * @var list<string>
      */
     protected $fillable = [
+        'user_id',
         'image',
         'name',
         'description',
         'music',
         'configuration',
         'is_active',
+        'is_custom',
     ];
 
     /**
@@ -30,6 +32,7 @@ class Therapy extends Model
         return [
             'configuration' => 'array',
             'is_active' => 'boolean',
+            'is_custom' => 'boolean',
         ];
     }
 
@@ -38,7 +41,7 @@ class Therapy extends Model
      */
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image ? asset('storage/' . $this->image) : null;
+        return $this->image ? asset('storage/'.$this->image) : null;
     }
 
     /**
@@ -46,6 +49,14 @@ class Therapy extends Model
      */
     public function getMusicUrlAttribute(): string
     {
-        return asset('storage/' . $this->music);
+        return asset('storage/'.$this->music);
+    }
+
+    /**
+     * Get the user that owns the therapy
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

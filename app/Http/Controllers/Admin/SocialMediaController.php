@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SocialMediaUpdateRequest;
 use App\Models\SocialMedia;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class SocialMediaController extends Controller

@@ -7,7 +7,6 @@ use App\Http\Requests\Admin\NewsCreateRequest;
 use App\Http\Requests\Admin\NewsUpdateRequest;
 use App\Models\News;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class NewsController extends Controller
@@ -45,12 +44,12 @@ class NewsController extends Controller
         }
 
         if (isset($validated['published_date']) && isset($validated['published_time'])) {
-            if (now()->greaterThanOrEqualTo(\DateTime::createFromFormat('d-m-Y H:i:s', $validated['published_date'] . ' ' . $validated['published_time']))) {
+            if (now()->greaterThanOrEqualTo(\DateTime::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']))) {
                 $validated['is_published'] = true;
             } else {
                 $validated['is_published'] = false;
             }
-            $validated['published_at'] = \DateTime::createFromFormat('d-m-Y H:i:s', $validated['published_date'] . ' ' . $validated['published_time']);
+            $validated['published_at'] = \DateTime::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']);
         }
 
         News::create($validated);
@@ -64,7 +63,7 @@ class NewsController extends Controller
     public function show(News $news)
     {
         transform($news, function ($item) {
-            $item->image_url = $item->image ? asset('storage/' . $item->image) : null;
+            $item->image_url = $item->image ? asset('storage/'.$item->image) : null;
         });
 
         return Inertia::render('admin/news/show', [
@@ -80,6 +79,7 @@ class NewsController extends Controller
         transform($news, function ($item) {
             $item->published_date = $item->published_at ? $item->published_at->format('d-m-Y') : null;
             $item->published_time = $item->published_at ? $item->published_at->format('H:i:s') : null;
+
             return $item;
         });
 
@@ -101,12 +101,12 @@ class NewsController extends Controller
         }
 
         if (isset($validated['published_date']) && isset($validated['published_time'])) {
-            if (now()->greaterThanOrEqualTo(Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'] . ' ' . $validated['published_time']))) {
+            if (now()->greaterThanOrEqualTo(Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']))) {
                 $validated['is_published'] = true;
             } else {
                 $validated['is_published'] = false;
             }
-            $validated['published_at'] = Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'] . ' ' . $validated['published_time']);
+            $validated['published_at'] = Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']);
         } else {
             $validated['is_published'] = false;
             $validated['published_at'] = null;

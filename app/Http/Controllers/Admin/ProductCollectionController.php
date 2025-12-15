@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductCollectionCreateRequest;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Lunar\Models\Collection;
 use Lunar\Models\Product;

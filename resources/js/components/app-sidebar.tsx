@@ -5,12 +5,14 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { index as indexCollectionGroups } from '@/routes/admin/collection-groups';
 import { index as indexFAQs } from '@/routes/admin/faqs';
+import { index as indexFeedbacks } from '@/routes/admin/feedbacks';
 import { index as indexKnowledge } from '@/routes/admin/knowledge';
 import { index as indexNews } from '@/routes/admin/news';
 import { index as indexProducts } from '@/routes/admin/products';
 import { edit as editSocialMedia } from '@/routes/admin/social-media';
 import { index as indexTherapies } from '@/routes/admin/therapies';
 import { index as indexUsers } from '@/routes/admin/users';
+import { index as indexCustomTherapies } from '@/routes/custom-therapies';
 import { index as indexDeviceMaintenance } from '@/routes/device-maintenance';
 import { index } from '@/routes/devices';
 import { index as indexHealthReports } from '@/routes/health-reports';
@@ -55,6 +57,11 @@ const mainNavItems: NavItem[] = [
                 href: indexUsageHistory(),
             },
         ],
+    },
+    {
+        title: 'Custom Therapies',
+        icon: BookHeart,
+        href: indexCustomTherapies(),
     },
     {
         title: 'Device Maintenances',
@@ -121,6 +128,11 @@ const managementNavItems: NavItem[] = [
     {
         title: 'FAQs',
         href: indexFAQs(),
+        icon: MessageCircleQuestion,
+    },
+    {
+        title: 'Feedbacks',
+        href: indexFeedbacks(),
         icon: MessageCircleQuestion,
     },
 ];
