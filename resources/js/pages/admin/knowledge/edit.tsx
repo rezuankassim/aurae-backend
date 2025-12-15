@@ -9,8 +9,10 @@ import { index } from '@/routes/admin/knowledge';
 
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Progress } from '@/components/ui/progress';
+import { useChunkedUpload } from '@/hooks/use-chunked-upload';
 import { SerializedEditorState, SerializedLexicalNode } from 'lexical';
-import { ChevronDown, Info, X } from 'lucide-react';
+import { ChevronDown, Info, Loader2, X } from 'lucide-react';
 import { SetStateAction, useRef, useState } from 'react';
 
 import KnowledgeController from '@/actions/App/Http/Controllers/Admin/KnowledgeController';
@@ -42,7 +44,33 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
     const [videoFile, setVideoFile] = useState<File | null>(null);
     const [videoPreview, setVideoPreview] = useState<string | null>(null);
     const [existingVideo, setExistingVideo] = useState<string | null>(knowledge.video_path);
+    const [uploadedVideoPath, setUploadedVideoPath] = useState<string | null>(null);
     const videoInputRef = useRef<HTMLInputElement>(null);
+
+    const { uploadFile, uploadState } = useChunkedUpload({
+        onComplete: (path) => {
+            setUploadedVideoPath(path);
+        },
+        onError: (error) => {
+            console.error('Upload error:', error);
+        },
+    });
+
+    const handleVideoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setVideoFile(file);
+            const url = URL.createObjectURL(file);
+            setVideoPreview(url);
+
+            // Start chunked upload immediately
+            try {
+                await uploadFile(file);
+            } catch (error) {
+                console.error('Upload failed:', error);
+            }
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -62,7 +90,7 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                             content: JSON.stringify(editorState),
                             html_content: editorHtmlState,
                             published_date: date ? dayjs(date).format('DD-MM-YYYY') : null,
-                            ...(videoFile ? { video: videoFile } : {}),
+                            ...(uploadedVideoPath ? { video_path: uploadedVideoPath } : {}),
                         };
 
                         return formData;
@@ -131,14 +159,8 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                 id="video"
                                                 accept="video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/x-flv,video/x-matroska,video/webm"
                                                 className="hidden"
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file) {
-                                                        setVideoFile(file);
-                                                        const url = URL.createObjectURL(file);
-                                                        setVideoPreview(url);
-                                                    }
-                                                }}
+                                                onChange={handleVideoChange}
+                                                disabled={uploadState.uploading}
                                             />
 
                                             {/* Show existing video */}
@@ -187,6 +209,23 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                 </div>
                                             )}
 
+                                            {uploadState.uploading && (
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center justify-between text-sm">
+                                                        <span className="flex items-center gap-2">
+                                                            <Loader2 className="size-4 animate-spin" />
+                                                            Uploading video...
+                                                        </span>
+                                                        <span className="font-medium">{uploadState.progress.toFixed(1)}%</span>
+                                                    </div>
+                                                    <Progress value={uploadState.progress} />
+                                                </div>
+                                            )}
+
+                                            {uploadState.error && (
+                                                <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{uploadState.error}</div>
+                                            )}
+
                                             {/* Show upload button */}
                                             {!videoFile && !existingVideo && (
                                                 <Button
@@ -194,6 +233,7 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                     variant="outline"
                                                     onClick={() => videoInputRef.current?.click()}
                                                     className="w-full"
+                                                    disabled={uploadState.uploading}
                                                 >
                                                     Choose Video File (Max 5GB)
                                                 </Button>
@@ -206,6 +246,7 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                     variant="outline"
                                                     onClick={() => videoInputRef.current?.click()}
                                                     className="w-full"
+                                                    disabled={uploadState.uploading}
                                                 >
                                                     Replace Video
                                                 </Button>

@@ -39,9 +39,13 @@ class KnowledgeController extends Controller
     {
         $validated = $request->validated();
 
-        // Handle video upload
+        // Handle video upload (traditional)
         if ($request->hasFile('video')) {
             $validated['video_path'] = $request->file('video')->store('knowledge/videos', 'public');
+        }
+        // Handle chunked upload path
+        elseif ($request->has('video_path')) {
+            $validated['video_path'] = $request->input('video_path');
         }
 
         $validated['published_at'] = isset($validated['published_date']) && isset($validated['published_time']) ? Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']) : null;
@@ -87,7 +91,7 @@ class KnowledgeController extends Controller
     {
         $validated = $request->validated();
 
-        // Handle video upload
+        // Handle video upload (traditional)
         if ($request->hasFile('video')) {
             // Delete old video if exists
             if ($knowledge->video_path && Storage::disk('public')->exists($knowledge->video_path)) {
@@ -95,6 +99,15 @@ class KnowledgeController extends Controller
             }
 
             $validated['video_path'] = $request->file('video')->store('knowledge/videos', 'public');
+        }
+        // Handle chunked upload path
+        elseif ($request->has('video_path')) {
+            // Delete old video if exists
+            if ($knowledge->video_path && Storage::disk('public')->exists($knowledge->video_path)) {
+                Storage::disk('public')->delete($knowledge->video_path);
+            }
+
+            $validated['video_path'] = $request->input('video_path');
         }
 
         $validated['published_at'] = isset($validated['published_date']) && isset($validated['published_time']) ? Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']) : null;

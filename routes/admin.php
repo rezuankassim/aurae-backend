@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ChunkedUploadController;
 use App\Http\Controllers\Admin\CollectionGroupCollectionController;
 use App\Http\Controllers\Admin\CollectionGroupController;
 use App\Http\Controllers\Admin\FAQController;
@@ -20,6 +21,12 @@ use App\Http\Middleware\EnsureIsAdmin;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')->group(function () {
+    // Chunked upload routes
+    Route::post('/chunked-upload/initiate', [ChunkedUploadController::class, 'initiate'])->name('chunked-upload.initiate');
+    Route::post('/chunked-upload/chunk', [ChunkedUploadController::class, 'uploadChunk'])->name('chunked-upload.chunk');
+    Route::post('/chunked-upload/finalize', [ChunkedUploadController::class, 'finalize'])->name('chunked-upload.finalize');
+    Route::post('/chunked-upload/cancel', [ChunkedUploadController::class, 'cancel'])->name('chunked-upload.cancel');
+
     Route::get('/news', [NewsController::class, 'index'])->name('news.index');
     Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
     Route::post('/news', [NewsController::class, 'store'])->name('news.store');
