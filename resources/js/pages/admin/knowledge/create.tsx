@@ -10,8 +10,8 @@ import { create, index } from '@/routes/admin/knowledge';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { SerializedEditorState, SerializedLexicalNode } from 'lexical';
-import { ChevronDown, Info } from 'lucide-react';
-import { SetStateAction, useState } from 'react';
+import { ChevronDown, Info, X } from 'lucide-react';
+import { SetStateAction, useRef, useState } from 'react';
 
 import KnowledgeController from '@/actions/App/Http/Controllers/Admin/KnowledgeController';
 import { Editor } from '@/components/editor-00/editor';
@@ -57,6 +57,10 @@ export default function KnowledgeCreate() {
     const [open, setOpen] = useState(false);
     const [date, setDate] = useState<Date | undefined>(undefined);
 
+    const [videoFile, setVideoFile] = useState<File | null>(null);
+    const [videoPreview, setVideoPreview] = useState<string | null>(null);
+    const videoInputRef = useRef<HTMLInputElement>(null);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create knowledge" />
@@ -67,14 +71,23 @@ export default function KnowledgeCreate() {
                     {...KnowledgeController.store.form()}
                     options={{
                         preserveScroll: true,
+                        onSuccess: () => {
+                            setVideoFile(null);
+                            setVideoPreview(null);
+                        },
                     }}
                     resetOnSuccess
-                    transform={(data) => ({
-                        ...data,
-                        content: JSON.stringify(editorState),
-                        html_content: editorHtmlState,
-                        published_date: date ? dayjs(date).format('DD-MM-YYYY') : null,
-                    })}
+                    transform={(data) => {
+                        const formData = {
+                            ...data,
+                            content: JSON.stringify(editorState),
+                            html_content: editorHtmlState,
+                            published_date: date ? dayjs(date).format('DD-MM-YYYY') : null,
+                            ...(videoFile ? { video: videoFile } : {}),
+                        };
+
+                        return formData;
+                    }}
                     className="space-y-6"
                 >
                     {({ processing, errors }) => (
@@ -103,25 +116,89 @@ export default function KnowledgeCreate() {
                                             {errors.content ? <FieldError>{errors.content}</FieldError> : null}
                                         </Field>
 
+                                        {!videoFile && (
+                                            <Field>
+                                                <FieldLabel htmlFor="video_url" className="flex items-center gap-2">
+                                                    <span>Video URL</span>
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            <Info className="size-4" />
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <img src="/example-video-url.png" className="pb-1" />
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </FieldLabel>
+                                                <Input id="video_url" name="video_url" placeholder="Video URL" />
+
+                                                <FieldDescription>
+                                                    Use youtube link and copy the link from the clicking "Share" button and click "Embed" and copy the
+                                                    value from "src"
+                                                </FieldDescription>
+                                                {errors.video_url ? <FieldError>{errors.video_url}</FieldError> : null}
+                                            </Field>
+                                        )}
+
                                         <Field>
-                                            <FieldLabel htmlFor="video_url" className="flex items-center gap-2">
-                                                <span>Video URL</span>
-                                                <Tooltip>
-                                                    <TooltipTrigger>
-                                                        <Info className="size-4" />
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <img src="/example-video-url.png" className="pb-1" />
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </FieldLabel>
-                                            <Input id="video_url" name="video_url" placeholder="Video URL" />
+                                            <FieldLabel htmlFor="video">Upload Video</FieldLabel>
+                                            <input
+                                                ref={videoInputRef}
+                                                type="file"
+                                                id="video"
+                                                accept="video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/x-flv,video/x-matroska,video/webm"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        setVideoFile(file);
+                                                        const url = URL.createObjectURL(file);
+                                                        setVideoPreview(url);
+                                                    }
+                                                }}
+                                            />
+
+                                            {!videoFile && (
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={() => videoInputRef.current?.click()}
+                                                    className="w-full"
+                                                >
+                                                    Choose Video File (Max 5GB)
+                                                </Button>
+                                            )}
+
+                                            {videoFile && videoPreview && (
+                                                <div className="space-y-2">
+                                                    <div className="relative">
+                                                        <video src={videoPreview} controls className="w-full rounded-lg" />
+                                                        <Button
+                                                            type="button"
+                                                            variant="destructive"
+                                                            size="icon"
+                                                            className="absolute top-2 right-2"
+                                                            onClick={() => {
+                                                                setVideoFile(null);
+                                                                setVideoPreview(null);
+                                                                if (videoInputRef.current) {
+                                                                    videoInputRef.current.value = '';
+                                                                }
+                                                            }}
+                                                        >
+                                                            <X className="size-4" />
+                                                        </Button>
+                                                    </div>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
+                                                    </p>
+                                                </div>
+                                            )}
 
                                             <FieldDescription>
-                                                Use youtube link and copy the link from the clicking "Share" button and click "Embed" and copy the
-                                                value from "src"
+                                                Upload a video file (MP4, MOV, AVI, WMV, FLV, MKV, WebM). Maximum size: 5GB. If video is uploaded,
+                                                video URL will be ignored.
                                             </FieldDescription>
-                                            {errors.video_url ? <FieldError>{errors.video_url}</FieldError> : null}
+                                            {errors.video ? <FieldError>{errors.video}</FieldError> : null}
                                         </Field>
 
                                         <div className="grid grid-flow-col gap-2">

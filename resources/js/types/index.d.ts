@@ -118,6 +118,7 @@ export interface Knowledge {
     created_at: string;
     updated_at: string;
     video_url: string | null;
+    video_path: string | null;
     [key: string]: unknown; // This allows for additional properties...
 }
 

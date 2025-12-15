@@ -30,7 +30,7 @@ export default function ShowKnowledge({ knowledge }: { knowledge: Knowledge }) {
 
                 <span className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="size-5" />
-                    {knowledge.publihsed_at ? (
+                    {knowledge.published_at ? (
                         <time className="mb-0.5">{dayjs(knowledge.published_at).format('MMMM DD YYYY, HH:mm')}</time>
                     ) : (
                         <span className="italic">Unpublished</span>
@@ -39,7 +39,10 @@ export default function ShowKnowledge({ knowledge }: { knowledge: Knowledge }) {
 
                 <h1 className="mt-4 text-lg font-extrabold">{knowledge.title}</h1>
 
-                {knowledge.video_url ? (
+                {/* Show uploaded video if exists, otherwise show YouTube embed */}
+                {knowledge.video_path ? (
+                    <video src={`/storage/${knowledge.video_path}`} controls className="w-full rounded-lg" />
+                ) : knowledge.video_url ? (
                     <iframe
                         src={knowledge.video_url}
                         title="YouTube video player"
