@@ -56,5 +56,5 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
     Route::post('/send-verify', [AuthenticationController::class, 'sendVerify'])->name('api.send_verify');
     Route::post('/verify-phone', [AuthenticationController::class, 'verifyPhone'])->name('api.verify_phone');
 
-    Route::get('/device-retrieve', [DeviceController::class, 'retrieve'])->name('api.device.retrieve');
+    Route::post('/device-retrieve', [DeviceController::class, 'retrieve'])->name('api.device.retrieve');
 });

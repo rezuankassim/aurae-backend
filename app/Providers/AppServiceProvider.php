@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Listeners\LogFailedLogin;
 use App\Listeners\LogLogout;
 use App\Listeners\LogSuccessfulLogin;
+use App\Modifiers\CustomShippingModifier;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
@@ -25,8 +26,10 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot(\Lunar\Base\ShippingModifiers $shippingModifiers): void
     {
+        $shippingModifiers->add(CustomShippingModifier::class);
+
         Event::listen(Login::class, LogSuccessfulLogin::class);
         Event::listen(Logout::class, LogLogout::class);
         Event::listen(Failed::class, LogFailedLogin::class);

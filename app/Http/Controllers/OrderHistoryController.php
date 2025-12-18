@@ -2,64 +2,49 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Lunar\Models\Order;
 
 class OrderHistoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the user's orders.
      */
     public function index()
     {
-        return Inertia::render('order-history');
+        $orders = Order::where('user_id', auth()->id())
+            ->with([
+                'lines.purchasable.product.productType',
+                'currency',
+            ])
+            ->latest()
+            ->get();
+
+        return Inertia::render('order-history', [
+            'orders' => $orders,
+        ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display the specified order.
      */
-    public function create()
+    public function show(Order $order)
     {
-        //
-    }
+        // Ensure user can only view their own orders
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $order->load([
+            'lines.purchasable.product.productType',
+            'lines.purchasable.product.thumbnail',
+            'currency',
+            'shippingAddress.country',
+            'billingAddress.country',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return Inertia::render('order-history/show', [
+            'order' => $order,
+        ]);
     }
 }

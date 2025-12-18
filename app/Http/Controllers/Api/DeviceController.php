@@ -15,17 +15,26 @@ class DeviceController extends Controller
     {
         $request->validate([
             'uuid' => ['required'],
+            'name' => ['required'],
         ]);
 
-        $device = Device::where('uuid', $request->uuid)
-            ->firstOrFail();
+        // Create or find the device by UUID
+        $device = Device::firstOrCreate(
+            ['uuid' => $request->uuid],
+            [
+                'name' => $request->name,
+                'status' => 1,
+            ]
+        );
 
+        // Generate QR code with device credentials for login
         $qr = Quar::format('png')
             ->size(200)
             ->generate(route('api.device.login', ['id' => $device->id, 'uuid' => $device->uuid]));
 
         return BaseResource::make([
             'qr' => 'data:image/png;base64,'.base64_encode($qr),
+            'device_id' => $device->id,
         ])
             ->additional([
                 'status' => 200,
@@ -42,9 +51,37 @@ class DeviceController extends Controller
 
         $device = Device::where('id', $request->id)
             ->where('uuid', $request->uuid)
-            ->where('status', 1)
             ->firstOrFail();
 
+        // Check if device is not linked to any user, link it to the current user
+        if (! $device->user_id) {
+            $device->user_id = $request->user()->id;
+            $device->save();
+        }
+
+        // Verify the device belongs to the authenticated user
+        if ($device->user_id !== $request->user()->id) {
+            return BaseResource::make(null)
+                ->additional([
+                    'status' => 403,
+                    'message' => 'This device is already linked to another user.',
+                ])
+                ->response()
+                ->setStatusCode(403);
+        }
+
+        // Check if device status is active
+        if ($device->status !== 1) {
+            return BaseResource::make(null)
+                ->additional([
+                    'status' => 403,
+                    'message' => 'This device is inactive. Please contact support.',
+                ])
+                ->response()
+                ->setStatusCode(403);
+        }
+
+        // Update last logged in timestamp
         $device->update([
             'last_logged_in_at' => now(),
         ]);

@@ -1,16 +1,23 @@
 <?php
 
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomTherapyController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceMaintenanceController;
 use App\Http\Controllers\HealthReportController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\OrderHistoryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UsageHistoryController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::redirect('/', '/login')->name('home');
+
+// Public product routes
+Route::get('products', [ProductController::class, 'index'])->name('products.index');
+Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
@@ -19,7 +26,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('devices', [DeviceController::class, 'index'])->name('devices.index');
 
+    // Cart routes
+    Route::get('cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::put('cart/lines/{cartLine}', [CartController::class, 'updateLine'])->name('cart.lines.update');
+    Route::delete('cart/lines/{cartLine}', [CartController::class, 'removeLine'])->name('cart.lines.destroy');
+
+    // Checkout routes
+    Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('checkout/address', [CheckoutController::class, 'saveAddress'])->name('checkout.address');
+    Route::get('checkout/review', [CheckoutController::class, 'review'])->name('checkout.review');
+    Route::post('checkout/complete', [CheckoutController::class, 'complete'])->name('checkout.complete');
+    Route::get('checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
+
+    // Order history routes
     Route::get('order-history', [OrderHistoryController::class, 'index'])->name('order-history.index');
+    Route::get('order-history/{order}', [OrderHistoryController::class, 'show'])->name('order-history.show');
 
     Route::get('news', [NewsController::class, 'index'])->name('news.index');
     Route::get('news/{news}', [NewsController::class, 'show'])->name('news.show');

@@ -226,6 +226,7 @@ export interface ProductVariant {
 export interface ProductType {
     id: number;
     name: string;
+    is_subscription: boolean;
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
@@ -363,4 +364,126 @@ export interface SocialMedia {
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface Cart {
+    id: number;
+    user_id: number | null;
+    currency_id: number;
+    currency: Currency;
+    sub_total: PriceV | number;
+    total: PriceV | number;
+    tax_total: PriceV | number;
+    discount_total: PriceV | number;
+    lines: CartLine[];
+    shippingAddress?: CartAddress | null;
+    billingAddress?: CartAddress | null;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
+}
+
+export interface CartLine {
+    id: number;
+    cart_id: number;
+    purchasable_id: number;
+    purchasable_type: string;
+    purchasable: ProductVariant & { product: Product };
+    quantity: number;
+    sub_total: PriceV | number;
+    total: PriceV | number;
+    tax_total: PriceV | number;
+    discount_total: PriceV | number;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
+}
+
+export interface CartAddress {
+    id: number;
+    cart_id: number;
+    type: 'shipping' | 'billing';
+    first_name: string;
+    last_name: string;
+    line_one: string;
+    line_two: string | null;
+    city: string;
+    state: string | null;
+    postcode: string;
+    country_id: number;
+    country?: Country;
+    contact_email: string;
+    contact_phone: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
+}
+
+export interface Order {
+    id: number;
+    user_id: number;
+    user?: User;
+    currency_id: number;
+    currency: Currency;
+    reference: string;
+    status: string;
+    sub_total: PriceV | number;
+    total: PriceV | number;
+    tax_total: PriceV | number;
+    discount_total: PriceV | number;
+    lines: OrderLine[];
+    shippingAddress?: OrderAddress | null;
+    billingAddress?: OrderAddress | null;
+    placed_at: string | null;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
+}
+
+export interface OrderLine {
+    id: number;
+    order_id: number;
+    purchasable_id: number;
+    purchasable_type: string;
+    purchasable: ProductVariant & { product: Product };
+    quantity: number;
+    sub_total: PriceV | number;
+    total: PriceV | number;
+    tax_total: PriceV | number;
+    discount_total: PriceV | number;
+    description: string;
+    identifier: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
+}
+
+export interface OrderAddress {
+    id: number;
+    order_id: number;
+    type: 'shipping' | 'billing';
+    first_name: string;
+    last_name: string;
+    line_one: string;
+    line_two: string | null;
+    city: string;
+    state: string | null;
+    postcode: string;
+    country_id: number;
+    country?: Country;
+    contact_email: string;
+    contact_phone: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
+}
+
+export interface Country {
+    id: number;
+    name: string;
+    iso2: string;
+    iso3: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
 }

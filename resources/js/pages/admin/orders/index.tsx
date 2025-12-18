@@ -1,9 +1,8 @@
-import Heading from '@/components/heading';
-import { Badge } from '@/components/ui/badge';
+import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Order } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { format } from 'date-fns';
@@ -14,12 +13,12 @@ interface Props {
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Order History',
-        href: '/order-history',
+        title: 'Orders',
+        href: '/admin/orders',
     },
 ];
 
-export default function OrderHistory({ orders }: Props) {
+export default function AdminOrdersIndex({ orders }: Props) {
     const formatPrice = (price: any) => {
         if (typeof price === 'number') {
             return `$${(price / 100).toFixed(2)}`;
@@ -35,7 +34,7 @@ export default function OrderHistory({ orders }: Props) {
             'awaiting-payment': { label: 'Awaiting Payment', variant: 'secondary' },
             'payment-offline': { label: 'Payment Offline', variant: 'default' },
             'payment-received': { label: 'Payment Received', variant: 'default' },
-            dispatched: { label: 'Dispatched', variant: 'outline' },
+            'dispatched': { label: 'Dispatched', variant: 'outline' },
         };
 
         const config = statusMap[status] || { label: status, variant: 'secondary' };
@@ -48,32 +47,28 @@ export default function OrderHistory({ orders }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Order History" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <Heading title="Order History" description="View and track your orders" />
+            <Head title="Orders" />
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
+                <div>
+                    <h1 className="text-3xl font-bold">Orders</h1>
+                    <p className="text-muted-foreground">Manage customer orders</p>
+                </div>
 
-                {orders.length === 0 ? (
-                    <Card>
-                        <CardContent className="flex min-h-[400px] flex-col items-center justify-center gap-4">
-                            <div className="text-center">
-                                <h2 className="text-2xl font-semibold">No orders yet</h2>
-                                <p className="text-muted-foreground">You haven't placed any orders yet.</p>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>All Orders ({orders.length})</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {orders.length === 0 ? (
+                            <div className="flex min-h-[200px] items-center justify-center">
+                                <p className="text-muted-foreground">No orders found.</p>
                             </div>
-                            <Link href="/products">
-                                <Button>Start Shopping</Button>
-                            </Link>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Your Orders</CardTitle>
-                        </CardHeader>
-                        <CardContent>
+                        ) : (
                             <Table>
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Order #</TableHead>
+                                        <TableHead>Customer</TableHead>
                                         <TableHead>Date</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead>Items</TableHead>
@@ -85,6 +80,7 @@ export default function OrderHistory({ orders }: Props) {
                                     {orders.map((order) => (
                                         <TableRow key={order.id}>
                                             <TableCell className="font-medium">{order.reference}</TableCell>
+                                            <TableCell>{order.user?.name || 'Guest'}</TableCell>
                                             <TableCell>{format(new Date(order.created_at), 'MMM d, yyyy')}</TableCell>
                                             <TableCell>
                                                 <div className="flex flex-col gap-1">
@@ -99,7 +95,7 @@ export default function OrderHistory({ orders }: Props) {
                                             <TableCell>{order.lines.length}</TableCell>
                                             <TableCell className="text-right font-semibold">{formatPrice(order.total)}</TableCell>
                                             <TableCell className="text-right">
-                                                <Link href={`/order-history/${order.id}`}>
+                                                <Link href={`/admin/orders/${order.id}`}>
                                                     <Button variant="outline" size="sm">
                                                         View Details
                                                     </Button>
@@ -109,9 +105,9 @@ export default function OrderHistory({ orders }: Props) {
                                     ))}
                                 </TableBody>
                             </Table>
-                        </CardContent>
-                    </Card>
-                )}
+                        )}
+                    </CardContent>
+                </Card>
             </div>
         </AppLayout>
     );
