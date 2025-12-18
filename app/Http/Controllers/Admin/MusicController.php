@@ -44,7 +44,7 @@ class MusicController extends Controller
 
         $path = $request->file('music')->store('music', 'public');
         $thumbnail = null;
-        
+
         if ($request->hasFile('thumbnail')) {
             $thumbnail = $request->file('thumbnail')->store('music/thumbnails', 'public');
         }
@@ -119,7 +119,7 @@ class MusicController extends Controller
         if ($music->thumbnail && Storage::disk('public')->exists($music->thumbnail)) {
             Storage::disk('public')->delete($music->thumbnail);
         }
-        
+
         if ($music->path && Storage::disk('public')->exists($music->path)) {
             Storage::disk('public')->delete($music->path);
         }

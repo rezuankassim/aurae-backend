@@ -70,7 +70,7 @@ class CustomTherapyController extends Controller
 
             $validated['image'] = $request->file('image')->store('therapies/images', 'public');
         }
-        
+
         if ($request->filled('music_id')) {
             $validated['music_id'] = $request->input('music_id');
         }

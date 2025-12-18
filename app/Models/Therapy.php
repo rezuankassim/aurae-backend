@@ -53,6 +53,7 @@ class Therapy extends Model
         if ($this->music_id && $this->musicRelation) {
             return $this->musicRelation->url;
         }
+
         return $this->music ? asset('storage/'.$this->music) : '';
     }
 

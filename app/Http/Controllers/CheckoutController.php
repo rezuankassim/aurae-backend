@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Lunar\Facades\CartSession;
-use Lunar\Models\CartAddress;
 use Lunar\Models\Country;
 use Lunar\Models\Order;
 
@@ -18,7 +17,7 @@ class CheckoutController extends Controller
     {
         $cart = CartSession::current();
 
-        if (!$cart || $cart->lines->isEmpty()) {
+        if (! $cart || $cart->lines->isEmpty()) {
             return redirect()->route('cart.index')
                 ->with('error', 'Your cart is empty.');
         }
@@ -71,7 +70,7 @@ class CheckoutController extends Controller
 
         $cart = CartSession::current();
 
-        if (!$cart) {
+        if (! $cart) {
             return redirect()->route('cart.index')
                 ->with('error', 'Cart not found.');
         }
@@ -138,12 +137,12 @@ class CheckoutController extends Controller
     {
         $cart = CartSession::current();
 
-        if (!$cart || $cart->lines->isEmpty()) {
+        if (! $cart || $cart->lines->isEmpty()) {
             return redirect()->route('cart.index')
                 ->with('error', 'Your cart is empty.');
         }
 
-        if (!$cart->shippingAddress || !$cart->billingAddress) {
+        if (! $cart->shippingAddress || ! $cart->billingAddress) {
             return redirect()->route('checkout.index')
                 ->with('error', 'Please complete your shipping information.');
         }
@@ -169,12 +168,12 @@ class CheckoutController extends Controller
     {
         $cart = CartSession::current();
 
-        if (!$cart || $cart->lines->isEmpty()) {
+        if (! $cart || $cart->lines->isEmpty()) {
             return redirect()->route('cart.index')
                 ->with('error', 'Your cart is empty.');
         }
 
-        if (!$cart->shippingAddress || !$cart->billingAddress) {
+        if (! $cart->shippingAddress || ! $cart->billingAddress) {
             return redirect()->route('checkout.index')
                 ->with('error', 'Please complete your shipping information.');
         }

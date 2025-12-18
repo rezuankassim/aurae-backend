@@ -49,7 +49,7 @@ class CartController extends Controller
 
         $cart = CartSession::current();
 
-        if (!$cart) {
+        if (! $cart) {
             $cart = Cart::create([
                 'currency_id' => Currency::getDefault()->id,
                 'user_id' => auth()->id(),

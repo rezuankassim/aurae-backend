@@ -42,6 +42,6 @@ class KnowledgeCreateRequest extends FormRequest
     {
         return [
             'html_content.required' => 'The content field is required.',
-        ];  
+        ];
     }
 }

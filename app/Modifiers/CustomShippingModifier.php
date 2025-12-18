@@ -7,9 +7,8 @@ use Lunar\Base\ShippingModifier;
 use Lunar\DataTypes\Price;
 use Lunar\DataTypes\ShippingOption;
 use Lunar\Facades\ShippingManifest;
-use Lunar\Models\Currency;
-use Lunar\Models\TaxClass;
 use Lunar\Models\Contracts\Cart;
+use Lunar\Models\TaxClass;
 
 class CustomShippingModifier extends ShippingModifier
 {
@@ -39,7 +38,7 @@ class CustomShippingModifier extends ShippingModifier
                 collect: true
             )
         );
-        
+
         return $next($cart);
     }
 }
