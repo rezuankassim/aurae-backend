@@ -7,6 +7,7 @@ import { index as indexCollectionGroups } from '@/routes/admin/collection-groups
 import { index as indexFAQs } from '@/routes/admin/faqs';
 import { index as indexFeedbacks } from '@/routes/admin/feedbacks';
 import { index as indexKnowledge } from '@/routes/admin/knowledge';
+import { index as indexMusic } from '@/routes/admin/music';
 import { index as indexNews } from '@/routes/admin/news';
 import { index as indexProducts } from '@/routes/admin/products';
 import { edit as editSocialMedia } from '@/routes/admin/social-media';
@@ -29,6 +30,7 @@ import {
     FileClock,
     LayoutGrid,
     MessageCircleQuestion,
+    Music,
     Newspaper,
     ShoppingBag,
     TabletSmartphone,
@@ -95,6 +97,11 @@ const managementNavItems: NavItem[] = [
         title: 'Therapies',
         href: indexTherapies(),
         icon: BookHeart,
+    },
+    {
+        title: 'Music',
+        href: indexMusic(),
+        icon: Music,
     },
     {
         title: 'News',

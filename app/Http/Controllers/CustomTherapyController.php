@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Admin\TherapyUpdateRequest;
+use App\Models\Music;
 use App\Models\Therapy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -39,8 +40,11 @@ class CustomTherapyController extends Controller
         $customTherapy->image_url = $customTherapy->image_url;
         $customTherapy->music_url = $customTherapy->music_url;
 
+        $music = Music::where('is_active', true)->orderBy('title')->get();
+
         return Inertia::render('custom-therapies/edit', [
             'customTherapy' => $customTherapy,
+            'music' => $music,
         ]);
     }
 
@@ -66,13 +70,9 @@ class CustomTherapyController extends Controller
 
             $validated['image'] = $request->file('image')->store('therapies/images', 'public');
         }
-        if ($request->hasFile('music')) {
-            // Remove old music if exists
-            if ($customTherapy->music) {
-                Storage::disk('public')->delete($customTherapy->music);
-            }
-
-            $validated['music'] = $request->file('music')->store('therapies/music', 'public');
+        
+        if ($request->filled('music_id')) {
+            $validated['music_id'] = $request->input('music_id');
         }
 
         $validated['configuration'] = collect([
@@ -100,9 +100,6 @@ class CustomTherapyController extends Controller
         // Delete associated files
         if ($customTherapy->image) {
             Storage::disk('public')->delete($customTherapy->image);
-        }
-        if ($customTherapy->music) {
-            Storage::disk('public')->delete($customTherapy->music);
         }
 
         $customTherapy->delete();

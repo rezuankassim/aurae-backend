@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\KnowledgeController;
+use App\Http\Controllers\Api\MusicController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\TherapyController;
 use App\Http\Controllers\Api\UsageHistoryController;
@@ -36,6 +37,8 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
         Route::get('/knowledge/{knowledge}/video', [VideoStreamController::class, 'streamKnowledgeVideo'])->name('api.knowledge.video.stream');
 
         Route::get('/therapies', [TherapyController::class, 'index'])->name('api.therapies.index');
+
+        Route::get('/music', [MusicController::class, 'index'])->name('api.music.index');
 
         Route::get('/custom-therapies', [CustomTherapyController::class, 'index'])->name('api.custom-therapies.index');
         Route::post('/custom-therapies', [CustomTherapyController::class, 'store'])->name('api.custom-therapies.store');

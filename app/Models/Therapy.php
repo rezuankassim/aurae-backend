@@ -13,10 +13,11 @@ class Therapy extends Model
      */
     protected $fillable = [
         'user_id',
+        'music_id',
         'image',
         'name',
         'description',
-        'music',
+        'music', // Kept for backward compatibility if needed, or to be removed later
         'configuration',
         'is_active',
         'is_custom',
@@ -49,7 +50,18 @@ class Therapy extends Model
      */
     public function getMusicUrlAttribute(): string
     {
-        return asset('storage/'.$this->music);
+        if ($this->music_id && $this->musicRelation) {
+            return $this->musicRelation->url;
+        }
+        return $this->music ? asset('storage/'.$this->music) : '';
+    }
+
+    /**
+     * Get the music associated with the therapy
+     */
+    public function musicRelation()
+    {
+        return $this->belongsTo(Music::class, 'music_id');
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\CollectionGroupController;
 use App\Http\Controllers\Admin\FAQController;
 use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\KnowledgeController;
+use App\Http\Controllers\Admin\MusicController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductCollectionController;
@@ -115,4 +116,11 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status.update');
+
+    Route::get('/music', [MusicController::class, 'index'])->name('music.index');
+    Route::get('/music/create', [MusicController::class, 'create'])->name('music.create');
+    Route::post('/music', [MusicController::class, 'store'])->name('music.store');
+    Route::get('/music/{music}/edit', [MusicController::class, 'edit'])->name('music.edit');
+    Route::put('/music/{music}', [MusicController::class, 'update'])->name('music.update');
+    Route::delete('/music/{music}', [MusicController::class, 'destroy'])->name('music.destroy');
 });

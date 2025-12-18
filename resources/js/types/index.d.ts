@@ -487,3 +487,17 @@ export interface Country {
     updated_at: string;
     [key: string]: unknown;
 }
+
+export interface Music {
+    id: number;
+    title: string;
+    thumbnail: string | null;
+    path: string;
+    duration: number | null;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    url?: string;
+    thumbnail_url?: string | null;
+    [key: string]: unknown;
+}

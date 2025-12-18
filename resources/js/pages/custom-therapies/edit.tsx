@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/custom-therapies';
-import { BreadcrumbItem, Therapy } from '@/types';
+import { BreadcrumbItem, Music, Therapy } from '@/types';
 import { Form, Head, Link } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -34,7 +34,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function CustomTherapiesEdit({ customTherapy }: { customTherapy: Therapy }) {
+export default function CustomTherapiesEdit({ customTherapy, music }: { customTherapy: Therapy; music: Music[] }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit custom therapy" />
@@ -93,7 +93,7 @@ export default function CustomTherapiesEdit({ customTherapy }: { customTherapy: 
                                         </Field>
 
                                         <Field>
-                                            <FieldLabel htmlFor="music">Music</FieldLabel>
+                                            <FieldLabel htmlFor="music_id">Music</FieldLabel>
 
                                             {customTherapy.music_url ? (
                                                 <MediaPlayer className="h-20">
@@ -114,9 +114,20 @@ export default function CustomTherapiesEdit({ customTherapy }: { customTherapy: 
                                                 </MediaPlayer>
                                             ) : null}
 
-                                            <Input type="file" id="music" name="music" placeholder="Music" accept="audio/*" />
+                                            <Select name="music_id" defaultValue={customTherapy.music_id?.toString()}>
+                                                <SelectTrigger id="music_id">
+                                                    <SelectValue placeholder="Select music" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {music.map((item) => (
+                                                        <SelectItem key={item.id} value={item.id.toString()}>
+                                                            {item.title}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
 
-                                            {errors.music ? <FieldError>{errors.music}</FieldError> : null}
+                                            {errors.music_id ? <FieldError>{errors.music_id}</FieldError> : null}
                                         </Field>
 
                                         <div className="grid grid-cols-3 gap-2">

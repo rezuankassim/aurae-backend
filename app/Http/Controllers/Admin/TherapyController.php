@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\TherapyCreateRequest;
 use App\Http\Requests\Admin\TherapyUpdateRequest;
+use App\Models\Music;
 use App\Models\Therapy;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -28,7 +29,11 @@ class TherapyController extends Controller
      */
     public function create()
     {
-        return Inertia::render('admin/therapies/create');
+        $music = Music::where('is_active', true)->orderBy('title')->get();
+
+        return Inertia::render('admin/therapies/create', [
+            'music' => $music,
+        ]);
     }
 
     /**
@@ -43,7 +48,10 @@ class TherapyController extends Controller
             $validated['image'] = $request->file('image')->store('therapies/images', 'public');
         }
 
-        $validated['music'] = $request->file('music')->store('therapies/music', 'public');
+        if ($request->filled('music_id')) {
+            $validated['music_id'] = $request->input('music_id');
+        }
+
         $validated['configuration'] = collect([
             'duration' => $request->input('duration'),
             'temperature' => $request->input('temp'),
@@ -63,8 +71,11 @@ class TherapyController extends Controller
         $therapy->image_url = $therapy->image_url;
         $therapy->music_url = $therapy->music_url;
 
+        $music = Music::where('is_active', true)->orderBy('title')->get();
+
         return Inertia::render('admin/therapies/edit', [
             'therapy' => $therapy,
+            'music' => $music,
         ]);
     }
 
@@ -84,13 +95,9 @@ class TherapyController extends Controller
 
             $validated['image'] = $request->file('image')->store('therapies/images', 'public');
         }
-        if ($request->hasFile('music')) {
-            // Remove old music if exists
-            if ($therapy->music) {
-                Storage::disk('public')->delete($therapy->music);
-            }
 
-            $validated['music'] = $request->file('music')->store('therapies/music', 'public');
+        if ($request->filled('music_id')) {
+            $validated['music_id'] = $request->input('music_id');
         }
 
         $validated['configuration'] = collect([

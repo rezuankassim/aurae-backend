@@ -35,7 +35,7 @@ class CustomTherapyController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'max:10240'], // 10MB max
-            'music' => ['required', 'file', 'mimes:mp3,wav,ogg', 'max:20480'], // 20MB max
+            'music_id' => ['required', 'exists:music,id'],
             'duration' => ['required', 'numeric', 'min:0'],
             'temperature' => ['required', 'numeric'],
             'light' => ['required', 'numeric'],
@@ -49,7 +49,7 @@ class CustomTherapyController extends Controller
             $validated['image'] = $request->file('image')->store('therapies/images', 'public');
         }
 
-        $validated['music'] = $request->file('music')->store('therapies/music', 'public');
+        $validated['music_id'] = $request->input('music_id');
         $validated['configuration'] = [
             'duration' => $request->input('duration'),
             'temperature' => $request->input('temperature'),
