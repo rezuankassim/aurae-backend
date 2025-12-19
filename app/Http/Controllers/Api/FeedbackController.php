@@ -19,13 +19,13 @@ class FeedbackController extends Controller
         ]);
 
         $feedback = Feedback::create([
-            'user_id' => $request->user()->id,
+            'user_id' => $request->user()?->id,
             'description' => $request->input('description'),
         ]);
 
         return BaseResource::make($feedback)
             ->additional([
-                'status' => 201,
+                'status' => 200,
                 'message' => 'Feedback submitted successfully.',
             ]);
     }

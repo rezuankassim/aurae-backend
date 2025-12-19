@@ -33,7 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->is('api/*')) {
                 return BaseResource::make([])
                     ->additional([
-                        'status' => 500,
+                        'status' => 200,
                         'message' => $exception->getMessage(),
                     ])
                     ->response();

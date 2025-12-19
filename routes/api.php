@@ -51,8 +51,6 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
 
         Route::post('/usage-histories', [UsageHistoryController::class, 'store'])->name('api.usage-histories.store');
 
-        Route::post('/feedback', [FeedbackController::class, 'store'])->name('api.feedback.store');
-
         Route::get('/notifications', [NotificationController::class, 'index'])->name('api.notifications.index');
 
         Route::post('/device/fcm-token', [DeviceTokenController::class, 'update'])->name('api.device.fcm-token.update');
@@ -62,6 +60,8 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
 
     Route::get('/faqs', [FaqController::class, 'index'])->name('api.faqs.index');
     Route::get('/faqs/{faq}', [FaqController::class, 'show'])->name('api.faqs.show');
+
+    Route::post('/feedback', [FeedbackController::class, 'store'])->name('api.feedback.store');
 
     Route::post('/login', [AuthenticationController::class, 'login'])->name('api.login');
     Route::post('/register', [AuthenticationController::class, 'register'])->name('api.register');
