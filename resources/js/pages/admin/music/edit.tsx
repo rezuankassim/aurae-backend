@@ -43,30 +43,25 @@ export default function MusicEdit({ music }: { music: Music }) {
                         <>
                             <Card className="mt-0">
                                 <CardContent className="space-y-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="title">Title</Label>
-                                <Input id="title" name="title" placeholder="Title" defaultValue={music.title} />
-                                <InputError message={errors.title} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="thumbnail">Thumbnail Image (Optional)</Label>
-                                {music.thumbnail_url && (
-                                    <div className="mb-2">
-                                        <img src={music.thumbnail_url} alt={music.title} className="h-32 w-32 rounded-md object-cover" />
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="title">Title</Label>
+                                        <Input id="title" name="title" placeholder="Title" defaultValue={music.title} />
+                                        <InputError message={errors.title} />
                                     </div>
-                                )}
-                                <Input 
-                                    type="file" 
-                                    id="thumbnail" 
-                                    name="thumbnail" 
-                                    accept="image/*" 
-                                />
-                                <InputError message={errors.thumbnail} />
-                            </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="music">Music File (Optional - Leave empty to keep current)</Label>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="thumbnail">Thumbnail Image (Optional)</Label>
+                                        {music.thumbnail_url && (
+                                            <div className="mb-2">
+                                                <img src={music.thumbnail_url} alt={music.title} className="h-32 w-32 rounded-md object-cover" />
+                                            </div>
+                                        )}
+                                        <Input type="file" id="thumbnail" name="thumbnail" accept="image/*" />
+                                        <InputError message={errors.thumbnail} />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="music">Music File (Optional - Leave empty to keep current)</Label>
                                         {music.url && (
                                             <div className="mb-2">
                                                 <audio controls src={music.url} className="w-full" />

@@ -6,6 +6,7 @@ import { dashboard } from '@/routes';
 import { index as indexCollectionGroups } from '@/routes/admin/collection-groups';
 import { index as indexFAQs } from '@/routes/admin/faqs';
 import { index as indexFeedbacks } from '@/routes/admin/feedbacks';
+import { edit as editGeneralSettings } from '@/routes/admin/general-settings';
 import { index as indexKnowledge } from '@/routes/admin/knowledge';
 import { index as indexMusic } from '@/routes/admin/music';
 import { index as indexNews } from '@/routes/admin/news';
@@ -25,6 +26,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     BookHeart,
     BookOpenText,
+    CogIcon,
     Construction,
     FileBox,
     FileClock,
@@ -141,6 +143,11 @@ const managementNavItems: NavItem[] = [
         title: 'Feedbacks',
         href: indexFeedbacks(),
         icon: MessageCircleQuestion,
+    },
+    {
+        title: 'General Settings',
+        href: editGeneralSettings(),
+        icon: CogIcon,
     },
 ];
 

@@ -1,7 +1,7 @@
-import AppLayout from '@/layouts/app-layout';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Order } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { CheckCircle } from 'lucide-react';
@@ -39,9 +39,7 @@ export default function CheckoutSuccess({ order }: Props) {
                         <CheckCircle className="h-16 w-16 text-green-600" />
                         <div>
                             <h1 className="text-3xl font-bold">Order Confirmed!</h1>
-                            <p className="mt-2 text-muted-foreground">
-                                Thank you for your purchase. Your order has been placed successfully.
-                            </p>
+                            <p className="mt-2 text-muted-foreground">Thank you for your purchase. Your order has been placed successfully.</p>
                         </div>
                         <div className="rounded-lg bg-muted px-6 py-3">
                             <p className="text-sm text-muted-foreground">Order Number</p>
@@ -72,9 +70,7 @@ export default function CheckoutSuccess({ order }: Props) {
                             {order.lines.map((line) => (
                                 <div key={line.id} className="flex justify-between">
                                     <div>
-                                        <p className="font-medium">
-                                            {line.purchasable?.product?.attribute_data?.name?.en || 'Product'}
-                                        </p>
+                                        <p className="font-medium">{line.purchasable?.product?.attribute_data?.name?.en || 'Product'}</p>
                                         <p className="text-sm text-muted-foreground">Quantity: {line.quantity}</p>
                                         {line.purchasable?.product?.product_type?.is_subscription && (
                                             <Badge variant="secondary" className="mt-1">
@@ -122,8 +118,7 @@ export default function CheckoutSuccess({ order }: Props) {
                                     {order.shippingAddress.line_two && <p>{order.shippingAddress.line_two}</p>}
                                     <p>
                                         {order.shippingAddress.city}
-                                        {order.shippingAddress.state && `, ${order.shippingAddress.state}`}{' '}
-                                        {order.shippingAddress.postcode}
+                                        {order.shippingAddress.state && `, ${order.shippingAddress.state}`} {order.shippingAddress.postcode}
                                     </p>
                                     <p>{order.shippingAddress.country?.name}</p>
                                     <div className="mt-3">

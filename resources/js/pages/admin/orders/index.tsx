@@ -1,8 +1,8 @@
-import AppLayout from '@/layouts/app-layout';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Order } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { format } from 'date-fns';
@@ -34,7 +34,7 @@ export default function AdminOrdersIndex({ orders }: Props) {
             'awaiting-payment': { label: 'Awaiting Payment', variant: 'secondary' },
             'payment-offline': { label: 'Payment Offline', variant: 'default' },
             'payment-received': { label: 'Payment Received', variant: 'default' },
-            'dispatched': { label: 'Dispatched', variant: 'outline' },
+            dispatched: { label: 'Dispatched', variant: 'outline' },
         };
 
         const config = statusMap[status] || { label: status, variant: 'secondary' };

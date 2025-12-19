@@ -1,10 +1,10 @@
-import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Cart, type Country } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 
@@ -33,7 +33,7 @@ export default function CheckoutIndex({ cart, countries }: Props) {
         shipping_city: cart.shippingAddress?.city || '',
         shipping_state: cart.shippingAddress?.state || '',
         shipping_postcode: cart.shippingAddress?.postcode || '',
-        shipping_country_id: cart.shippingAddress?.country_id || (countries[0]?.id || 0),
+        shipping_country_id: cart.shippingAddress?.country_id || countries[0]?.id || 0,
         shipping_contact_email: cart.shippingAddress?.contact_email || '',
         shipping_contact_phone: cart.shippingAddress?.contact_phone || '',
         same_as_shipping: true,
@@ -79,9 +79,7 @@ export default function CheckoutIndex({ cart, countries }: Props) {
                                         onChange={(e) => setData('shipping_first_name', e.target.value)}
                                         required
                                     />
-                                    {errors.shipping_first_name && (
-                                        <p className="text-sm text-destructive">{errors.shipping_first_name}</p>
-                                    )}
+                                    {errors.shipping_first_name && <p className="text-sm text-destructive">{errors.shipping_first_name}</p>}
                                 </div>
 
                                 <div className="space-y-2">
@@ -92,9 +90,7 @@ export default function CheckoutIndex({ cart, countries }: Props) {
                                         onChange={(e) => setData('shipping_last_name', e.target.value)}
                                         required
                                     />
-                                    {errors.shipping_last_name && (
-                                        <p className="text-sm text-destructive">{errors.shipping_last_name}</p>
-                                    )}
+                                    {errors.shipping_last_name && <p className="text-sm text-destructive">{errors.shipping_last_name}</p>}
                                 </div>
                             </div>
 
@@ -106,9 +102,7 @@ export default function CheckoutIndex({ cart, countries }: Props) {
                                     onChange={(e) => setData('shipping_line_one', e.target.value)}
                                     required
                                 />
-                                {errors.shipping_line_one && (
-                                    <p className="text-sm text-destructive">{errors.shipping_line_one}</p>
-                                )}
+                                {errors.shipping_line_one && <p className="text-sm text-destructive">{errors.shipping_line_one}</p>}
                             </div>
 
                             <div className="space-y-2">
@@ -149,9 +143,7 @@ export default function CheckoutIndex({ cart, countries }: Props) {
                                         onChange={(e) => setData('shipping_postcode', e.target.value)}
                                         required
                                     />
-                                    {errors.shipping_postcode && (
-                                        <p className="text-sm text-destructive">{errors.shipping_postcode}</p>
-                                    )}
+                                    {errors.shipping_postcode && <p className="text-sm text-destructive">{errors.shipping_postcode}</p>}
                                 </div>
                             </div>
 
@@ -172,9 +164,7 @@ export default function CheckoutIndex({ cart, countries }: Props) {
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                {errors.shipping_country_id && (
-                                    <p className="text-sm text-destructive">{errors.shipping_country_id}</p>
-                                )}
+                                {errors.shipping_country_id && <p className="text-sm text-destructive">{errors.shipping_country_id}</p>}
                             </div>
 
                             <div className="grid gap-4 md:grid-cols-2">
@@ -187,9 +177,7 @@ export default function CheckoutIndex({ cart, countries }: Props) {
                                         onChange={(e) => setData('shipping_contact_email', e.target.value)}
                                         required
                                     />
-                                    {errors.shipping_contact_email && (
-                                        <p className="text-sm text-destructive">{errors.shipping_contact_email}</p>
-                                    )}
+                                    {errors.shipping_contact_email && <p className="text-sm text-destructive">{errors.shipping_contact_email}</p>}
                                 </div>
 
                                 <div className="space-y-2">
@@ -200,9 +188,7 @@ export default function CheckoutIndex({ cart, countries }: Props) {
                                         onChange={(e) => setData('shipping_contact_phone', e.target.value)}
                                         required
                                     />
-                                    {errors.shipping_contact_phone && (
-                                        <p className="text-sm text-destructive">{errors.shipping_contact_phone}</p>
-                                    )}
+                                    {errors.shipping_contact_phone && <p className="text-sm text-destructive">{errors.shipping_contact_phone}</p>}
                                 </div>
                             </div>
                         </CardContent>

@@ -1,11 +1,11 @@
-import AppLayout from '@/layouts/app-layout';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Cart } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Trash2, ShoppingBag } from 'lucide-react';
+import { ShoppingBag, Trash2 } from 'lucide-react';
 
 interface Props {
     cart: Cart | null;
@@ -35,7 +35,7 @@ export default function CartIndex({ cart }: Props) {
             { quantity },
             {
                 preserveScroll: true,
-            }
+            },
         );
     };
 
@@ -99,11 +99,7 @@ export default function CartIndex({ cart }: Props) {
                                 <CardContent className="p-4">
                                     <div className="flex gap-4">
                                         <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md bg-muted">
-                                            <img
-                                                src={getProductImage(line)}
-                                                alt={getProductName(line)}
-                                                className="h-full w-full object-cover"
-                                            />
+                                            <img src={getProductImage(line)} alt={getProductName(line)} className="h-full w-full object-cover" />
                                         </div>
 
                                         <div className="flex flex-1 flex-col justify-between">
@@ -120,11 +116,7 @@ export default function CartIndex({ cart }: Props) {
                                                             </Badge>
                                                         )}
                                                     </div>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleRemoveLine(line.id)}
-                                                    >
+                                                    <Button variant="ghost" size="icon" onClick={() => handleRemoveLine(line.id)}>
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 </div>

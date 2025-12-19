@@ -1,9 +1,9 @@
-import AppLayout from '@/layouts/app-layout';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Order } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
@@ -43,7 +43,7 @@ export default function AdminOrderShow({ order }: Props) {
             'awaiting-payment': { label: 'Awaiting Payment', variant: 'secondary' },
             'payment-offline': { label: 'Payment Offline', variant: 'default' },
             'payment-received': { label: 'Payment Received', variant: 'default' },
-            'dispatched': { label: 'Dispatched', variant: 'outline' },
+            dispatched: { label: 'Dispatched', variant: 'outline' },
         };
 
         const config = statusMap[status] || { label: status, variant: 'secondary' };
@@ -77,9 +77,7 @@ export default function AdminOrderShow({ order }: Props) {
                         <CardContent className="pt-6">
                             <div className="flex gap-3">
                                 <Badge variant="secondary">Subscription</Badge>
-                                <p className="text-sm text-blue-900">
-                                    This order contains subscription items. Customer will be charged monthly.
-                                </p>
+                                <p className="text-sm text-blue-900">This order contains subscription items. Customer will be charged monthly.</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -103,9 +101,7 @@ export default function AdminOrderShow({ order }: Props) {
                                         </div>
                                         <div className="flex flex-1 justify-between">
                                             <div>
-                                                <h3 className="font-semibold">
-                                                    {line.purchasable?.product?.attribute_data?.name?.en || 'Product'}
-                                                </h3>
+                                                <h3 className="font-semibold">{line.purchasable?.product?.attribute_data?.name?.en || 'Product'}</h3>
                                                 <p className="text-sm text-muted-foreground">Quantity: {line.quantity}</p>
                                                 {line.purchasable?.product?.product_type?.is_subscription && (
                                                     <Badge variant="secondary" className="mt-1">
@@ -160,8 +156,7 @@ export default function AdminOrderShow({ order }: Props) {
                                         {order.shippingAddress.line_two && <p>{order.shippingAddress.line_two}</p>}
                                         <p>
                                             {order.shippingAddress.city}
-                                            {order.shippingAddress.state && `, ${order.shippingAddress.state}`}{' '}
-                                            {order.shippingAddress.postcode}
+                                            {order.shippingAddress.state && `, ${order.shippingAddress.state}`} {order.shippingAddress.postcode}
                                         </p>
                                         <p>{order.shippingAddress.country?.name}</p>
                                         <div className="mt-3">
@@ -189,8 +184,7 @@ export default function AdminOrderShow({ order }: Props) {
                                         {order.billingAddress.line_two && <p>{order.billingAddress.line_two}</p>}
                                         <p>
                                             {order.billingAddress.city}
-                                            {order.billingAddress.state && `, ${order.billingAddress.state}`}{' '}
-                                            {order.billingAddress.postcode}
+                                            {order.billingAddress.state && `, ${order.billingAddress.state}`} {order.billingAddress.postcode}
                                         </p>
                                         <p>{order.billingAddress.country?.name}</p>
                                     </div>

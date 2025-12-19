@@ -11,7 +11,6 @@ use App\Models\Guest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Lunar\Models\Customer;
 
@@ -44,7 +43,7 @@ class DeviceGuestController extends Controller
                 'username' => $username,
                 'name' => $request->name,
                 'phone' => $request->phone,
-                'email' => $username . '@example.com', // Guests don't need email
+                'email' => $username.'@example.com', // Guests don't need email
                 'password' => bcrypt(Str::random(32)), // Random password, won't be used
                 'is_admin' => false,
                 'status' => 1,

@@ -87,6 +87,9 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/social-media', [\App\Http\Controllers\Admin\SocialMediaController::class, 'edit'])->name('social-media.edit');
     Route::put('/social-media', [\App\Http\Controllers\Admin\SocialMediaController::class, 'update'])->name('social-media.update');
 
+    Route::get('/general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'edit'])->name('general-settings.edit');
+    Route::put('/general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'update'])->name('general-settings.update');
+
     Route::get('/knowledge', [KnowledgeController::class, 'index'])->name('knowledge.index');
     Route::get('/knowledge/create', [KnowledgeController::class, 'create'])->name('knowledge.create');
     Route::post('/knowledge', [KnowledgeController::class, 'store'])->name('knowledge.store');

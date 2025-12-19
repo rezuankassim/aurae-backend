@@ -366,6 +366,14 @@ export interface SocialMedia {
     [key: string]: unknown; // This allows for additional properties...
 }
 
+export interface GeneralSetting {
+    id: number;
+    contact_no: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
 export interface Cart {
     id: number;
     user_id: number | null;

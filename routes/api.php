@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\DeviceGuestController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\FeedbackController;
+use App\Http\Controllers\Api\GeneralSettingController;
 use App\Http\Controllers\Api\KnowledgeController;
 use App\Http\Controllers\Api\MusicController;
 use App\Http\Controllers\Api\NotificationController;
@@ -17,6 +18,9 @@ use App\Http\Middleware\EnsureDevice;
 use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+// Unprotected routes
+Route::get('/general-settings', [GeneralSettingController::class, 'index'])->name('api.general-settings.index');
 
 Route::group(['middleware' => [EnsureDevice::class]], function () {
     Route::group(['middleware' => ['auth:sanctum']], function () {

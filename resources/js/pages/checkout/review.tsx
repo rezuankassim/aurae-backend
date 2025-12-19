@@ -1,7 +1,7 @@
-import AppLayout from '@/layouts/app-layout';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Cart } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 
@@ -69,11 +69,7 @@ export default function CheckoutReview({ cart }: Props) {
                                 {cart.lines.map((line) => (
                                     <div key={line.id} className="flex gap-4">
                                         <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-muted">
-                                            <img
-                                                src={getProductImage(line)}
-                                                alt={getProductName(line)}
-                                                className="h-full w-full object-cover"
-                                            />
+                                            <img src={getProductImage(line)} alt={getProductName(line)} className="h-full w-full object-cover" />
                                         </div>
                                         <div className="flex flex-1 justify-between">
                                             <div>
@@ -112,8 +108,7 @@ export default function CheckoutReview({ cart }: Props) {
                                         {cart.shippingAddress.line_two && <p>{cart.shippingAddress.line_two}</p>}
                                         <p>
                                             {cart.shippingAddress.city}
-                                            {cart.shippingAddress.state && `, ${cart.shippingAddress.state}`}{' '}
-                                            {cart.shippingAddress.postcode}
+                                            {cart.shippingAddress.state && `, ${cart.shippingAddress.state}`} {cart.shippingAddress.postcode}
                                         </p>
                                         <p>{cart.shippingAddress.country?.name}</p>
                                         <p className="mt-2">{cart.shippingAddress.contact_email}</p>
@@ -140,8 +135,7 @@ export default function CheckoutReview({ cart }: Props) {
                                         {cart.billingAddress.line_two && <p>{cart.billingAddress.line_two}</p>}
                                         <p>
                                             {cart.billingAddress.city}
-                                            {cart.billingAddress.state && `, ${cart.billingAddress.state}`}{' '}
-                                            {cart.billingAddress.postcode}
+                                            {cart.billingAddress.state && `, ${cart.billingAddress.state}`} {cart.billingAddress.postcode}
                                         </p>
                                         <p>{cart.billingAddress.country?.name}</p>
                                     </div>
