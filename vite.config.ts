@@ -6,6 +6,11 @@ import path from 'node:path';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+    optimizeDeps: {
+        include: ['qs'],
+        // If the error originates from a specific package using qs, be more specific:
+        // include: ['@protonemedia/inertiajs-tables-laravel-query-builder > qs'],
+    },
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
