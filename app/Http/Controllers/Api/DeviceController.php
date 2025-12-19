@@ -8,6 +8,7 @@ use App\Http\Resources\BaseResource;
 use App\Http\Resources\DeviceResource;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use tbQuar\Facades\Quar;
 
 class DeviceController extends Controller
@@ -91,8 +92,13 @@ class DeviceController extends Controller
         $token = $request->user()->createToken($device->uuid)->plainTextToken;
         $device->token = $token;
 
+        Log::info('DeviceAuthenticated event created', [
+            'device_uuid' => $device->uuid,
+            'channel' => 'device.'.$device->uuid,
+            'token_length' => strlen($token),
+        ]);
         // Broadcast the authentication event with the access token
-        DeviceAuthenticated::dispatch($request->device->udid, $token);
+        DeviceAuthenticated::dispatch($device->uuid, $token);
 
         return DeviceResource::make($device)
             ->additional([
