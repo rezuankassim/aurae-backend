@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthenticationController;
 use App\Http\Controllers\Api\CustomTherapyController;
 use App\Http\Controllers\Api\DeviceController;
+use App\Http\Controllers\Api\DeviceGuestController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\FeedbackController;
@@ -20,10 +21,14 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => [EnsureDevice::class]], function () {
     Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/user', function (Request $request) {
-            return BaseResource::make($request->user())
+            $user = $request->user();
+            $user->load('guest');
+
+            return BaseResource::make($user)
                 ->additional([
                     'status' => 200,
                     'message' => 'User retrieved successfully.',
+                    'is_guest' => $user->isGuest(),
                 ]);
         });
 
@@ -60,4 +65,9 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
     Route::post('/verify-phone', [AuthenticationController::class, 'verifyPhone'])->name('api.verify_phone');
 
     Route::post('/device-retrieve', [DeviceController::class, 'retrieve'])->name('api.device.retrieve');
+
+    // Guest management routes
+    Route::get('/device-guests', [DeviceGuestController::class, 'index'])->name('api.device.guests.index');
+    Route::post('/device-guest-create', [DeviceGuestController::class, 'store'])->name('api.device.guests.store');
+    Route::post('/device-guest-login', [DeviceGuestController::class, 'login'])->name('api.device.guests.login');
 });

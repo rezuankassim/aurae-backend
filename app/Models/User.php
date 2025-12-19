@@ -80,4 +80,20 @@ class User extends Authenticatable implements LunarUserInterface
     {
         return $this->morphMany(UserDevice::class, 'deviceable');
     }
+
+    /**
+     * Get the guest record if this user is a guest.
+     */
+    public function guest(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Guest::class);
+    }
+
+    /**
+     * Check if this user is a guest user.
+     */
+    public function isGuest(): bool
+    {
+        return $this->guest()->exists();
+    }
 }
