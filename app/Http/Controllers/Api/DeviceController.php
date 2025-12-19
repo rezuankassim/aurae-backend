@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\DeviceAuthenticated;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Http\Resources\DeviceResource;
@@ -89,6 +90,9 @@ class DeviceController extends Controller
         // Pass user token to device
         $token = $request->user()->createToken($device->uuid)->plainTextToken;
         $device->token = $token;
+
+        // Broadcast the authentication event with the access token
+        DeviceAuthenticated::dispatch($request->device->udid, $token);
 
         return DeviceResource::make($device)
             ->additional([
