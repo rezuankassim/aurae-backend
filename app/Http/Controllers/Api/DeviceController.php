@@ -62,7 +62,7 @@ class DeviceController extends Controller
 
         // Verify the device belongs to the authenticated user
         if ($device->user_id !== $request->user()->id) {
-            return BaseResource::make(null)
+            return BaseResource::make([])
                 ->additional([
                     'status' => 403,
                     'message' => 'This device is already linked to another user.',
@@ -73,7 +73,7 @@ class DeviceController extends Controller
 
         // Check if device status is active
         if ($device->status !== 1) {
-            return BaseResource::make(null)
+            return BaseResource::make([])
                 ->additional([
                     'status' => 403,
                     'message' => 'This device is inactive. Please contact support.',
