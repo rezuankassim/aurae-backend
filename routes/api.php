@@ -29,9 +29,6 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
 
         Route::post('/logout', [AuthenticationController::class, 'logout'])->name('api.logout');
 
-        Route::get('/faqs', [FaqController::class, 'index'])->name('api.faqs.index');
-        Route::get('/faqs/{faq}', [FaqController::class, 'show'])->name('api.faqs.show');
-
         Route::get('/knowledge', [KnowledgeController::class, 'index'])->name('api.knowledge.index');
         Route::get('/knowledge/{knowledge}', [KnowledgeController::class, 'show'])->name('api.knowledge.show');
         Route::get('/knowledge/{knowledge}/video', [VideoStreamController::class, 'streamKnowledgeVideo'])->name('api.knowledge.video.stream');
@@ -53,6 +50,9 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
 
         Route::post('/device-login', [DeviceController::class, 'login'])->name('api.device.login');
     });
+
+    Route::get('/faqs', [FaqController::class, 'index'])->name('api.faqs.index');
+    Route::get('/faqs/{faq}', [FaqController::class, 'show'])->name('api.faqs.show');
 
     Route::post('/login', [AuthenticationController::class, 'login'])->name('api.login');
     Route::post('/register', [AuthenticationController::class, 'register'])->name('api.register');
