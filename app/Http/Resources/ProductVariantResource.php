@@ -18,7 +18,21 @@ class ProductVariantResource extends JsonResource
         return [
             'id' => $this->id,
             'sku' => $this->sku,
-            'price' => $this->getPricing()?->price->formatted()
+            'price' => $this->getPricing()?->price->formatted(),
+            'description' => $this->getDescription(),
+            'values' => $this->values->map(function ($value) {
+                return [
+                    'id' => $value->id,
+                    'product_option_id' => $value->product_option_id,
+                    'name' => $value->translate('name'),
+                    'position' => $value->position,
+                    'option' => [
+                        'id' => $value->option->id,
+                        'name' => $value->option->translate('name'),
+                    ]
+                ];
+            }),
+            'values_ids' => $this->values->pluck('id'),
         ];
     }
 

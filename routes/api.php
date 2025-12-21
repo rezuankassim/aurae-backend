@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\AuthenticationController;
 use App\Http\Controllers\Api\CustomTherapyController;
 use App\Http\Controllers\Api\DeviceController;
@@ -20,10 +21,29 @@ use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Unprotected routes
-Route::get('/general-settings', [GeneralSettingController::class, 'index'])->name('api.general-settings.index');
-
 Route::group(['middleware' => [EnsureDevice::class]], function () {
+    // Unprotected routes
+    Route::get('/general-settings', [GeneralSettingController::class, 'index'])->name('api.general-settings.index');
+    Route::get('/countries', [AddressController::class, 'countries'])->name('api.countries.index');
+    Route::get('/states', [AddressController::class, 'states'])->name('api.states.index');
+
+    Route::get('/faqs', [FaqController::class, 'index'])->name('api.faqs.index');
+    Route::get('/faqs/{faq}', [FaqController::class, 'show'])->name('api.faqs.show');
+
+    Route::post('/feedback', [FeedbackController::class, 'store'])->name('api.feedback.store');
+
+    Route::post('/login', [AuthenticationController::class, 'login'])->name('api.login');
+    Route::post('/register', [AuthenticationController::class, 'register'])->name('api.register');
+    Route::post('/send-verify', [AuthenticationController::class, 'sendVerify'])->name('api.send_verify');
+    Route::post('/verify-phone', [AuthenticationController::class, 'verifyPhone'])->name('api.verify_phone');
+
+    Route::post('/device-retrieve', [DeviceController::class, 'retrieve'])->name('api.device.retrieve');
+
+    // Guest management routes
+    Route::get('/device-guests', [DeviceGuestController::class, 'index'])->name('api.device.guests.index');
+    Route::post('/device-guest-create', [DeviceGuestController::class, 'store'])->name('api.device.guests.store');
+    Route::post('/device-guest-login', [DeviceGuestController::class, 'login'])->name('api.device.guests.login');
+
     Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/user', function (Request $request) {
             $user = $request->user();
@@ -57,25 +77,16 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
         Route::post('/device/fcm-token', [DeviceTokenController::class, 'update'])->name('api.device.fcm-token.update');
 
         Route::post('/device-login', [DeviceController::class, 'login'])->name('api.device.login');
+
+        Route::get('/collections', [EcommerceController::class, 'collections'])->name('api.ecommerce.collections');
+        Route::get('/cart', [EcommerceController::class, 'cart'])->name('api.ecommerce.cart');
+        Route::post('/cart/add', [EcommerceController::class, 'addToCart'])->name('api.ecommerce.cart.add');
+        Route::post('/cart/remove', [EcommerceController::class, 'removeFromCart'])->name('api.ecommerce.cart.remove');
+
+        Route::get('/addresses', [AddressController::class, 'index'])->name('api.addresses.index');
+        Route::post('/addresses', [AddressController::class, 'store'])->name('api.addresses.store');
+        Route::get('/addresses/{address}', [AddressController::class, 'show'])->name('api.addresses.show');
+        Route::post('/addresses/{address}', [AddressController::class, 'update'])->name('api.addresses.update');
+        Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('api.addresses.destroy');
     });
-
-    Route::get('/faqs', [FaqController::class, 'index'])->name('api.faqs.index');
-    Route::get('/faqs/{faq}', [FaqController::class, 'show'])->name('api.faqs.show');
-
-    Route::post('/feedback', [FeedbackController::class, 'store'])->name('api.feedback.store');
-
-    Route::post('/login', [AuthenticationController::class, 'login'])->name('api.login');
-    Route::post('/register', [AuthenticationController::class, 'register'])->name('api.register');
-    Route::post('/send-verify', [AuthenticationController::class, 'sendVerify'])->name('api.send_verify');
-    Route::post('/verify-phone', [AuthenticationController::class, 'verifyPhone'])->name('api.verify_phone');
-
-    Route::post('/device-retrieve', [DeviceController::class, 'retrieve'])->name('api.device.retrieve');
-
-    // Guest management routes
-    Route::get('/device-guests', [DeviceGuestController::class, 'index'])->name('api.device.guests.index');
-    Route::post('/device-guest-create', [DeviceGuestController::class, 'store'])->name('api.device.guests.store');
-    Route::post('/device-guest-login', [DeviceGuestController::class, 'login'])->name('api.device.guests.login');
-
-
-    Route::get('/collections', [EcommerceController::class, 'collections'])->name('api.ecommerce.collections');
 });

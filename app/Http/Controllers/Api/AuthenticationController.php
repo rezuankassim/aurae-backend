@@ -8,7 +8,9 @@ use App\Models\User;
 use App\Models\Verification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Lunar\Models\Customer;
 
 class AuthenticationController extends Controller
 {
@@ -59,6 +61,13 @@ class AuthenticationController extends Controller
             'phone' => $request->phone,
             'phone_verified_at' => now(),
         ]);
+
+        $customer = Customer::create([
+            'first_name' => Str::before($request->name, ' '),
+            'last_name' => Str::afterLast($request->name, ' '),
+        ]);
+
+        $customer->users()->attach($user->id);
 
         $request->device->update([
             'deviceable_type' => User::class,
