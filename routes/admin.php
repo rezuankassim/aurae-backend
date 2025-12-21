@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\ProductVariantController;
 use App\Http\Controllers\Admin\TherapyController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserLoginActivityController;
+use App\Http\Controllers\Admin\WebSocketTestController;
 use App\Http\Middleware\EnsureIsAdmin;
 use Illuminate\Support\Facades\Route;
 
@@ -126,4 +127,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/music/{music}/edit', [MusicController::class, 'edit'])->name('music.edit');
     Route::put('/music/{music}', [MusicController::class, 'update'])->name('music.update');
     Route::delete('/music/{music}', [MusicController::class, 'destroy'])->name('music.destroy');
+
+    Route::get('/websocket-test', [WebSocketTestController::class, 'index'])->name('websocket-test.index');
+    Route::post('/websocket-test/trigger', [WebSocketTestController::class, 'trigger'])->name('websocket-test.trigger');
 });

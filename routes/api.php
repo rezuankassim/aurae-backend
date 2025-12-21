@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\CustomTherapyController;
 use App\Http\Controllers\Api\DeviceController;
 use App\Http\Controllers\Api\DeviceGuestController;
 use App\Http\Controllers\Api\DeviceTokenController;
+use App\Http\Controllers\Api\EcommerceController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\GeneralSettingController;
@@ -74,4 +75,7 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
     Route::get('/device-guests', [DeviceGuestController::class, 'index'])->name('api.device.guests.index');
     Route::post('/device-guest-create', [DeviceGuestController::class, 'store'])->name('api.device.guests.store');
     Route::post('/device-guest-login', [DeviceGuestController::class, 'login'])->name('api.device.guests.login');
+
+
+    Route::get('/collections', [EcommerceController::class, 'collections'])->name('api.ecommerce.collections');
 });

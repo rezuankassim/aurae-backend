@@ -14,6 +14,7 @@ import { index as indexProducts } from '@/routes/admin/products';
 import { edit as editSocialMedia } from '@/routes/admin/social-media';
 import { index as indexTherapies } from '@/routes/admin/therapies';
 import { index as indexUsers } from '@/routes/admin/users';
+import { index as indexWebSocketTest } from '@/routes/admin/websocket-test';
 import { index as indexCustomTherapies } from '@/routes/custom-therapies';
 import { index as indexDeviceMaintenance } from '@/routes/device-maintenance';
 import { index } from '@/routes/devices';
@@ -34,6 +35,7 @@ import {
     MessageCircleQuestion,
     Music,
     Newspaper,
+    Radio,
     ShoppingBag,
     TabletSmartphone,
     UsersIcon,
@@ -148,6 +150,11 @@ const managementNavItems: NavItem[] = [
         title: 'General Settings',
         href: editGeneralSettings(),
         icon: CogIcon,
+    },
+    {
+        title: 'WebSocket Test',
+        href: indexWebSocketTest(),
+        icon: Radio,
     },
 ];
 
