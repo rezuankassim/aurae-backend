@@ -28,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(\Lunar\Base\ShippingModifiers $shippingModifiers): void
     {
+        \Lunar\Facades\Telemetry::optOut();
+
         $shippingModifiers->add(CustomShippingModifier::class);
 
         Event::listen(Login::class, LogSuccessfulLogin::class);
