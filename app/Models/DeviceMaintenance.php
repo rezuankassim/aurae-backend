@@ -19,6 +19,7 @@ class DeviceMaintenance extends Model
     protected $fillable = [
         'status', // 0: pending, 1: pending_factory, 2: in_progress, 3: completed
         'user_id',
+        'device_id',
         'maintenance_requested_at',
         'factory_maintenance_requested_at',
         'requested_at_changes',
@@ -46,5 +47,13 @@ class DeviceMaintenance extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the device that needs maintenance.
+     */
+    public function device(): BelongsTo
+    {
+        return $this->belongsTo(Device::class);
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Lunar\Facades\Pricing;
-use Lunar\Models\Product;
 
 class ProductResource extends BaseResource
 {

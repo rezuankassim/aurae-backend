@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\ChunkedUploadController;
 use App\Http\Controllers\Admin\CollectionGroupCollectionController;
 use App\Http\Controllers\Admin\CollectionGroupController;
+use App\Http\Controllers\Admin\DeviceLocationController;
+use App\Http\Controllers\Admin\DeviceMaintenanceController;
 use App\Http\Controllers\Admin\FAQController;
 use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\FirebaseTestController;
@@ -135,4 +137,11 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/firebase-test', [FirebaseTestController::class, 'index'])->name('firebase-test.index');
     Route::post('/firebase-test/send', [FirebaseTestController::class, 'send'])->name('firebase-test.send');
     Route::post('/firebase-test/test-token', [FirebaseTestController::class, 'testToken'])->name('firebase-test.test-token');
+
+    Route::get('/device-maintenances', [DeviceMaintenanceController::class, 'index'])->name('device-maintenances.index');
+    Route::get('/device-maintenances/{deviceMaintenance}', [DeviceMaintenanceController::class, 'show'])->name('device-maintenances.show');
+    Route::put('/device-maintenances/{deviceMaintenance}/status', [DeviceMaintenanceController::class, 'updateStatus'])->name('device-maintenances.status.update');
+
+    Route::get('/device-locations', [DeviceLocationController::class, 'index'])->name('device-locations.index');
+    Route::get('/device-locations/{userDevice}', [DeviceLocationController::class, 'show'])->name('device-locations.show');
 });

@@ -68,7 +68,7 @@ export default function FirebaseTest({ users }: { users: User[] }) {
     const sendNotification = () => {
         setIsSending(true);
 
-        let data: Record<string, any> = {
+        const data: Record<string, any> = {
             type: notificationType,
             title,
             body,

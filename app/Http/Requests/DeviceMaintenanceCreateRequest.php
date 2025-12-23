@@ -22,6 +22,7 @@ class DeviceMaintenanceCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'device_id' => ['required', 'exists:devices,id'],
             'maintenance_date' => ['required', 'date', 'after_or_equal:today'],
             'maintenance_time' => ['required', 'date_format:H:i:s'],
         ];

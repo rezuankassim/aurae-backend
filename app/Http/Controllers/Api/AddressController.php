@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AddressResource;
 use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Lunar\Models\Address;
 use Lunar\Models\Country;
 use Lunar\Models\State;

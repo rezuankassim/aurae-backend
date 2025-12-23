@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Http\Resources\BaseResource;
+use App\Models\DeviceLocation;
 use App\Models\UserDevice;
 use Closure;
 use Illuminate\Http\Request;
@@ -40,6 +41,34 @@ class EnsureDevice
 
         $request->device = $device;
 
+        $this->logDeviceLocation($request, $device);
+
         return $next($request);
+    }
+
+    /**
+     * Log the device's GPS location if coordinates are provided
+     */
+    protected function logDeviceLocation(Request $request, UserDevice $device): void
+    {
+        $latitude = $request->header('X-Device-Latitude');
+        $longitude = $request->header('X-Device-Longitude');
+
+        // Only log if we have at least latitude and longitude
+        if (! $latitude || ! $longitude) {
+            return;
+        }
+
+        DeviceLocation::create([
+            'user_device_id' => $device->id,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'accuracy' => $request->header('X-Device-Accuracy'),
+            'altitude' => $request->header('X-Device-Altitude'),
+            'speed' => $request->header('X-Device-Speed'),
+            'heading' => $request->header('X-Device-Heading'),
+            'api_endpoint' => $request->path(),
+            'ip_address' => $request->ip(),
+        ]);
     }
 }

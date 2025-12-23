@@ -4,6 +4,8 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as indexCollectionGroups } from '@/routes/admin/collection-groups';
+import { index as indexDeviceLocations } from '@/routes/admin/device-locations';
+import { index as indexAdminDeviceMaintenances } from '@/routes/admin/device-maintenances';
 import { index as indexFAQs } from '@/routes/admin/faqs';
 import { index as indexFeedbacks } from '@/routes/admin/feedbacks';
 import { index as indexFirebaseTest } from '@/routes/admin/firebase-test';
@@ -34,6 +36,7 @@ import {
     FileBox,
     FileClock,
     LayoutGrid,
+    MapPin,
     MessageCircleQuestion,
     Music,
     Newspaper,
@@ -98,6 +101,16 @@ const managementNavItems: NavItem[] = [
         title: 'Users',
         href: indexUsers(),
         icon: UsersIcon,
+    },
+    {
+        title: 'Device Maintenances',
+        href: indexAdminDeviceMaintenances(),
+        icon: Construction,
+    },
+    {
+        title: 'Device Locations',
+        href: indexDeviceLocations(),
+        icon: MapPin,
     },
     {
         title: 'Therapies',

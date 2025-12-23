@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CartResource;
 use App\Http\Resources\CollectionResource;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Lunar\Models\Cart;
 use Lunar\Models\Channel;
 use Lunar\Models\Collection;
@@ -19,12 +18,12 @@ class EcommerceController extends Controller
     {
         $collections = Collection::query()
             ->with([
-                'thumbnail', 
+                'thumbnail',
                 'products.media',
-                'products.variants.basePrices.currency', 
+                'products.variants.basePrices.currency',
                 'products.variants.basePrices.priceable',
                 'products.variants.values.option',
-                'products.defaultUrl'
+                'products.defaultUrl',
             ])
             ->get();
 
@@ -41,7 +40,7 @@ class EcommerceController extends Controller
             ->where('user_id', $request->user()->id)
             ->first();
 
-        if (!$cart) {
+        if (! $cart) {
             $cart = Cart::create([
                 'user_id' => $request->user()->id,
                 'currency_id' => Currency::getDefault()->id,
@@ -72,7 +71,7 @@ class EcommerceController extends Controller
                 'channel_id' => Channel::getDefault()->id,
             ]
         );
-        
+
         $productVariant = ProductVariant::findOrFail($request->product_variant_id);
 
         $cart->add($productVariant, $request->quantity);

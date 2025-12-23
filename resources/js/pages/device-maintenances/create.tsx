@@ -12,9 +12,17 @@ import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import dayjs from 'dayjs';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+
+interface Device {
+    id: string;
+    name: string;
+    uuid: string;
+    status: number;
+}
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -27,7 +35,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function News() {
+export default function DeviceMaintenanceCreate({ devices }: { devices: Device[] }) {
     const [open, setOpen] = useState(false);
     const [date, setDate] = useState<Date | undefined>(undefined);
 
@@ -51,11 +59,32 @@ export default function News() {
                 >
                     {({ processing, errors }) => (
                         <>
-                            <div>
-                                <pre className="w-full rounded-lg bg-muted p-4 text-sm">
-                                    <code>/** Device will be added in later **/</code>
-                                </pre>
-                            </div>
+                            {devices.length === 0 ? (
+                                <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+                                    <p className="text-sm text-yellow-800">
+                                        You don't have any registered devices yet. Please register a device before scheduling maintenance.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-flow-col gap-2">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="device_id">Select Device</Label>
+                                        <Select name="device_id">
+                                            <SelectTrigger id="device_id">
+                                                <SelectValue placeholder="Select a device" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {devices.map((device) => (
+                                                    <SelectItem key={device.id} value={device.id}>
+                                                        {device.name} ({device.uuid})
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <InputError message={errors.device_id} />
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="grid grid-flow-col gap-2">
                                 <div className="grid gap-2">
@@ -99,7 +128,7 @@ export default function News() {
                                 </div>
                             </div>
 
-                            <Button type="submit" disabled={processing}>
+                            <Button type="submit" disabled={processing || devices.length === 0}>
                                 Submit
                             </Button>
                         </>

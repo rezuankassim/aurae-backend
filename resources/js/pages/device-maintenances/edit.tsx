@@ -79,11 +79,15 @@ export default function DeviceMaintenanceUpdate({ deviceMaintenance }: { deviceM
                                 </div>
                             </div>
 
-                            <div>
-                                <pre className="w-full rounded-lg bg-muted p-4 text-sm">
-                                    <code>/** Device will be added in later **/</code>
-                                </pre>
-                            </div>
+                            {deviceMaintenance.device && (
+                                <div className="rounded-lg border bg-muted/50 p-4">
+                                    <h2 className="mb-2 text-sm font-medium">Device</h2>
+                                    <div>
+                                        <p className="font-semibold">{deviceMaintenance.device.name}</p>
+                                        <p className="text-sm text-muted-foreground">{deviceMaintenance.device.uuid}</p>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="grid grid-flow-col gap-2">
                                 <div className="grid gap-2">

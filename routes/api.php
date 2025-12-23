@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthenticationController;
 use App\Http\Controllers\Api\CustomTherapyController;
 use App\Http\Controllers\Api\DeviceController;
 use App\Http\Controllers\Api\DeviceGuestController;
+use App\Http\Controllers\Api\DeviceMaintenanceController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\EcommerceController;
 use App\Http\Controllers\Api\FaqController;
@@ -88,5 +89,10 @@ Route::group(['middleware' => [EnsureDevice::class]], function () {
         Route::get('/addresses/{address}', [AddressController::class, 'show'])->name('api.addresses.show');
         Route::post('/addresses/{address}', [AddressController::class, 'update'])->name('api.addresses.update');
         Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('api.addresses.destroy');
+
+        Route::get('/devices', [DeviceMaintenanceController::class, 'devices'])->name('api.devices.index');
+        Route::get('/device-maintenances', [DeviceMaintenanceController::class, 'index'])->name('api.device-maintenances.index');
+        Route::post('/device-maintenances', [DeviceMaintenanceController::class, 'store'])->name('api.device-maintenances.store');
+        Route::get('/device-maintenances/{deviceMaintenance}', [DeviceMaintenanceController::class, 'show'])->name('api.device-maintenances.show');
     });
 });

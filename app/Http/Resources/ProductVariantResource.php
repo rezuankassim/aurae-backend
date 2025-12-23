@@ -29,7 +29,7 @@ class ProductVariantResource extends JsonResource
                     'option' => [
                         'id' => $value->option->id,
                         'name' => $value->option->translate('name'),
-                    ]
+                    ],
                 ];
             }),
             'values_ids' => $this->values->pluck('id'),

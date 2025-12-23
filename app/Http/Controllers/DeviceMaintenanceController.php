@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\DeviceMaintenanceCreateRequest;
 use App\Http\Requests\DeviceMaintenanceUpdateRequest;
+use App\Models\Device;
 use App\Models\DeviceMaintenance;
 use App\Models\User;
 use Carbon\Carbon;
@@ -17,7 +18,10 @@ class DeviceMaintenanceController extends Controller
      */
     public function index()
     {
-        $deviceMaintenances = DeviceMaintenance::where('user_id', auth()->id())->latest()->get();
+        $deviceMaintenances = DeviceMaintenance::with('device')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get();
 
         return Inertia::render('device-maintenances/index', [
             'deviceMaintenances' => $deviceMaintenances,
@@ -29,7 +33,13 @@ class DeviceMaintenanceController extends Controller
      */
     public function create()
     {
-        return Inertia::render('device-maintenances/create');
+        $devices = Device::where('user_id', auth()->id())
+            ->where('status', 1)
+            ->get();
+
+        return Inertia::render('device-maintenances/create', [
+            'devices' => $devices,
+        ]);
     }
 
     /**
@@ -39,8 +49,14 @@ class DeviceMaintenanceController extends Controller
     {
         $validated = $request->validated();
 
+        // Verify device belongs to user
+        $device = Device::where('id', $validated['device_id'])
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
         DeviceMaintenance::create([
             'status' => 1, // pending_factory
+            'device_id' => $validated['device_id'],
             'maintenance_requested_at' => Carbon::parse($validated['maintenance_date'].' '.$validated['maintenance_time']),
             'user_id' => auth()->id(),
         ]);
@@ -93,6 +109,8 @@ class DeviceMaintenanceController extends Controller
         if ($deviceMaintenance->user_id !== auth()->id()) {
             return to_route('device-maintenance.index')->with('error', 'You are not authorized to edit this maintenance request.');
         }
+
+        $deviceMaintenance->load('device');
 
         return Inertia::render('device-maintenances/edit', [
             'deviceMaintenance' => $deviceMaintenance,
