@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CollectionGroupCollectionController;
 use App\Http\Controllers\Admin\CollectionGroupController;
 use App\Http\Controllers\Admin\FAQController;
 use App\Http\Controllers\Admin\FeedbackController;
+use App\Http\Controllers\Admin\FirebaseTestController;
 use App\Http\Controllers\Admin\KnowledgeController;
 use App\Http\Controllers\Admin\MusicController;
 use App\Http\Controllers\Admin\NewsController;
@@ -130,4 +131,8 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
 
     Route::get('/websocket-test', [WebSocketTestController::class, 'index'])->name('websocket-test.index');
     Route::post('/websocket-test/trigger', [WebSocketTestController::class, 'trigger'])->name('websocket-test.trigger');
+
+    Route::get('/firebase-test', [FirebaseTestController::class, 'index'])->name('firebase-test.index');
+    Route::post('/firebase-test/send', [FirebaseTestController::class, 'send'])->name('firebase-test.send');
+    Route::post('/firebase-test/test-token', [FirebaseTestController::class, 'testToken'])->name('firebase-test.test-token');
 });

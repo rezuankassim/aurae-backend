@@ -6,6 +6,7 @@ import { dashboard } from '@/routes';
 import { index as indexCollectionGroups } from '@/routes/admin/collection-groups';
 import { index as indexFAQs } from '@/routes/admin/faqs';
 import { index as indexFeedbacks } from '@/routes/admin/feedbacks';
+import { index as indexFirebaseTest } from '@/routes/admin/firebase-test';
 import { edit as editGeneralSettings } from '@/routes/admin/general-settings';
 import { index as indexKnowledge } from '@/routes/admin/knowledge';
 import { index as indexMusic } from '@/routes/admin/music';
@@ -25,6 +26,7 @@ import { index as indexUsageHistory } from '@/routes/usage-history';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
+    BellRing,
     BookHeart,
     BookOpenText,
     CogIcon,
@@ -155,6 +157,11 @@ const managementNavItems: NavItem[] = [
         title: 'WebSocket Test',
         href: indexWebSocketTest(),
         icon: Radio,
+    },
+    {
+        title: 'Firebase Test',
+        href: indexFirebaseTest(),
+        icon: BellRing,
     },
 ];
 
