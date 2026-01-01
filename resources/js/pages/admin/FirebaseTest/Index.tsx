@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Heading from '@/components/heading';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -79,7 +80,7 @@ export default function FirebaseTest({ users }: { users: User[] }) {
             if (Object.keys(parsedData).length > 0) {
                 data.data = parsedData;
             }
-        } catch (e) {
+        } catch {
             // Ignore invalid JSON
         }
 
@@ -115,7 +116,7 @@ export default function FirebaseTest({ users }: { users: User[] }) {
 
             const result = await response.json();
             setTokenValidation(result);
-        } catch (error) {
+        } catch {
             setTokenValidation({
                 valid: false,
                 message: 'Failed to validate token',
