@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AddressController;
+use App\Http\Controllers\Api\ApkController;
 use App\Http\Controllers\Api\AuthenticationController;
 use App\Http\Controllers\Api\CustomTherapyController;
 use App\Http\Controllers\Api\DeviceController;
@@ -22,7 +23,15 @@ use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['middleware' => [EnsureDevice::class]], function () {
+Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], function () {
+    // Mobile APK routes
+    Route::get('/apk/info', [ApkController::class, 'info'])->name('api.apk.info');
+    Route::get('/apk/download', [ApkController::class, 'download'])->name('api.apk.download');
+
+    // Tablet APK routes
+    Route::get('/apk/tablet/info', [ApkController::class, 'tabletInfo'])->name('api.apk.tablet.info');
+    Route::get('/apk/tablet/download', [ApkController::class, 'tabletDownload'])->name('api.apk.tablet.download');
+
     // Unprotected routes
     Route::get('/general-settings', [GeneralSettingController::class, 'index'])->name('api.general-settings.index');
     Route::get('/countries', [AddressController::class, 'countries'])->name('api.countries.index');

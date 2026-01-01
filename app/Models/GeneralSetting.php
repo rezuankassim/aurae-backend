@@ -13,5 +13,13 @@ class GeneralSetting extends Model
      */
     protected $fillable = [
         'contact_no',
+        'apk_file_path',
+        'apk_version',
+        'apk_file_size',
+        'apk_release_notes',
+        'tablet_apk_file_path',
+        'tablet_apk_version',
+        'tablet_apk_file_size',
+        'tablet_apk_release_notes',
     ];
 }

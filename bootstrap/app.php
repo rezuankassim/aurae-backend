@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckAppVersion;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\HandleLoginSessionIdLogger;
@@ -26,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             HandleLoginSessionIdLogger::class,
+        ]);
+
+        $middleware->alias([
+            'check.app.version' => CheckAppVersion::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

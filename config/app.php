@@ -123,4 +123,32 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Mobile App Version
+    |--------------------------------------------------------------------------
+    |
+    | This value represents the minimum required version of the mobile app.
+    | When a mobile device makes an API request with an X-Device-App-Version
+    | header, it will be checked against this value. If outdated, the API will
+    | return a response prompting the user to update their app.
+    |
+    */
+
+    'mobile_app_version' => env('MOBILE_APP_VERSION', '1.0.0'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mobile Tablet App Version
+    |--------------------------------------------------------------------------
+    |
+    | This value represents the minimum required version of the tablet app.
+    | When a tablet device makes an API request with an X-Device-Tablet-App-Version
+    | header, it will be checked against this value. If outdated, the API will
+    | return a response prompting the user to update their app.
+    |
+    */
+
+    'mobile_tablet_app_version' => env('MOBILE_TABLET_APP_VERSION', '1.0.0'),
+
 ];

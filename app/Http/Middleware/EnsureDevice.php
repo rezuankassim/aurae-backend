@@ -22,9 +22,12 @@ class EnsureDevice
 
         if (empty($deviceUdid)) {
             return BaseResource::make(null)
-                ->setStatusCode(400)
-                ->setMessage('You need to specify your device details.')
-                ->response();
+                ->additional([
+                    'status' => 400,
+                    'message' => 'You need to specify your device details.',
+                ])
+                ->response()
+                ->setStatusCode(400);
         }
 
         // We save the device details
