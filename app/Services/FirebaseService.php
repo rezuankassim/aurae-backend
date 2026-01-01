@@ -101,9 +101,10 @@ class FirebaseService
         try {
             $notification = Notification::create($title, $body);
 
-            $message = CloudMessage::withTarget('token', $token)
+            $message = CloudMessage::new()
                 ->withNotification($notification)
-                ->withData($data);
+                ->withData($data)
+                ->toToken($token);
 
             $this->messaging->send($message);
 
