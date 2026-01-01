@@ -109,6 +109,27 @@ export default function TherapiesCreate({ music }: { music: Music[] }) {
                                         </div>
 
                                         <Field>
+                                            <FieldLabel htmlFor="color_led">Color LED</FieldLabel>
+                                            <Select name="color_led">
+                                                <SelectTrigger id="color_led">
+                                                    <SelectValue placeholder="Select color LED" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="Off">Off</SelectItem>
+                                                    <SelectItem value="Red">Red</SelectItem>
+                                                    <SelectItem value="Orange">Orange</SelectItem>
+                                                    <SelectItem value="Yellow">Yellow</SelectItem>
+                                                    <SelectItem value="Green">Green</SelectItem>
+                                                    <SelectItem value="Blue">Blue</SelectItem>
+                                                    <SelectItem value="Purple">Purple</SelectItem>
+                                                    <SelectItem value="White">White</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+
+                                            {errors.color_led ? <FieldError>{errors.color_led}</FieldError> : null}
+                                        </Field>
+
+                                        <Field>
                                             <FieldLabel htmlFor="status">Status</FieldLabel>
                                             <Select name="status">
                                                 <SelectTrigger id="status">

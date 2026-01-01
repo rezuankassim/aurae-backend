@@ -142,30 +142,28 @@ export default function KnowledgeCreate() {
                                             ) : null}
                                         </Field>
 
-                                        {!videoFile && (
-                                            <Field>
-                                                <FieldLabel htmlFor="video_url" className="flex items-center gap-2">
-                                                    <span>Video URL</span>
-                                                    <Tooltip>
-                                                        <TooltipTrigger>
-                                                            <Info className="size-4" />
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <img src="/example-video-url.png" className="pb-1" />
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </FieldLabel>
-                                                <Input id="video_url" name="video_url" placeholder="Video URL" />
-
-                                                <FieldDescription>
-                                                    Use youtube link and copy the link from the clicking "Share" button and click "Embed" and copy the
-                                                    value from "src"
-                                                </FieldDescription>
-                                                {errors.video_url ? <FieldError>{errors.video_url}</FieldError> : null}
-                                            </Field>
-                                        )}
-
                                         <Field>
+                                            <FieldLabel htmlFor="video_url" className="flex items-center gap-2">
+                                                <span>Video URL</span>
+                                                <Tooltip>
+                                                    <TooltipTrigger>
+                                                        <Info className="size-4" />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <img src="/example-video-url.png" className="pb-1" />
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </FieldLabel>
+                                            <Input id="video_url" name="video_url" placeholder="Video URL" />
+
+                                            <FieldDescription>
+                                                Use youtube link and copy the link from the clicking "Share" button and click "Embed" and copy the
+                                                value from "src"
+                                            </FieldDescription>
+                                            {errors.video_url ? <FieldError>{errors.video_url}</FieldError> : null}
+                                        </Field>
+
+                                        {/* <Field>
                                             <FieldLabel htmlFor="video">Upload Video</FieldLabel>
                                             <input
                                                 ref={videoInputRef}
@@ -237,7 +235,7 @@ export default function KnowledgeCreate() {
                                                 video URL will be ignored.
                                             </FieldDescription>
                                             {errors.video ? <FieldError>{errors.video}</FieldError> : null}
-                                        </Field>
+                                        </Field> */}
 
                                         <div className="grid grid-flow-col gap-2">
                                             <Field>

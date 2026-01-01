@@ -123,35 +123,33 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                             {errors.content ? <FieldError>{errors.content}</FieldError> : null}
                                         </Field>
 
-                                        {!videoFile && !existingVideo && (
-                                            <Field>
-                                                <FieldLabel htmlFor="video_url" className="flex items-center gap-2">
-                                                    <span>Video URL</span>
-                                                    <Tooltip>
-                                                        <TooltipTrigger>
-                                                            <Info className="size-4" />
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <img src="/example-video-url.png" className="pb-1" />
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </FieldLabel>
-                                                <Input
-                                                    id="video_url"
-                                                    name="video_url"
-                                                    placeholder="Video URL"
-                                                    defaultValue={knowledge.video_url || ''}
-                                                />
-
-                                                <FieldDescription>
-                                                    Use youtube link and copy the link from the clicking "Share" button and click "Embed" and copy the
-                                                    value from "src"
-                                                </FieldDescription>
-                                                {errors.video_url ? <FieldError>{errors.video_url}</FieldError> : null}
-                                            </Field>
-                                        )}
-
                                         <Field>
+                                            <FieldLabel htmlFor="video_url" className="flex items-center gap-2">
+                                                <span>Video URL</span>
+                                                <Tooltip>
+                                                    <TooltipTrigger>
+                                                        <Info className="size-4" />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <img src="/example-video-url.png" className="pb-1" />
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </FieldLabel>
+                                            <Input
+                                                id="video_url"
+                                                name="video_url"
+                                                placeholder="Video URL"
+                                                defaultValue={knowledge.video_url || ''}
+                                            />
+
+                                            <FieldDescription>
+                                                Use youtube link and copy the link from the clicking "Share" button and click "Embed" and copy the
+                                                value from "src"
+                                            </FieldDescription>
+                                            {errors.video_url ? <FieldError>{errors.video_url}</FieldError> : null}
+                                        </Field>
+
+                                        {/* <Field>
                                             <FieldLabel htmlFor="video">Upload Video</FieldLabel>
                                             <input
                                                 ref={videoInputRef}
@@ -164,7 +162,7 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                             />
 
                                             {/* Show existing video */}
-                                            {existingVideo && !videoFile && (
+                                            {/* {existingVideo && !videoFile && (
                                                 <div className="space-y-2">
                                                     <div className="relative">
                                                         <video src={`/storage/${existingVideo}`} controls className="w-full rounded-lg" />
@@ -180,10 +178,10 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                     </div>
                                                     <p className="text-sm text-muted-foreground">Existing video uploaded</p>
                                                 </div>
-                                            )}
+                                            )} */}
 
                                             {/* Show new video preview */}
-                                            {videoFile && videoPreview && (
+                                            {/* {videoFile && videoPreview && (
                                                 <div className="space-y-2">
                                                     <div className="relative">
                                                         <video src={videoPreview} controls className="w-full rounded-lg" />
@@ -207,9 +205,9 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                         {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
                                                     </p>
                                                 </div>
-                                            )}
+                                            )} */}
 
-                                            {uploadState.uploading && (
+                                            {/* {uploadState.uploading && (
                                                 <div className="space-y-2">
                                                     <div className="flex items-center justify-between text-sm">
                                                         <span className="flex items-center gap-2">
@@ -220,14 +218,14 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                     </div>
                                                     <Progress value={uploadState.progress} />
                                                 </div>
-                                            )}
+                                            )} */}
 
-                                            {uploadState.error && (
+                                            {/* {uploadState.error && (
                                                 <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{uploadState.error}</div>
-                                            )}
+                                            )} */}
 
                                             {/* Show upload button */}
-                                            {!videoFile && !existingVideo && (
+                                            {/* {!videoFile && !existingVideo && (
                                                 <Button
                                                     type="button"
                                                     variant="outline"
@@ -237,10 +235,10 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                 >
                                                     Choose Video File (Max 5GB)
                                                 </Button>
-                                            )}
+                                            )} */}
 
                                             {/* Show replace button for existing video */}
-                                            {existingVideo && !videoFile && (
+                                            {/* {existingVideo && !videoFile && (
                                                 <Button
                                                     type="button"
                                                     variant="outline"
@@ -250,14 +248,14 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                 >
                                                     Replace Video
                                                 </Button>
-                                            )}
+                                            )} */}
 
-                                            <FieldDescription>
+                                            {/* <FieldDescription>
                                                 Upload a video file (MP4, MOV, AVI, WMV, FLV, MKV, WebM). Maximum size: 5GB. If video is uploaded,
                                                 video URL will be ignored.
                                             </FieldDescription>
                                             {errors.video ? <FieldError>{errors.video}</FieldError> : null}
-                                        </Field>
+                                        </Field> */}
 
                                         <div className="grid grid-flow-col gap-2">
                                             <Field>

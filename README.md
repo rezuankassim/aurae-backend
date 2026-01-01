@@ -1,6 +1,6 @@
 ### Deployments
 
-[![Laravel Forge Site Deployment Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fforge.laravel.com%2Fsite-badges%2F7bd8e650-b574-4ea8-9991-2771ed050e7d&style=plastic)](https://forge.laravel.com/rezuan-kassim/aurae-backend/2857918)
+[![Laravel Forge Site Deployment Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fforge.laravel.com%2Fsite-badges%2Fe5db96e9-33f7-4c6a-81a1-5088169faadb&style=plastic)](https://forge.laravel.com/rezuan-kassim/aurae-backend/2972858)
 
 ### Modules
 

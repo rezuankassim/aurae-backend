@@ -39,6 +39,7 @@ class CustomTherapyController extends Controller
             'duration' => ['required', 'numeric', 'min:0'],
             'temperature' => ['required', 'numeric'],
             'light' => ['required', 'numeric'],
+            'color_led' => ['required', 'string', 'in:Off,Red,Orange,Yellow,Green,Blue,Purple,White'],
             'status' => ['nullable', 'boolean'],
         ]);
 
@@ -54,6 +55,7 @@ class CustomTherapyController extends Controller
             'duration' => $request->input('duration'),
             'temperature' => $request->input('temperature'),
             'light' => $request->input('light'),
+            'color_led' => $request->input('color_led'),
         ];
         $validated['is_active'] = $request->input('status', true);
         $validated['is_custom'] = true;

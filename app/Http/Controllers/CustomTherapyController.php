@@ -79,6 +79,7 @@ class CustomTherapyController extends Controller
             'duration' => $request->input('duration'),
             'temperature' => $request->input('temp'),
             'light' => $request->input('light'),
+            'color_led' => $request->input('color_led'),
         ])->toArray();
         $validated['is_active'] = $request->input('status', false);
         $customTherapy->update($validated);

@@ -29,6 +29,7 @@ class TherapyUpdateRequest extends FormRequest
             'duration' => 'required|integer|min:1',
             'temp' => 'nullable|integer|min:0|max:100',
             'light' => 'nullable|integer|min:0|max:100',
+            'color_led' => 'required|string|in:Off,Red,Orange,Yellow,Green,Blue,Purple,White',
             'status' => 'sometimes|boolean',
         ];
     }

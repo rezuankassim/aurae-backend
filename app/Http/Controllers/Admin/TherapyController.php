@@ -56,6 +56,7 @@ class TherapyController extends Controller
             'duration' => $request->input('duration'),
             'temperature' => $request->input('temp'),
             'light' => $request->input('light'),
+            'color_led' => $request->input('color_led'),
         ])->toArray();
         $validated['is_active'] = $request->input('status', false);
         $therapy = Therapy::create($validated);
@@ -104,6 +105,7 @@ class TherapyController extends Controller
             'duration' => $request->input('duration'),
             'temperature' => $request->input('temp'),
             'light' => $request->input('light'),
+            'color_led' => $request->input('color_led'),
         ])->toArray();
         $validated['is_active'] = $request->input('status', false);
         $therapy->update($validated);
