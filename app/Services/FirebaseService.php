@@ -16,6 +16,7 @@ class FirebaseService
     public function __construct()
     {
         $credentialsPath = config('firebase.credentials.file');
+        $credentialsPath = $credentialsPath ? base_path($credentialsPath) : null;
 
         if ($credentialsPath && file_exists($credentialsPath)) {
             $factory = (new Factory)->withServiceAccount($credentialsPath);
