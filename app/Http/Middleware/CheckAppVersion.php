@@ -19,13 +19,23 @@ class CheckAppVersion
         $mobileAppVersion = $request->header('X-Device-App-Version');
         $tabletAppVersion = $request->header('X-Device-Tablet-App-Version');
 
+        $mobile_apple_app_store_id = config('app.mobile_apple_app_store_id');
+        $mobile_android_package_name = config('app.mobile_android_package_name');
+        $tablet_android_package_name = config('app.tablet_android_package_name');
+
+        $data = [
+            'mobile_app_id' => $mobile_apple_app_store_id,
+            'mobile_android_package_name' => $mobile_android_package_name,
+            'tablet_android_package_name' => $tablet_android_package_name,
+        ];
+
         // Check mobile app version if header is present
         if ($mobileAppVersion) {
             $requiredVersion = config('app.mobile_app_version');
 
             // Compare versions
             if (version_compare($mobileAppVersion, $requiredVersion, '<')) {
-                return BaseResource::make(null)
+                return BaseResource::make($data)
                     ->additional([
                         'status' => 426,
                         'message' => 'Please update your app to the latest version to continue using this service.',
@@ -44,7 +54,7 @@ class CheckAppVersion
 
             // Compare versions
             if (version_compare($tabletAppVersion, $requiredVersion, '<')) {
-                return BaseResource::make(null)
+                return BaseResource::make($data)
                     ->additional([
                         'status' => 426,
                         'message' => 'Please update your app to the latest version to continue using this service.',

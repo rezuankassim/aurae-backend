@@ -151,4 +151,39 @@ return [
 
     'mobile_tablet_app_version' => env('MOBILE_TABLET_APP_VERSION', '1.0.0'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Mobile Apple App Store ID
+    |--------------------------------------------------------------------------
+    |
+    | This value represents the Apple App Store ID for the mobile application.
+    | It is used to generate links to the app on the App Store for update prompts
+    | and other references within the application.
+    |
+    */
+    'mobile_apple_app_store_id' => env('MOBILE_APPLE_APP_STORE_ID', null),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mobile Android Package Name
+    |--------------------------------------------------------------------------
+    |
+    | This value represents the Android package name for the mobile application.
+    | It is used to generate links to the app on the Google Play Store for update
+    | prompts and other references within the application.
+    |
+    */
+    'mobile_android_package_name' => env('MOBILE_ANDROID_PACKAGE_NAME', null),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tablet Android Package Name
+    |--------------------------------------------------------------------------
+    |
+    | This value represents the Android package name for the tablet application.
+    | It is used to generate links to the app on the Google Play Store for update
+    | prompts and other references within the application.
+    |
+    */
+    'tablet_android_package_name' => env('TABLET_ANDROID_PACKAGE_NAME', null),
 ];
