@@ -31,7 +31,7 @@ class SocialMediaController extends Controller
         $socialMedia = SocialMedia::first();
         $socialMedia->links = [
             'facebook' => $validated['facebook'] ?? null,
-            'twitter' => $validated['twitter'] ?? null,
+            'xhs' => $validated['xhs'] ?? null,
             'instagram' => $validated['instagram'] ?? null,
         ];
         $socialMedia->save();

@@ -62,15 +62,10 @@ export default function SocialMediaEdit({ socialMedia }: { socialMedia: SocialMe
                                         </Field>
 
                                         <Field>
-                                            <FieldLabel htmlFor="xiaohongshu">Xiao Hong Shu</FieldLabel>
-                                            <Input
-                                                id="xiaohongshu"
-                                                name="xiaohongshu"
-                                                placeholder="Xiao Hong Shu"
-                                                defaultValue={socialMedia.links?.xiaohongshu || ''}
-                                            />
+                                            <FieldLabel htmlFor="xhs">Xiao Hong Shu</FieldLabel>
+                                            <Input id="xhs" name="xhs" placeholder="Xiao Hong Shu" defaultValue={socialMedia.links?.xhs || ''} />
 
-                                            {errors.xiaohongshu ? <FieldError>{errors.xiaohongshu}</FieldError> : null}
+                                            {errors.xhs ? <FieldError>{errors.xhs}</FieldError> : null}
                                         </Field>
                                     </FieldSet>
                                 </CardContent>

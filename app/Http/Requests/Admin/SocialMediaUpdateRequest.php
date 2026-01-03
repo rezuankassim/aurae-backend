@@ -23,7 +23,7 @@ class SocialMediaUpdateRequest extends FormRequest
     {
         return [
             'facebook' => ['nullable', 'url', 'max:255'],
-            'twitter' => ['nullable', 'url', 'max:255'],
+            'xhs' => ['nullable', 'url', 'max:255'],
             'instagram' => ['nullable', 'url', 'max:255'],
         ];
     }
