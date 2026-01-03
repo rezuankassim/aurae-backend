@@ -9,10 +9,9 @@ import { create, index } from '@/routes/admin/knowledge';
 
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Progress } from '@/components/ui/progress';
 import { useChunkedUpload } from '@/hooks/use-chunked-upload';
 import { SerializedEditorState, SerializedLexicalNode } from 'lexical';
-import { ChevronDown, Info, Loader2, X } from 'lucide-react';
+import { ChevronDown, Info } from 'lucide-react';
 import { SetStateAction, useRef, useState } from 'react';
 
 import KnowledgeController from '@/actions/App/Http/Controllers/Admin/KnowledgeController';

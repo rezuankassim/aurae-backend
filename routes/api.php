@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\EcommerceController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\GeneralSettingController;
+use App\Http\Controllers\Api\HealthReportController;
 use App\Http\Controllers\Api\KnowledgeController;
 use App\Http\Controllers\Api\MusicController;
 use App\Http\Controllers\Api\NotificationController;
@@ -103,5 +104,8 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::get('/device-maintenances', [DeviceMaintenanceController::class, 'index'])->name('api.device-maintenances.index');
         Route::post('/device-maintenances', [DeviceMaintenanceController::class, 'store'])->name('api.device-maintenances.store');
         Route::get('/device-maintenances/{deviceMaintenance}', [DeviceMaintenanceController::class, 'show'])->name('api.device-maintenances.show');
+
+        Route::get('/health-reports', [HealthReportController::class, 'index'])->name('api.health-reports.index');
+        Route::get('/health-reports/{healthReport}', [HealthReportController::class, 'show'])->name('api.health-reports.show');
     });
 });

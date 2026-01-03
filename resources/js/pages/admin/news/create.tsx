@@ -96,6 +96,22 @@ export default function News() {
                             </div>
 
                             <div className="grid gap-2">
+                                <Label htmlFor="status">Status</Label>
+
+                                <Select name="status" defaultValue="unpublished">
+                                    <SelectTrigger id="status" name="status">
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="published">Published</SelectItem>
+                                        <SelectItem value="unpublished">Unpublished</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                <InputError message={errors.status} />
+                            </div>
+
+                            <div className="grid gap-2">
                                 <Label htmlFor="image">Image</Label>
 
                                 <Input type="file" id="image" name="image" placeholder="Image URL" accept="image/*" />

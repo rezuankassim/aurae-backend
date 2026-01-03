@@ -9,10 +9,9 @@ import { index } from '@/routes/admin/knowledge';
 
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Progress } from '@/components/ui/progress';
 import { useChunkedUpload } from '@/hooks/use-chunked-upload';
 import { SerializedEditorState, SerializedLexicalNode } from 'lexical';
-import { ChevronDown, Info, Loader2, X } from 'lucide-react';
+import { ChevronDown, Info } from 'lucide-react';
 import { SetStateAction, useRef, useState } from 'react';
 
 import KnowledgeController from '@/actions/App/Http/Controllers/Admin/KnowledgeController';
@@ -135,12 +134,7 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </FieldLabel>
-                                            <Input
-                                                id="video_url"
-                                                name="video_url"
-                                                placeholder="Video URL"
-                                                defaultValue={knowledge.video_url || ''}
-                                            />
+                                            <Input id="video_url" name="video_url" placeholder="Video URL" defaultValue={knowledge.video_url || ''} />
 
                                             <FieldDescription>
                                                 Use youtube link and copy the link from the clicking "Share" button and click "Embed" and copy the
@@ -162,7 +156,7 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                             />
 
                                             {/* Show existing video */}
-                                            {/* {existingVideo && !videoFile && (
+                                        {/* {existingVideo && !videoFile && (
                                                 <div className="space-y-2">
                                                     <div className="relative">
                                                         <video src={`/storage/${existingVideo}`} controls className="w-full rounded-lg" />
@@ -180,8 +174,8 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                 </div>
                                             )} */}
 
-                                            {/* Show new video preview */}
-                                            {/* {videoFile && videoPreview && (
+                                        {/* Show new video preview */}
+                                        {/* {videoFile && videoPreview && (
                                                 <div className="space-y-2">
                                                     <div className="relative">
                                                         <video src={videoPreview} controls className="w-full rounded-lg" />
@@ -207,7 +201,7 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                 </div>
                                             )} */}
 
-                                            {/* {uploadState.uploading && (
+                                        {/* {uploadState.uploading && (
                                                 <div className="space-y-2">
                                                     <div className="flex items-center justify-between text-sm">
                                                         <span className="flex items-center gap-2">
@@ -220,12 +214,12 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                 </div>
                                             )} */}
 
-                                            {/* {uploadState.error && (
+                                        {/* {uploadState.error && (
                                                 <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{uploadState.error}</div>
                                             )} */}
 
-                                            {/* Show upload button */}
-                                            {/* {!videoFile && !existingVideo && (
+                                        {/* Show upload button */}
+                                        {/* {!videoFile && !existingVideo && (
                                                 <Button
                                                     type="button"
                                                     variant="outline"
@@ -237,8 +231,8 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                 </Button>
                                             )} */}
 
-                                            {/* Show replace button for existing video */}
-                                            {/* {existingVideo && !videoFile && (
+                                        {/* Show replace button for existing video */}
+                                        {/* {existingVideo && !videoFile && (
                                                 <Button
                                                     type="button"
                                                     variant="outline"
@@ -250,7 +244,7 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                 </Button>
                                             )} */}
 
-                                            {/* <FieldDescription>
+                                        {/* <FieldDescription>
                                                 Upload a video file (MP4, MOV, AVI, WMV, FLV, MKV, WebM). Maximum size: 5GB. If video is uploaded,
                                                 video URL will be ignored.
                                             </FieldDescription>

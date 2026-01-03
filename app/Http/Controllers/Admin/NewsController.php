@@ -43,14 +43,21 @@ class NewsController extends Controller
             $validated['image'] = $path;
         }
 
+        // Set is_published based on status field
+        $validated['is_published'] = $validated['status'] === 'published';
+
+        // Handle scheduled publishing date (optional)
         if (isset($validated['published_date']) && isset($validated['published_time'])) {
-            if (now()->greaterThanOrEqualTo(\DateTime::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']))) {
-                $validated['is_published'] = true;
-            } else {
-                $validated['is_published'] = false;
-            }
-            $validated['published_at'] = \DateTime::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']);
+            $validated['published_at'] = Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']);
+        } elseif ($validated['is_published']) {
+            // If published now without scheduled date, set published_at to now
+            $validated['published_at'] = now();
+        } else {
+            $validated['published_at'] = null;
         }
+
+        // Remove temporary fields
+        unset($validated['status'], $validated['published_date'], $validated['published_time']);
 
         News::create($validated);
 
@@ -79,6 +86,7 @@ class NewsController extends Controller
         transform($news, function ($item) {
             $item->published_date = $item->published_at ? $item->published_at->format('d-m-Y') : null;
             $item->published_time = $item->published_at ? $item->published_at->format('H:i:s') : null;
+            $item->status = $item->is_published ? 'published' : 'unpublished';
 
             return $item;
         });
@@ -100,17 +108,22 @@ class NewsController extends Controller
             $validated['image'] = $path;
         }
 
+        // Set is_published based on status field
+        $validated['is_published'] = $validated['status'] === 'published';
+
+        // Handle scheduled publishing date (optional)
         if (isset($validated['published_date']) && isset($validated['published_time'])) {
-            if (now()->greaterThanOrEqualTo(Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']))) {
-                $validated['is_published'] = true;
-            } else {
-                $validated['is_published'] = false;
-            }
             $validated['published_at'] = Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']);
-        } else {
-            $validated['is_published'] = false;
+        } elseif ($validated['is_published'] && ! $news->published_at) {
+            // If published now without scheduled date and no previous published_at, set to now
+            $validated['published_at'] = now();
+        } elseif (! $validated['is_published'] && ! isset($validated['published_date'])) {
+            // If unpublished and no scheduled date provided, clear published_at
             $validated['published_at'] = null;
         }
+
+        // Remove temporary fields
+        unset($validated['status'], $validated['published_date'], $validated['published_time']);
 
         $news->update($validated);
 

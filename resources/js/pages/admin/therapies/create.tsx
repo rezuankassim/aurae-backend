@@ -2,7 +2,7 @@ import TherapyController from '@/actions/App/Http/Controllers/Admin/TherapyContr
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Field, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
+import { Field, FieldError, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -101,9 +101,16 @@ export default function TherapiesCreate({ music }: { music: Music[] }) {
 
                                             <Field>
                                                 <FieldLabel htmlFor="light">Light</FieldLabel>
-                                                <Input type="number" id="light" name="light" placeholder="Light" step="0.01" />
+                                                <Select name="light">
+                                                    <SelectTrigger id="light">
+                                                        <SelectValue placeholder="Select light" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="on">On</SelectItem>
+                                                        <SelectItem value="off">Off</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
 
-                                                <FieldDescription>Wait get actual data, then replace this field</FieldDescription>
                                                 {errors.light ? <FieldError>{errors.light}</FieldError> : null}
                                             </Field>
                                         </div>

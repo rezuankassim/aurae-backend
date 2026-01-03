@@ -2,7 +2,7 @@ import TherapyController from '@/actions/App/Http/Controllers/Admin/TherapyContr
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Field, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
+import { Field, FieldError, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
     MediaPlayer,
@@ -161,16 +161,16 @@ export default function TherapiesEdit({ therapy, music }: { therapy: Therapy; mu
 
                                             <Field>
                                                 <FieldLabel htmlFor="light">Light</FieldLabel>
-                                                <Input
-                                                    type="number"
-                                                    id="light"
-                                                    name="light"
-                                                    placeholder="Light"
-                                                    step="0.01"
-                                                    defaultValue={therapy.configuration.light || ''}
-                                                />
+                                                <Select name="light" defaultValue={therapy.configuration.light || 'off'}>
+                                                    <SelectTrigger id="light">
+                                                        <SelectValue placeholder="Select light" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="on">On</SelectItem>
+                                                        <SelectItem value="off">Off</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
 
-                                                <FieldDescription>Wait get actual data, then replace this field</FieldDescription>
                                                 {errors.light ? <FieldError>{errors.light}</FieldError> : null}
                                             </Field>
                                         </div>

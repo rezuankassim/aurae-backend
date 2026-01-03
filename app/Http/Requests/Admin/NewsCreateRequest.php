@@ -27,6 +27,7 @@ class NewsCreateRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
             'html_content' => ['required', 'string'],
+            'status' => ['required', 'string', 'in:published,unpublished'], // Status of news
             'published_date' => ['nullable', 'date_format:d-m-Y'],
             'published_time' => ['nullable', 'date_format:H:i:s'],
         ];

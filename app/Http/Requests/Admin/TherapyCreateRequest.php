@@ -25,10 +25,10 @@ class TherapyCreateRequest extends FormRequest
             'image' => 'nullable|image|max:10240', // Max 10MB
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'music' => 'required|file|mimetypes:audio/*|max:10240', // Max 10MB
+            'music_id' => 'required|exists:music,id',
             'duration' => 'required|integer|min:1',
             'temp' => 'nullable|integer|min:0|max:100',
-            'light' => 'nullable|integer|min:0|max:100',
+            'light' => 'nullable|in:on,off',
             'color_led' => 'required|string|in:Off,Red,Orange,Yellow,Green,Blue,Purple,White',
             'status' => 'sometimes|boolean',
         ];

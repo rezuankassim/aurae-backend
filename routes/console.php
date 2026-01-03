@@ -13,3 +13,8 @@ Artisan::command('inspire', function () {
 Schedule::command('uploads:cleanup --hours=24')
     ->daily()
     ->at('02:00');
+
+// Schedule automatic publishing of news based on published_at timestamp
+// Runs every minute to check for news that should be published
+Schedule::command('news:publish-scheduled')
+    ->everyMinute();
