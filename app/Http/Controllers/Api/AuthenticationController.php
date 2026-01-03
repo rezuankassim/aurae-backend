@@ -131,12 +131,12 @@ class AuthenticationController extends Controller
             ]);
         }
 
-        // $user = User::where('phone', $request->phone)->first();
-        // if (! $user) {
-        //     throw ValidationException::withMessages([
-        //         'phone' => ['No user found with this phone number.'],
-        //     ]);
-        // }
+        $user = User::where('phone', $request->phone)->first();
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'phone' => ['No user found with this phone number.'],
+            ]);
+        }
         // $user->phone_verified_at = now();
         // $user->save();
 
