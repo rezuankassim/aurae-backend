@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Listeners\LogConnectionPruned;
 use App\Listeners\LogFailedLogin;
 use App\Listeners\LogLogout;
 use App\Listeners\LogSuccessfulLogin;
@@ -11,6 +12,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Reverb\Events\ConnectionPruned;
 use Lunar\Admin\Support\Facades\LunarPanel;
 
 class AppServiceProvider extends ServiceProvider
@@ -35,5 +37,6 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(Login::class, LogSuccessfulLogin::class);
         Event::listen(Logout::class, LogLogout::class);
         Event::listen(Failed::class, LogFailedLogin::class);
+        Event::listen(ConnectionPruned::class, LogConnectionPruned::class);
     }
 }

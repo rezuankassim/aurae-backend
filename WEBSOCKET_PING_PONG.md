@@ -340,6 +340,60 @@ Event: `.device.pong`
 4. **Error Handling**: Always handle network errors gracefully
 5. **Battery Optimization**: On mobile, adjust ping frequency based on app state (foreground/background)
 
+## Connection Pruning
+
+The backend automatically monitors WebSocket connections and prunes inactive/stale connections. When a connection is pruned, detailed information is logged.
+
+### What Gets Logged
+
+When a connection is pruned due to inactivity, the following information is logged:
+
+- **Connection ID**: Unique identifier for the connection
+- **Connection Identifier**: Raw socket connection identifier
+- **App ID & Key**: Reverb application credentials
+- **Origin**: Origin of the WebSocket connection
+- **Last Seen At**: Timestamp when connection was last active
+- **Last Seen Seconds Ago**: How long the connection was inactive
+- **Was Inactive**: Whether the connection exceeded ping interval
+- **Was Stale**: Whether the connection failed to respond to ping
+- **Uses Control Frames**: Whether WebSocket control frames are used
+- **Ping Interval**: Configured ping interval for the app
+- **Channel Data**: Any additional channel subscription data
+
+### Viewing Connection Logs
+
+You can monitor connection pruning events in real-time:
+
+```bash
+php artisan pail
+```
+
+Or check the Laravel log file:
+
+```bash
+tail -f storage/logs/laravel.log | grep "connection_pruned"
+```
+
+### Example Log Entry
+
+```json
+{
+    "event": "connection_pruned",
+    "connection_id": "abc123",
+    "connection_identifier": "resource_123",
+    "app_id": "605567",
+    "app_key": "bldn8aqyc7eyb1jwgkn7",
+    "origin": "http://localhost:3000",
+    "last_seen_at": "2026-01-04 14:30:00",
+    "last_seen_seconds_ago": 65,
+    "was_inactive": true,
+    "was_stale": true,
+    "uses_control_frames": false,
+    "ping_interval": 30,
+    "channel_data": []
+}
+```
+
 ## Troubleshooting
 
 ### Pong not received
@@ -352,8 +406,20 @@ Event: `.device.pong`
 - Check network stability
 - Verify firewall allows WebSocket connections (port 8080)
 - Ensure REVERB_APP_KEY matches between backend and frontend
+- Monitor connection pruning logs to see if connections are timing out
+- Adjust ping interval if connections are being pruned too aggressively
 
 ### High latency
 - Check server resources
 - Consider adjusting ping interval
 - Verify no network congestion
+
+### Connection Pruned Frequently
+- Check if ping interval is too short in Reverb config:
+  - **Config file**: `config/reverb.php` line 86
+  - **Environment variable**: `REVERB_APP_PING_INTERVAL` (default: 60 seconds)
+  - **Activity timeout**: `REVERB_APP_ACTIVITY_TIMEOUT` (default: 30 seconds)
+  - Connections are pruned if inactive longer than `ping_interval`
+- Verify frontend is sending pings regularly (recommended every 30 seconds)
+- Ensure network isn't dropping packets
+- Review pruning logs for patterns (check `last_seen_seconds_ago`)
