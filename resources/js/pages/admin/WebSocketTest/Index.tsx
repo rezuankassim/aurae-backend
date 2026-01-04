@@ -31,6 +31,12 @@ interface ReceivedEvent {
     access_token: string;
 }
 
+interface PongEvent {
+    timestamp: string;
+    message: string;
+    receivedAt: string;
+}
+
 interface TriggerResult {
     success: boolean;
     message: string;
@@ -47,8 +53,10 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
     const [isConnected, setIsConnected] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const [receivedEvents, setReceivedEvents] = useState<ReceivedEvent[]>([]);
+    const [pongEvents, setPongEvents] = useState<PongEvent[]>([]);
     const [connectionLog, setConnectionLog] = useState<string[]>([]);
     const [isSending, setIsSending] = useState(false);
+    const [isPinging, setIsPinging] = useState(false);
 
     const echoRef = useRef<Echo | null>(null);
     const channelRef = useRef<any>(null);
@@ -134,8 +142,21 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
             ]);
         });
 
+        channelRef.current.listen('.device.pong', (event: { message: string; timestamp: string }) => {
+            const receivedAt = new Date().toLocaleString();
+            addLog(`🏓 PONG received! Server time: ${event.timestamp}`);
+            setPongEvents((prev) => [
+                {
+                    message: event.message,
+                    timestamp: event.timestamp,
+                    receivedAt,
+                },
+                ...prev,
+            ]);
+        });
+
         setIsListening(true);
-        addLog(`Listening for 'device.authenticated' event on channel: ${channelName}`);
+        addLog(`Listening for 'device.authenticated' and 'device.pong' events on channel: ${channelName}`);
     };
 
     const stopListening = () => {
@@ -181,9 +202,50 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
         }
     }, [websocket_trigger]);
 
+    const sendPing = async () => {
+        if (!isConnected || !isListening) {
+            addLog('Connect and listen to channel first');
+            return;
+        }
+
+        setIsPinging(true);
+        addLog(`📤 Sending ping for device: ${deviceUuid}`);
+
+        try {
+            const response = await fetch('/api/ws/ping', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Device-Udid': deviceUuid,
+                    'X-Device-OS': 'Web',
+                    'X-Device-OS-Version': '1.0',
+                    'X-Device-Manufacturer': 'Test',
+                    'X-Device-Model': 'Browser',
+                    'X-Device-App-Version': '1.0.0',
+                },
+                body: JSON.stringify({
+                    device_uuid: deviceUuid,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                addLog(`✅ Ping sent successfully! Waiting for pong...`);
+            } else {
+                addLog(`❌ Ping failed: ${data.message}`);
+            }
+        } catch (error) {
+            addLog(`❌ Error sending ping: ${error instanceof Error ? error.message : String(error)}`);
+        } finally {
+            setIsPinging(false);
+        }
+    };
+
     const clearLogs = () => {
         setConnectionLog([]);
         setReceivedEvents([]);
+        setPongEvents([]);
     };
 
     useEffect(() => {
@@ -304,6 +366,39 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
                         </CardContent>
                     </Card>
 
+                    {/* Ping Pong Test */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Ping Pong Test</CardTitle>
+                            <CardDescription>Test WebSocket ping-pong mechanism</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="rounded-md border bg-accent/30 p-3">
+                                <p className="text-sm font-medium">How it works:</p>
+                                <ol className="mt-2 space-y-1 text-xs text-muted-foreground">
+                                    <li>1. Send HTTP ping request to server</li>
+                                    <li>2. Server broadcasts pong via WebSocket</li>
+                                    <li>3. Receive pong event on your channel</li>
+                                </ol>
+                            </div>
+
+                            <Button onClick={sendPing} disabled={!isConnected || !isListening || isPinging} className="w-full">
+                                {isPinging ? '🏓 Pinging...' : '🏓 Send Ping'}
+                            </Button>
+
+                            {pongEvents.length > 0 && (
+                                <div className="rounded-md border bg-green-50 p-3 dark:bg-green-950/20">
+                                    <p className="text-sm font-medium text-green-900 dark:text-green-100">
+                                        ✅ Last Pong: {pongEvents[0].receivedAt}
+                                    </p>
+                                    <p className="mt-1 text-xs text-green-700 dark:text-green-300">
+                                        Server: {pongEvents[0].timestamp}
+                                    </p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
                     {/* Connection Log */}
                     <Card>
                         <CardHeader>
@@ -353,6 +448,42 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
                                                 <span className="text-sm font-medium">Access Token:</span>
                                                 <p className="mt-1 rounded border bg-background p-2 font-mono text-xs break-all">
                                                     {event.access_token}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Pong Events */}
+                {pongEvents.length > 0 && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Pong Events ({pongEvents.length})</CardTitle>
+                            <CardDescription>Pong responses received via WebSocket</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-3">
+                                {pongEvents.map((event, index) => (
+                                    <div key={index} className="rounded-md border bg-green-50 p-4 dark:bg-green-950/20">
+                                        <div className="mb-2 flex items-center justify-between">
+                                            <Badge variant="default" className="bg-green-600">🏓 Pong #{pongEvents.length - index}</Badge>
+                                            <span className="text-xs text-muted-foreground">{event.receivedAt}</span>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div>
+                                                <span className="text-sm font-medium">Message:</span>
+                                                <p className="mt-1 rounded border bg-background p-2 font-mono text-xs">
+                                                    {event.message}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <span className="text-sm font-medium">Server Timestamp:</span>
+                                                <p className="mt-1 rounded border bg-background p-2 font-mono text-xs">
+                                                    {event.timestamp}
                                                 </p>
                                             </div>
                                         </div>

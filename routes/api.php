@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\TherapyController;
 use App\Http\Controllers\Api\UsageHistoryController;
 use App\Http\Controllers\Api\VideoStreamController;
+use App\Http\Controllers\Api\WebSocketController;
 use App\Http\Middleware\EnsureDevice;
 use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
@@ -49,6 +50,9 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
     Route::post('/verify-phone', [AuthenticationController::class, 'verifyPhone'])->name('api.verify_phone');
 
     Route::post('/device-retrieve', [DeviceController::class, 'retrieve'])->name('api.device.retrieve');
+
+    // WebSocket ping-pong
+    Route::post('/ws/ping', [WebSocketController::class, 'ping'])->name('api.ws.ping');
 
     // Guest management routes
     Route::get('/device-guests', [DeviceGuestController::class, 'index'])->name('api.device.guests.index');
