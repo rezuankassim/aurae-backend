@@ -38,7 +38,7 @@ class MusicController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'thumbnail' => ['nullable', 'image', 'max:10240'], // 10MB max
-            'music' => ['required', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:51200'], // 50MB max
+            'music' => ['required', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:1073741824'], // 1GB max
             'is_active' => ['boolean'],
         ]);
 
@@ -81,7 +81,7 @@ class MusicController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'thumbnail' => ['nullable', 'image', 'max:10240'],
-            'music' => ['nullable', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:51200'],
+            'music' => ['nullable', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:1073741824'], // 1GB
             'is_active' => ['boolean'],
         ]);
 
