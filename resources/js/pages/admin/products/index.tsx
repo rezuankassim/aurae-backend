@@ -97,7 +97,13 @@ export default function ProductsIndex({
 
                                                 <InputGroup>
                                                     <InputGroupAddon>RM</InputGroupAddon>
-                                                    <InputGroupInput type="number" id="base_price" name="base_price" placeholder="Price" />
+                                                    <InputGroupInput
+                                                        type="number"
+                                                        id="base_price"
+                                                        name="base_price"
+                                                        placeholder="Price"
+                                                        step="0.01"
+                                                    />
                                                 </InputGroup>
                                             </div>
                                         </div>

@@ -23,9 +23,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::query()
-            ->with(['productType', 'brand', 'variants' => function ($query) {
-                $query->whereHas('values');
-            }])
+            ->with(['productType', 'brand', 'variants'])
             ->get();
 
         $draftCount = Product::where('status', 'draft')->count();

@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\GeneralSettingController;
 use App\Http\Controllers\Api\HealthReportController;
 use App\Http\Controllers\Api\KnowledgeController;
 use App\Http\Controllers\Api\MusicController;
+use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\TherapyController;
 use App\Http\Controllers\Api\UsageHistoryController;
@@ -77,6 +78,9 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::get('/knowledge', [KnowledgeController::class, 'index'])->name('api.knowledge.index');
         Route::get('/knowledge/{knowledge}', [KnowledgeController::class, 'show'])->name('api.knowledge.show');
         Route::get('/knowledge/{knowledge}/video', [VideoStreamController::class, 'streamKnowledgeVideo'])->name('api.knowledge.video.stream');
+
+        Route::get('/news', [NewsController::class, 'index'])->name('api.news.index');
+        Route::get('/news/{news}', [NewsController::class, 'show'])->name('api.news.show');
 
         Route::get('/therapies', [TherapyController::class, 'index'])->name('api.therapies.index');
 
