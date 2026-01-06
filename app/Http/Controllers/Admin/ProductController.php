@@ -78,7 +78,7 @@ class ProductController extends Controller
             'price' => (int) bcmul($request->base_price, $currency->factor),
         ]);
 
-        return to_route('admin.products.edit', $product->id)->with('success', 'Product created successfully.');
+        return to_route('admin.products.index')->with('success', 'Product created successfully.');
     }
 
     /**
@@ -126,6 +126,57 @@ class ProductController extends Controller
             ],
         ]);
 
-        return to_route('admin.products.index')->with('success', 'Product updated successfully');
+        // Update tags
+        if (isset($validated['tags'])) {
+            $product->tags()->sync($validated['tags']);
+        }
+
+        return back()->with('success', 'Product updated successfully');
+    }
+
+    /**
+     * Update the product status.
+     */
+    public function updateStatus(Request $request, Product $product)
+    {
+        $request->validate([
+            'status' => ['required', 'in:draft,published'],
+        ]);
+
+        $product->update([
+            'status' => $request->status,
+        ]);
+
+        return back()->with('success', 'Product status updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Product $product)
+    {
+        // Delete all related data
+        foreach ($product->variants as $variant) {
+            $variant->basePrices()->delete();
+            $variant->values()->detach();
+            $variant->delete();
+        }
+
+        // Delete product options
+        $product->productOptions()->detach();
+
+        // Delete collections
+        $product->collections()->detach();
+
+        // Delete tags
+        $product->tags()->detach();
+
+        // Delete media
+        $product->clearMediaCollection();
+
+        // Delete the product
+        $product->delete();
+
+        return to_route('admin.products.index')->with('success', 'Product deleted successfully.');
     }
 }

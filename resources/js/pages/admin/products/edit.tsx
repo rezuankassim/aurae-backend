@@ -1,12 +1,13 @@
 import AppLayout from '@/layouts/app-layout';
 import { Product, ProductType, Tag, type BreadcrumbItem } from '@/types';
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Head, Link, router } from '@inertiajs/react';
 
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { index } from '@/routes/admin/products';
+import { update as updateStatus } from '@/routes/admin/products/status';
 
 import { Editor } from '@/components/editor-00/editor';
 import { SerializedEditorState, SerializedLexicalNode } from 'lexical';
@@ -64,7 +65,7 @@ export default function EditProducts({
               },
           } as unknown as SerializedEditorState);
     const [editorState, setEditorState] = useState<SerializedEditorState>(initialValue);
-    const [editorHtmlState, setEditorHtmlState] = useState<string>('');
+    const [editorHtmlState, setEditorHtmlState] = useState<string>(product.attribute_data.description?.en || '');
 
     const [selectedTags, setSelectedTags] = useState<string[]>(product.tags_array.map((tag) => String(tag)));
 
@@ -85,24 +86,56 @@ export default function EditProducts({
         setSelectedTags((prev) => [...prev, value]);
     };
 
+    const handleStatusChange = () => {
+        const newStatus = product.status === 'draft' ? 'published' : 'draft';
+        const message = newStatus === 'published' 
+            ? 'Are you sure you want to publish this product?' 
+            : 'Are you sure you want to change this product back to draft?';
+        
+        if (confirm(message)) {
+            router.put(updateStatus({ product: product.id }).url, 
+                { status: newStatus },
+                { preserveScroll: true }
+            );
+        }
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit product" />
 
             <ProductsLayout id_record={product.id} with_variants={withVariants}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto">
-                    <HeadingSmall title="Edit product" description="Manage system's product, edit or publish" />
+                    <div className="flex items-center justify-between">
+                        <HeadingSmall title="Edit product" description="Manage system's product, edit or publish" />
+                        <div className="flex items-center gap-2">
+                            <span className={`rounded-full px-3 py-1 text-xs font-medium ${
+                                product.status === 'published' 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                                {product.status === 'published' ? 'Published' : 'Draft'}
+                            </span>
+                            <Button
+                                type="button"
+                                variant={product.status === 'draft' ? 'default' : 'outline'}
+                                onClick={handleStatusChange}
+                            >
+                                {product.status === 'draft' ? 'Publish' : 'Unpublish'}
+                            </Button>
+                        </div>
+                    </div>
 
                     <Form
                         {...ProductController.update.form(product.id)}
                         options={{
                             preserveScroll: true,
                         }}
-                        resetOnSuccess
                         transform={(data) => ({
                             ...data,
                             content: JSON.stringify(editorState),
                             html_content: editorHtmlState,
+                            tags: selectedTags,
                         })}
                         className="space-y-6"
                     >

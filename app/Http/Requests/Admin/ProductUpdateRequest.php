@@ -28,6 +28,8 @@ class ProductUpdateRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
             'html_content' => ['nullable', 'string'],
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['exists:lunar_tags,id'],
         ];
     }
 }

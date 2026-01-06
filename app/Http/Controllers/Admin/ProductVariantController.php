@@ -246,9 +246,19 @@ class ProductVariantController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Product $product, ProductVariant $variant)
     {
-        //
+        // Check if this is the last variant - products must have at least one variant
+        if ($product->variants()->count() <= 1) {
+            return back()->with('error', 'Cannot delete the last variant. Products must have at least one variant.');
+        }
+
+        // Delete related data
+        $variant->basePrices()->delete();
+        $variant->values()->detach();
+        $variant->delete();
+
+        return back()->with('success', 'Variant deleted successfully.');
     }
 
     protected function cartesian(array $input)

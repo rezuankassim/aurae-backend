@@ -45,6 +45,8 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
     Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::put('/products/{product}/status', [ProductController::class, 'updateStatus'])->name('products.status.update');
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
     Route::get('/products/{product}/media', [ProductMediaController::class, 'index'])->name('products.media.index');
     Route::post('/products/{product}/media', [ProductMediaController::class, 'store'])->name('products.media.store');
@@ -56,6 +58,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/products/{product}/variants/configure', [ProductVariantController::class, 'configure'])->name('products.variants.configure');
     Route::post('/products/{product}/variants', [ProductVariantController::class, 'store'])->name('products.variants.store');
     Route::post('/products/{product}/variants/update-all', [ProductVariantController::class, 'updateAll'])->name('products.variants.update');
+    Route::delete('/products/{product}/variants/{variant}', [ProductVariantController::class, 'destroy'])->name('products.variants.destroy');
 
     Route::get('/products/{product}/pricing', [ProductPricingController::class, 'index'])->name('products.pricing.index');
     Route::post('/products/{product}/pricing', [ProductPricingController::class, 'store'])->name('products.pricing.store');

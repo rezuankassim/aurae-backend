@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { Product, ProductOption, ProductVariant, type BreadcrumbItem } from '@/types';
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Head, Link, router } from '@inertiajs/react';
 
 import ProductVariantController from '@/actions/App/Http/Controllers/Admin/ProductVariantController';
 import HeadingSmall from '@/components/heading-small';
@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import ProductsLayout from '@/layouts/products/layout';
 import { index } from '@/routes/admin/products';
-import { configure } from '@/routes/admin/products/variants';
+import { configure, destroy } from '@/routes/admin/products/variants';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -30,6 +30,14 @@ export default function ProductVariantsIndex({
     variants: ProductVariant[];
     withVariants: boolean;
 }) {
+    const handleDelete = (variantId: number) => {
+        if (confirm('Are you sure you want to delete this variant?')) {
+            router.delete(destroy({ product: product.id, variant: variantId }).url, {
+                preserveScroll: true,
+            });
+        }
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Product Variant" />
@@ -113,6 +121,7 @@ export default function ProductVariantsIndex({
                                                     <TableCell>
                                                         <Input
                                                             type="number"
+                                                            step="0.01"
                                                             name={`${variant.id}-price`}
                                                             className="w-40"
                                                             defaultValue={
@@ -128,9 +137,14 @@ export default function ProductVariantsIndex({
                                                         <Input name={`${variant.id}-stock`} className="w-16" defaultValue={variant.stock || ''} />
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                        <Button variant="link" size="sm">
-                                                            Edit
-                                                        </Button>
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <Button type="button" variant="link" size="sm">
+                                                                Edit
+                                                            </Button>
+                                                            <Button type="button" variant="link" size="sm" onClick={() => handleDelete(variant.id)}>
+                                                                Delete
+                                                            </Button>
+                                                        </div>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
