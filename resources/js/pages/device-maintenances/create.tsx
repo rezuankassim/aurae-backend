@@ -86,6 +86,21 @@ export default function DeviceMaintenanceCreate({ devices }: { devices: Device[]
                                 </div>
                             )}
 
+                            <div className="grid gap-2">
+                                <Label htmlFor="service_type">Service Type</Label>
+                                <Select name="service_type">
+                                    <SelectTrigger id="service_type">
+                                        <SelectValue placeholder="Select service type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Yearly service">Yearly service</SelectItem>
+                                        <SelectItem value="Monthly service">Monthly service</SelectItem>
+                                        <SelectItem value="One-time service">One-time service</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <InputError message={errors.service_type} />
+                            </div>
+
                             <div className="grid grid-flow-col gap-2">
                                 <div className="grid gap-2">
                                     <Label htmlFor="maintenance_date">Maintenance date</Label>

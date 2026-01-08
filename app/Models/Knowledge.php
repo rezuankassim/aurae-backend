@@ -13,6 +13,7 @@ class Knowledge extends Model
      */
     protected $fillable = [
         'title',
+        'cover_image',
         'content',
         'html_content',
         'video_url',

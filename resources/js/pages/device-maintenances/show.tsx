@@ -59,11 +59,34 @@ export default function DeviceMaintenanceShow({ deviceMaintenance }: { deviceMai
                         </div>
                     </div>
 
-                    <div>
-                        <pre className="w-full rounded-lg bg-muted p-4 text-sm">
-                            <code>/** Device will be added in later **/</code>
-                        </pre>
-                    </div>
+                    {deviceMaintenance.device && (
+                        <>
+                            <h2 className="mb-4 text-sm font-medium">Device Information</h2>
+                            <div className="flex items-start gap-4">
+                                <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border bg-muted">
+                                    <img
+                                        src={`/${deviceMaintenance.device.thumbnail}`}
+                                        alt={deviceMaintenance.device.name}
+                                        className="h-full w-full object-cover"
+                                    />
+                                </div>
+                                <div className="grid flex-1 grid-flow-col grid-cols-3 space-y-2">
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">Device Name</p>
+                                        <p className="font-semibold">{deviceMaintenance.device.name}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">Device UUID</p>
+                                        <p className="font-mono text-sm">{deviceMaintenance.device.uuid}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">Device Plan</p>
+                                        <p className="font-semibold">{deviceMaintenance.device.device_plan}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
 
                     <div className="grid grid-flow-col gap-2">
                         <div className="grid gap-2">

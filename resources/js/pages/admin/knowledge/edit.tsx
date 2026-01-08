@@ -110,6 +110,27 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                         </Field>
 
                                         <Field>
+                                            <FieldLabel htmlFor="cover_image">Cover Image</FieldLabel>
+                                            <Input type="file" id="cover_image" name="cover_image" accept="image/*" />
+
+                                            {knowledge.cover_image && (
+                                                <div className="mt-2">
+                                                    <img
+                                                        src={`/storage/${knowledge.cover_image}`}
+                                                        alt="Current cover"
+                                                        className="h-32 w-auto rounded-lg object-cover"
+                                                    />
+                                                    <p className="mt-1 text-sm text-muted-foreground">Current cover image</p>
+                                                </div>
+                                            )}
+
+                                            <FieldDescription>
+                                                Upload a new cover image to replace the existing one (JPEG, PNG, JPG, GIF, WebP). Maximum size: 10MB.
+                                            </FieldDescription>
+                                            {errors.cover_image ? <FieldError>{errors.cover_image}</FieldError> : null}
+                                        </Field>
+
+                                        <Field>
                                             <FieldLabel htmlFor="content">Content</FieldLabel>
                                             <Editor
                                                 editorSerializedState={editorState}

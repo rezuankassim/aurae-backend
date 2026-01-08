@@ -27,10 +27,10 @@ class ApkController extends Controller
         }
 
         return BaseResource::make([
-                'version' => $generalSetting->apk_version,
-                'file_size' => $generalSetting->apk_file_size,
-                'release_notes' => $generalSetting->apk_release_notes,
-            ])
+            'version' => $generalSetting->apk_version,
+            'file_size' => $generalSetting->apk_file_size,
+            'release_notes' => $generalSetting->apk_release_notes,
+        ])
             ->additional([
                 'status' => 200,
                 'message' => 'APK information retrieved successfully.',
@@ -87,10 +87,10 @@ class ApkController extends Controller
         }
 
         return BaseResource::make([
-                'version' => $generalSetting->tablet_apk_version,
-                'file_size' => $generalSetting->tablet_apk_file_size,
-                'release_notes' => $generalSetting->tablet_apk_release_notes,
-            ])
+            'version' => $generalSetting->tablet_apk_version,
+            'file_size' => $generalSetting->tablet_apk_file_size,
+            'release_notes' => $generalSetting->tablet_apk_release_notes,
+        ])
             ->additional([
                 'status' => 200,
                 'message' => 'Tablet APK information retrieved successfully.',

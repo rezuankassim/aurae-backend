@@ -21,7 +21,7 @@ class LogConnectionPruned
     public function handle(ConnectionPruned $event): void
     {
         $connection = $event->connection->connection();
-        
+
         $logData = [
             'event' => 'connection_pruned',
             'connection_id' => $connection->id(),

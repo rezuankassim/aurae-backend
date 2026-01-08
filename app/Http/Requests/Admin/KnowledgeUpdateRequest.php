@@ -23,6 +23,7 @@ class KnowledgeUpdateRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
+            'cover_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:10240'], // 10MB
             'content' => ['required', 'string'],
             'html_content' => ['required', 'string'],
             'published_date' => ['nullable', 'date'],

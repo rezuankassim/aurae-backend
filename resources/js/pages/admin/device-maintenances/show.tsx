@@ -42,6 +42,7 @@ interface DeviceMaintenance {
     user: User;
     maintenance_requested_at: string;
     factory_maintenance_requested_at: string | null;
+    service_type: string | null;
     is_factory_approved: boolean;
     is_user_approved: boolean;
     created_at: string;
@@ -124,6 +125,11 @@ export default function AdminDeviceMaintenanceShow({ maintenance }: Props) {
                                 </div>
 
                                 <div className="space-y-2 border-t pt-4">
+                                    <div>
+                                        <Label className="text-muted-foreground">Service Type</Label>
+                                        <p className="font-medium">{maintenance.service_type || '-'}</p>
+                                    </div>
+
                                     <div>
                                         <Label className="text-muted-foreground">User Requested Date & Time</Label>
                                         <p className="font-medium">{format(new Date(maintenance.maintenance_requested_at), 'MMMM d, yyyy HH:mm')}</p>

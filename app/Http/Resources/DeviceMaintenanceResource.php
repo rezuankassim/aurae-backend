@@ -27,6 +27,7 @@ class DeviceMaintenanceResource extends BaseResource
             ]),
             'maintenance_requested_at' => optional($this->maintenance_requested_at)->format('Y-m-d H:i:s'),
             'factory_maintenance_requested_at' => optional($this->factory_maintenance_requested_at)->format('Y-m-d H:i:s'),
+            'service_type' => $this->service_type,
             'is_factory_approved' => $this->is_factory_approved,
             'is_user_approved' => $this->is_user_approved,
             'requested_at_changes' => $this->requested_at_changes,

@@ -127,6 +127,16 @@ export default function KnowledgeCreate() {
                                         </Field>
 
                                         <Field>
+                                            <FieldLabel htmlFor="cover_image">Cover Image</FieldLabel>
+                                            <Input type="file" id="cover_image" name="cover_image" accept="image/*" />
+
+                                            <FieldDescription>
+                                                Upload a cover image for this knowledge entry (JPEG, PNG, JPG, GIF, WebP). Maximum size: 10MB.
+                                            </FieldDescription>
+                                            {errors.cover_image ? <FieldError>{errors.cover_image}</FieldError> : null}
+                                        </Field>
+
+                                        <Field>
                                             <FieldLabel htmlFor="content">Content</FieldLabel>
                                             <Editor
                                                 editorSerializedState={editorState}

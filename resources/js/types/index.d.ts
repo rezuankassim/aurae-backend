@@ -109,6 +109,7 @@ export interface News {
 export interface Knowledge {
     id: number;
     title: string;
+    cover_image: string | null;
     content: string;
     html_content: string;
     is_published: boolean;
@@ -168,8 +169,18 @@ export interface DeviceMaintenance {
     status: 0 | 1 | 2 | 3; // 0: pending, 1: pending_factory, 2: in_progress, 3: completed
     user_id: number;
     user: User;
+    device_id: string;
+    device?: {
+        id: string;
+        name: string;
+        uuid: string;
+        status: number;
+        thumbnail: string;
+        device_plan: string;
+    };
     maintenance_requested_at: string;
     factory_maintenance_requested_at: string | null;
+    service_type: string | null;
     requested_at_changes: string | null;
     created_at: string;
     updated_at: string;

@@ -39,6 +39,15 @@ export default function ShowKnowledge({ knowledge }: { knowledge: Knowledge }) {
 
                 <h1 className="mt-4 text-lg font-extrabold">{knowledge.title}</h1>
 
+                {/* Show cover image if exists */}
+                {knowledge.cover_image && (
+                    <img
+                        src={`/storage/${knowledge.cover_image}`}
+                        alt={knowledge.title}
+                        className="w-full rounded-lg object-cover"
+                    />
+                )}
+
                 {/* Show uploaded video if exists, otherwise show YouTube embed */}
                 {knowledge.video_path ? (
                     <video src={`/storage/${knowledge.video_path}`} controls className="w-full rounded-lg" />

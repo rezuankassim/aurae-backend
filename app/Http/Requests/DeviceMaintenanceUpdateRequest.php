@@ -24,6 +24,7 @@ class DeviceMaintenanceUpdateRequest extends FormRequest
         return [
             'maintenance_date' => ['required', 'date', 'after_or_equal:today'],
             'maintenance_time' => ['required', 'date_format:H:i:s'],
+            'service_type' => ['required', 'in:Yearly service,Monthly service,One-time service'],
         ];
     }
 }

@@ -216,6 +216,7 @@ class AddressController extends Controller
 
         $countries = Country::query()->get()->sortBy(function ($country) use ($priorityCountries) {
             $index = array_search($country->name, $priorityCountries);
+
             return $index !== false ? $index : count($priorityCountries) + array_search($country->name, Country::query()->pluck('name')->toArray());
         })->values();
 

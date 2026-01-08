@@ -18,6 +18,8 @@ class DeviceResource extends BaseResource
             'status' => $this->status,
             'uuid' => $this->uuid,
             'name' => $this->name,
+            'thumbnail' => $this->thumbnail,
+            'device_plan' => $this->device_plan,
             'started_at' => optional($this->started_at)->format('Y-m-d'),
             'should_end_at' => optional($this->should_end_at)->format('Y-m-d'),
             'last_used_at' => $this->last_used_at,

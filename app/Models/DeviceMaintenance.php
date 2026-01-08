@@ -22,6 +22,7 @@ class DeviceMaintenance extends Model
         'device_id',
         'maintenance_requested_at',
         'factory_maintenance_requested_at',
+        'service_type',
         'requested_at_changes',
         'is_factory_approved',
         'is_user_approved',

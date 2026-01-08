@@ -24,6 +24,7 @@ class DeviceMaintenanceStoreRequest extends FormRequest
         return [
             'device_id' => ['required', 'exists:devices,id'],
             'maintenance_requested_at' => ['required', 'date', 'after_or_equal:today'],
+            'service_type' => ['required', 'in:Yearly service,Monthly service,One-time service'],
         ];
     }
 

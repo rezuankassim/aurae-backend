@@ -44,7 +44,7 @@ class CheckAppVersion
                         'update_required' => true,
                     ])
                     ->response()
-                    ->setStatusCode(426);// 426 Upgrade Required
+                    ->setStatusCode(426); // 426 Upgrade Required
             }
         }
 

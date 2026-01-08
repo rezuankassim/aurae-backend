@@ -58,6 +58,7 @@ class DeviceMaintenanceController extends Controller
             'status' => 1, // pending_factory
             'device_id' => $validated['device_id'],
             'maintenance_requested_at' => Carbon::parse($validated['maintenance_date'].' '.$validated['maintenance_time']),
+            'service_type' => $validated['service_type'],
             'user_id' => auth()->id(),
         ]);
 
@@ -72,6 +73,8 @@ class DeviceMaintenanceController extends Controller
         if ($deviceMaintenance->user_id !== auth()->id() || ! auth()->user()->is_admin) {
             return to_route('device-maintenance.index')->with('error', 'You are not authorized to view this maintenance request.');
         }
+
+        $deviceMaintenance->load('device');
 
         transform($deviceMaintenance, function ($item) {
             if ($item->requested_at_changes) {
@@ -142,6 +145,7 @@ class DeviceMaintenanceController extends Controller
         $deviceMaintenance->update([
             'maintenance_requested_at' => Carbon::parse($validated['maintenance_date'].' '.$validated['maintenance_time']),
             'factory_maintenance_requested_at' => null,
+            'service_type' => $validated['service_type'],
             'status' => 1, // pending_factory
             'is_user_approved' => false,
             'is_factory_approved' => false,

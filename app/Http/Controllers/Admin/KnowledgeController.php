@@ -39,6 +39,11 @@ class KnowledgeController extends Controller
     {
         $validated = $request->validated();
 
+        // Handle cover image upload
+        if ($request->hasFile('cover_image')) {
+            $validated['cover_image'] = $request->file('cover_image')->store('knowledge/covers', 'public');
+        }
+
         // // Handle video upload (traditional)
         // if ($request->hasFile('video')) {
         //     $validated['video_path'] = $request->file('video')->store('knowledge/videos', 'public');
@@ -91,6 +96,16 @@ class KnowledgeController extends Controller
     {
         $validated = $request->validated();
 
+        // Handle cover image upload
+        if ($request->hasFile('cover_image')) {
+            // Delete old cover image if exists
+            if ($knowledge->cover_image && Storage::disk('public')->exists($knowledge->cover_image)) {
+                Storage::disk('public')->delete($knowledge->cover_image);
+            }
+
+            $validated['cover_image'] = $request->file('cover_image')->store('knowledge/covers', 'public');
+        }
+
         // // Handle video upload (traditional)
         // if ($request->hasFile('video')) {
         //     // Delete old video if exists
@@ -128,6 +143,11 @@ class KnowledgeController extends Controller
      */
     public function destroy(Knowledge $knowledge)
     {
+        // Delete cover image if exists
+        if ($knowledge->cover_image && Storage::disk('public')->exists($knowledge->cover_image)) {
+            Storage::disk('public')->delete($knowledge->cover_image);
+        }
+
         // Delete video file if exists
         if ($knowledge->video_path && Storage::disk('public')->exists($knowledge->video_path)) {
             Storage::disk('public')->delete($knowledge->video_path);

@@ -14,6 +14,7 @@ class KnowledgeResource extends BaseResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'cover_image_url' => $this->cover_image ? asset('storage/'.$this->cover_image) : null,
             'content' => $this->content,
             'html_content' => $this->html_content,
             'video_url' => $this->video_url,

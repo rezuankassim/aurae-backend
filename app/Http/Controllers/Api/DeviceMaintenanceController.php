@@ -71,6 +71,7 @@ class DeviceMaintenanceController extends Controller
             'user_id' => $request->user()->id,
             'device_id' => $validated['device_id'],
             'maintenance_requested_at' => $validated['maintenance_requested_at'],
+            'service_type' => $validated['service_type'],
             'is_factory_approved' => false,
             'is_user_approved' => false,
         ]);
