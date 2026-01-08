@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DeviceResource extends BaseResource
 {
@@ -18,7 +19,9 @@ class DeviceResource extends BaseResource
             'status' => $this->status,
             'uuid' => $this->uuid,
             'name' => $this->name,
-            'thumbnail' => $this->thumbnail,
+            'thumbnail' => $this->thumbnail && Storage::exists($this->thumbnail)
+                ? Storage::url($this->thumbnail)
+                : null,
             'device_plan' => $this->device_plan,
             'started_at' => optional($this->started_at)->format('Y-m-d'),
             'should_end_at' => optional($this->should_end_at)->format('Y-m-d'),
