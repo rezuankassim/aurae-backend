@@ -25,6 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::get('devices', [DeviceController::class, 'index'])->name('devices.index');
+    Route::get('devices/{device}', [DeviceController::class, 'show'])->name('devices.show');
 
     // Cart routes
     Route::get('cart', [CartController::class, 'index'])->name('cart.index');

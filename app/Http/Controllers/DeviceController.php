@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Device;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -12,7 +13,13 @@ class DeviceController extends Controller
      */
     public function index()
     {
-        return Inertia::render('device');
+        $devices = Device::where('user_id', auth()->id())
+            ->latest()
+            ->get();
+
+        return Inertia::render('devices/index', [
+            'devices' => $devices,
+        ]);
     }
 
     /**
@@ -34,9 +41,16 @@ class DeviceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Device $device)
     {
-        //
+        // Ensure the device belongs to the authenticated user
+        if ($device->user_id !== auth()->id()) {
+            return to_route('devices.index')->with('error', 'You are not authorized to view this device.');
+        }
+
+        return Inertia::render('devices/show', [
+            'device' => $device,
+        ]);
     }
 
     /**
