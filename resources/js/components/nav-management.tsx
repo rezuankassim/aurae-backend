@@ -60,13 +60,20 @@ export function NavManagement({ items = [] }: { items: NavItem[] }) {
                             <SidebarMenuButton
                                 asChild
                                 // @ts-expect-error item href url might be undefined
-                                isActive={page.url.startsWith(typeof item.href === 'string' ? item.href : item.href.url)}
+                                isActive={!item.external && page.url.startsWith(typeof item.href === 'string' ? item.href : item.href.url)}
                                 tooltip={{ children: item.title }}
                             >
-                                <Link href={item.href} prefetch>
-                                    {item.icon && <item.icon />}
-                                    <span>{item.title}</span>
-                                </Link>
+                                {item.external ? (
+                                    <a href={item.href as string}>
+                                        {item.icon && <item.icon />}
+                                        <span>{item.title}</span>
+                                    </a>
+                                ) : (
+                                    <Link href={item.href} prefetch>
+                                        {item.icon && <item.icon />}
+                                        <span>{item.title}</span>
+                                    </Link>
+                                )}
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ),

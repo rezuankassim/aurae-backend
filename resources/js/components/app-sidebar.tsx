@@ -40,6 +40,7 @@ import {
     Newspaper,
     Radio,
     ShoppingBag,
+    ShoppingCart,
     TabletSmartphone,
     UsersIcon,
     Waypoints,
@@ -90,6 +91,12 @@ const mainNavItems: NavItem[] = [
 ];
 
 const managementNavItems: NavItem[] = [
+    {
+        title: 'Ecommerce Platform',
+        href: '/lunar',
+        icon: ShoppingCart,
+        external: true,
+    },
     {
         title: 'Users',
         href: indexUsers(),
