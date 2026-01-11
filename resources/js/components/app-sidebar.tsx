@@ -10,6 +10,7 @@ import { index as indexFAQs } from '@/routes/admin/faqs';
 import { index as indexFeedbacks } from '@/routes/admin/feedbacks';
 import { index as indexFirebaseTest } from '@/routes/admin/firebase-test';
 import { edit as editGeneralSettings } from '@/routes/admin/general-settings';
+import { index as indexAdminHealthReports } from '@/routes/admin/health-reports';
 import { index as indexKnowledge } from '@/routes/admin/knowledge';
 import { index as indexMusic } from '@/routes/admin/music';
 import { index as indexNews } from '@/routes/admin/news';
@@ -101,6 +102,11 @@ const managementNavItems: NavItem[] = [
         title: 'Users',
         href: indexUsers(),
         icon: UsersIcon,
+    },
+    {
+        title: 'Health Reports',
+        href: indexAdminHealthReports(),
+        icon: FileBox,
     },
     {
         title: 'Device Maintenances',

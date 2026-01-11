@@ -41,11 +41,7 @@ export default function ShowKnowledge({ knowledge }: { knowledge: Knowledge }) {
 
                 {/* Show cover image if exists */}
                 {knowledge.cover_image && (
-                    <img
-                        src={`/storage/${knowledge.cover_image}`}
-                        alt={knowledge.title}
-                        className="w-full rounded-lg object-cover"
-                    />
+                    <img src={`/storage/${knowledge.cover_image}`} alt={knowledge.title} className="w-full rounded-lg object-cover" />
                 )}
 
                 {/* Show uploaded video if exists, otherwise show YouTube embed */}

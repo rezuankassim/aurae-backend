@@ -388,12 +388,8 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
 
                             {pongEvents.length > 0 && (
                                 <div className="rounded-md border bg-green-50 p-3 dark:bg-green-950/20">
-                                    <p className="text-sm font-medium text-green-900 dark:text-green-100">
-                                        ✅ Last Pong: {pongEvents[0].receivedAt}
-                                    </p>
-                                    <p className="mt-1 text-xs text-green-700 dark:text-green-300">
-                                        Server: {pongEvents[0].timestamp}
-                                    </p>
+                                    <p className="text-sm font-medium text-green-900 dark:text-green-100">✅ Last Pong: {pongEvents[0].receivedAt}</p>
+                                    <p className="mt-1 text-xs text-green-700 dark:text-green-300">Server: {pongEvents[0].timestamp}</p>
                                 </div>
                             )}
                         </CardContent>
@@ -470,21 +466,19 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
                                 {pongEvents.map((event, index) => (
                                     <div key={index} className="rounded-md border bg-green-50 p-4 dark:bg-green-950/20">
                                         <div className="mb-2 flex items-center justify-between">
-                                            <Badge variant="default" className="bg-green-600">🏓 Pong #{pongEvents.length - index}</Badge>
+                                            <Badge variant="default" className="bg-green-600">
+                                                🏓 Pong #{pongEvents.length - index}
+                                            </Badge>
                                             <span className="text-xs text-muted-foreground">{event.receivedAt}</span>
                                         </div>
                                         <div className="space-y-2">
                                             <div>
                                                 <span className="text-sm font-medium">Message:</span>
-                                                <p className="mt-1 rounded border bg-background p-2 font-mono text-xs">
-                                                    {event.message}
-                                                </p>
+                                                <p className="mt-1 rounded border bg-background p-2 font-mono text-xs">{event.message}</p>
                                             </div>
                                             <div>
                                                 <span className="text-sm font-medium">Server Timestamp:</span>
-                                                <p className="mt-1 rounded border bg-background p-2 font-mono text-xs">
-                                                    {event.timestamp}
-                                                </p>
+                                                <p className="mt-1 rounded border bg-background p-2 font-mono text-xs">{event.timestamp}</p>
                                             </div>
                                         </div>
                                     </div>

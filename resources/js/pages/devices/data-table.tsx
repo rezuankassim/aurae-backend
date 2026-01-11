@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Link } from '@inertiajs/react';
 import {
     type ColumnDef,
     flexRender,
@@ -9,7 +10,6 @@ import {
     type SortingState,
     useReactTable,
 } from '@tanstack/react-table';
-import { Link } from '@inertiajs/react';
 import { Eye } from 'lucide-react';
 import { useState } from 'react';
 

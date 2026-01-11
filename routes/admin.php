@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DeviceLocationController;
 use App\Http\Controllers\Admin\DeviceMaintenanceController;
 use App\Http\Controllers\Admin\FAQController;
 use App\Http\Controllers\Admin\FeedbackController;
+use App\Http\Controllers\Admin\HealthReportController;
 use App\Http\Controllers\Admin\FirebaseTestController;
 use App\Http\Controllers\Admin\KnowledgeController;
 use App\Http\Controllers\Admin\MusicController;
@@ -147,4 +148,10 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
 
     Route::get('/device-locations', [DeviceLocationController::class, 'index'])->name('device-locations.index');
     Route::get('/device-locations/{userDevice}', [DeviceLocationController::class, 'show'])->name('device-locations.show');
+
+    Route::get('/health-reports', [HealthReportController::class, 'index'])->name('health-reports.index');
+    Route::get('/health-reports/create', [HealthReportController::class, 'create'])->name('health-reports.create');
+    Route::post('/health-reports', [HealthReportController::class, 'store'])->name('health-reports.store');
+    Route::get('/health-reports/{healthReport}', [HealthReportController::class, 'show'])->name('health-reports.show');
+    Route::delete('/health-reports/{healthReport}', [HealthReportController::class, 'destroy'])->name('health-reports.destroy');
 });

@@ -10,6 +10,7 @@ use App\Http\Resources\DeviceResource;
 use App\Models\Device;
 use App\Models\DeviceMaintenance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DeviceMaintenanceController extends Controller
 {
@@ -109,6 +110,36 @@ class DeviceMaintenanceController extends Controller
             ->additional([
                 'status' => 200,
                 'message' => 'Device maintenance retrieved successfully.',
+            ]);
+    }
+
+    /**
+     * Get dates that should be disabled due to scheduled maintenance.
+     */
+    public function availability(Request $request)
+    {
+        // Get all dates that have maintenance scheduled
+        $disabledDates = DeviceMaintenance::whereNotNull('maintenance_requested_at')
+            ->select(DB::raw('DATE(maintenance_requested_at) as date'))
+            ->distinct()
+            ->pluck('date')
+            ->toArray();
+
+        // Also get factory maintenance dates
+        $factoryDates = DeviceMaintenance::whereNotNull('factory_maintenance_requested_at')
+            ->select(DB::raw('DATE(factory_maintenance_requested_at) as date'))
+            ->distinct()
+            ->pluck('date')
+            ->toArray();
+
+        // Merge and get unique dates
+        $allDisabledDates = array_unique(array_merge($disabledDates, $factoryDates));
+        sort($allDisabledDates);
+
+        return BaseResource::make(['disabled_dates' => array_values($allDisabledDates)])
+            ->additional([
+                'status' => 200,
+                'message' => 'Maintenance availability retrieved successfully.',
             ]);
     }
 }

@@ -48,8 +48,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('news/{news}', [NewsController::class, 'show'])->name('news.show');
 
     Route::get('health-reports', [HealthReportController::class, 'index'])->name('health-reports.index');
-    Route::get('health-reports/create', [HealthReportController::class, 'create'])->name('health-reports.create');
-    Route::post('health-reports', [HealthReportController::class, 'store'])->name('health-reports.store');
     Route::get('health-reports/{healthReport}', [HealthReportController::class, 'show'])->name('health-reports.show');
 
     Route::get('usage-history', [UsageHistoryController::class, 'index'])->name('usage-history.index');

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\HealthReportCreateRequest;
 use App\Models\HealthReport;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -25,29 +24,6 @@ class HealthReportController extends Controller
         return Inertia::render('health-reports/index', [
             'healthReports' => $healthReports,
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return Inertia::render('health-reports/create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(HealthReportCreateRequest $request)
-    {
-        $path = $request->file('file')->store('health-reports');
-
-        HealthReport::create([
-            'file' => $path,
-            'user_id' => auth()->id(),
-        ]);
-
-        return redirect()->route('health-reports.index')->with('success', 'Health report uploaded successfully.');
     }
 
     /**

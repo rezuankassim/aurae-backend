@@ -51,11 +51,7 @@ export const columns: ColumnDef<Device>[] = [
         header: 'Status',
         cell: ({ row }) => {
             const status = row.getValue('status') as number;
-            return status === 1 ? (
-                <Badge className="bg-green-100 text-green-800">Active</Badge>
-            ) : (
-                <Badge variant="secondary">Inactive</Badge>
-            );
+            return status === 1 ? <Badge className="bg-green-100 text-green-800">Active</Badge> : <Badge variant="secondary">Inactive</Badge>;
         },
     },
     {

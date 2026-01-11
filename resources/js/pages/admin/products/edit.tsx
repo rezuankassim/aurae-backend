@@ -88,15 +88,13 @@ export default function EditProducts({
 
     const handleStatusChange = () => {
         const newStatus = product.status === 'draft' ? 'published' : 'draft';
-        const message = newStatus === 'published' 
-            ? 'Are you sure you want to publish this product?' 
-            : 'Are you sure you want to change this product back to draft?';
-        
+        const message =
+            newStatus === 'published'
+                ? 'Are you sure you want to publish this product?'
+                : 'Are you sure you want to change this product back to draft?';
+
         if (confirm(message)) {
-            router.put(updateStatus({ product: product.id }).url, 
-                { status: newStatus },
-                { preserveScroll: true }
-            );
+            router.put(updateStatus({ product: product.id }).url, { status: newStatus }, { preserveScroll: true });
         }
     };
 
@@ -109,18 +107,14 @@ export default function EditProducts({
                     <div className="flex items-center justify-between">
                         <HeadingSmall title="Edit product" description="Manage system's product, edit or publish" />
                         <div className="flex items-center gap-2">
-                            <span className={`rounded-full px-3 py-1 text-xs font-medium ${
-                                product.status === 'published' 
-                                    ? 'bg-green-100 text-green-800' 
-                                    : 'bg-yellow-100 text-yellow-800'
-                            }`}>
+                            <span
+                                className={`rounded-full px-3 py-1 text-xs font-medium ${
+                                    product.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                }`}
+                            >
                                 {product.status === 'published' ? 'Published' : 'Draft'}
                             </span>
-                            <Button
-                                type="button"
-                                variant={product.status === 'draft' ? 'default' : 'outline'}
-                                onClick={handleStatusChange}
-                            >
+                            <Button type="button" variant={product.status === 'draft' ? 'default' : 'outline'} onClick={handleStatusChange}>
                                 {product.status === 'draft' ? 'Publish' : 'Unpublish'}
                             </Button>
                         </div>

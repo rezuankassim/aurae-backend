@@ -109,6 +109,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('api.addresses.destroy');
 
         Route::get('/devices', [DeviceMaintenanceController::class, 'devices'])->name('api.devices.index');
+        Route::get('/device-maintenances/availability', [DeviceMaintenanceController::class, 'availability'])->name('api.device-maintenances.availability');
         Route::get('/device-maintenances', [DeviceMaintenanceController::class, 'index'])->name('api.device-maintenances.index');
         Route::post('/device-maintenances', [DeviceMaintenanceController::class, 'store'])->name('api.device-maintenances.store');
         Route::get('/device-maintenances/{deviceMaintenance}', [DeviceMaintenanceController::class, 'show'])->name('api.device-maintenances.show');
