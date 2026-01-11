@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\ApkController;
 use App\Http\Controllers\Api\AuthenticationController;
+use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\CustomTherapyController;
 use App\Http\Controllers\Api\DeviceController;
 use App\Http\Controllers\Api\DeviceGuestController;
@@ -101,6 +102,13 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::get('/cart', [EcommerceController::class, 'cart'])->name('api.ecommerce.cart');
         Route::post('/cart/add', [EcommerceController::class, 'addToCart'])->name('api.ecommerce.cart.add');
         Route::post('/cart/remove', [EcommerceController::class, 'removeFromCart'])->name('api.ecommerce.cart.remove');
+
+        // Checkout and payment routes
+        Route::post('/checkout/set-addresses', [CheckoutController::class, 'setAddresses'])->name('api.checkout.set-addresses');
+        Route::post('/checkout/initiate-payment', [CheckoutController::class, 'initiatePayment'])->name('api.checkout.initiate-payment');
+        Route::get('/checkout/payment-status/{reference}', [CheckoutController::class, 'checkPaymentStatus'])->name('api.checkout.payment-status');
+        Route::get('/orders', [CheckoutController::class, 'orderHistory'])->name('api.orders.index');
+        Route::get('/orders/{order}', [CheckoutController::class, 'orderDetail'])->name('api.orders.show');
 
         Route::get('/addresses', [AddressController::class, 'index'])->name('api.addresses.index');
         Route::post('/addresses', [AddressController::class, 'store'])->name('api.addresses.store');

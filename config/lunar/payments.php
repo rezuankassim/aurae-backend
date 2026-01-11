@@ -9,6 +9,10 @@ return [
             'driver' => 'offline',
             'authorized' => 'payment-offline',
         ],
+        'revpay' => [
+            'driver' => 'revpay',
+            'authorized' => 'payment-received',
+        ],
     ],
 
 ];

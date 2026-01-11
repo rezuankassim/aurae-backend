@@ -8,6 +8,7 @@ use App\Listeners\LogFailedLogin;
 use App\Listeners\LogLogout;
 use App\Listeners\LogSuccessfulLogin;
 use App\Modifiers\CustomShippingModifier;
+use App\PaymentTypes\RevpayPayment;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
@@ -41,6 +42,9 @@ class AppServiceProvider extends ServiceProvider
                             ->icon('heroicon-o-arrow-left-circle'),
                     ]);
             })->register();
+
+        // Register RevPay payment driver
+        \Lunar\Facades\Payments::extend('revpay', fn ($app) => $app->make(RevpayPayment::class));
     }
 
     /**

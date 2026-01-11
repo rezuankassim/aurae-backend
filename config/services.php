@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'revpay' => [
+        'merchant_id' => env('REVPAY_MERCHANT_ID'),
+        'merchant_key' => env('REVPAY_MERCHANT_KEY'),
+        'key_index' => env('REVPAY_KEY_INDEX', 1),
+        'base_url' => env('REVPAY_BASE_URL', 'https://stg-mpg.revpay-sandbox.com.my/v1'),
+        'currency' => env('REVPAY_CURRENCY', 'MYR'),
+    ],
+
 ];
