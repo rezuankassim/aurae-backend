@@ -35,10 +35,15 @@ class DeviceMaintenanceController extends Controller
      */
     public function index(Request $request)
     {
-        $maintenances = DeviceMaintenance::with(['device', 'user'])
-            ->where('user_id', $request->user()->id)
-            ->latest()
-            ->get();
+        $query = DeviceMaintenance::with(['device', 'user'])
+            ->where('user_id', $request->user()->id);
+
+        // Filter by device_id if provided
+        if ($request->has('device_id') && $request->device_id) {
+            $query->where('device_id', $request->device_id);
+        }
+
+        $maintenances = $query->latest()->get();
 
         return DeviceMaintenanceResource::collection($maintenances)
             ->additional([
@@ -140,6 +145,43 @@ class DeviceMaintenanceController extends Controller
             ->additional([
                 'status' => 200,
                 'message' => 'Maintenance availability retrieved successfully.',
+            ]);
+    }
+
+    /**
+     * Cancel a maintenance request if not yet approved by factory.
+     */
+    public function cancel(Request $request, DeviceMaintenance $deviceMaintenance)
+    {
+        // Verify maintenance belongs to authenticated user
+        if ($deviceMaintenance->user_id !== $request->user()->id) {
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 403,
+                    'message' => 'You do not have permission to cancel this maintenance request.',
+                ])
+                ->response()
+                ->setStatusCode(403);
+        }
+
+        // Check if already approved by factory
+        if ($deviceMaintenance->is_factory_approved) {
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 422,
+                    'message' => 'Cannot cancel maintenance that has already been approved by factory.',
+                ])
+                ->response()
+                ->setStatusCode(422);
+        }
+
+        // Delete the maintenance request
+        $deviceMaintenance->delete();
+
+        return BaseResource::make([])
+            ->additional([
+                'status' => 200,
+                'message' => 'Maintenance request cancelled successfully.',
             ]);
     }
 }

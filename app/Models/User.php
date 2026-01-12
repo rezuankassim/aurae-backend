@@ -96,4 +96,36 @@ class User extends Authenticatable implements LunarUserInterface
     {
         return $this->guest()->exists();
     }
+
+    /**
+     * Get the user subscriptions.
+     */
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    /**
+     * Get the user's active subscription.
+     */
+    public function activeSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(UserSubscription::class)
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('ends_at')
+                    ->orWhere('ends_at', '>', now());
+            })
+            ->latest();
+    }
+
+    /**
+     * Get the maximum number of devices this user can have based on subscription.
+     */
+    public function getMaxDevices(): int
+    {
+        $activeSubscription = $this->activeSubscription()->with('subscription')->first();
+
+        return $activeSubscription?->subscription?->max_devices ?? 1;
+    }
 }

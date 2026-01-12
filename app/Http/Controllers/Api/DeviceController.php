@@ -57,6 +57,21 @@ class DeviceController extends Controller
 
         // Check if device is not linked to any user, link it to the current user
         if (! $device->user_id) {
+            // Check if user has reached device limit based on subscription
+            $user = $request->user();
+            $maxDevices = $user->getMaxDevices();
+            $currentDeviceCount = Device::where('user_id', $user->id)->count();
+
+            if ($currentDeviceCount >= $maxDevices) {
+                return BaseResource::make([])
+                    ->additional([
+                        'status' => 403,
+                        'message' => "Device limit reached. Your subscription allows up to {$maxDevices} device(s). Please upgrade your subscription to add more devices.",
+                    ])
+                    ->response()
+                    ->setStatusCode(403);
+            }
+
             $device->user_id = $request->user()->id;
             $device->save();
         }

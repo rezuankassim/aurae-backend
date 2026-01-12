@@ -7,9 +7,10 @@ use App\Http\Controllers\Admin\DeviceLocationController;
 use App\Http\Controllers\Admin\DeviceMaintenanceController;
 use App\Http\Controllers\Admin\FAQController;
 use App\Http\Controllers\Admin\FeedbackController;
-use App\Http\Controllers\Admin\HealthReportController;
 use App\Http\Controllers\Admin\FirebaseTestController;
+use App\Http\Controllers\Admin\HealthReportController;
 use App\Http\Controllers\Admin\KnowledgeController;
+use App\Http\Controllers\Admin\MaintenanceBannerController;
 use App\Http\Controllers\Admin\MusicController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\OrderController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\Admin\ProductInventoryController;
 use App\Http\Controllers\Admin\ProductMediaController;
 use App\Http\Controllers\Admin\ProductPricingController;
 use App\Http\Controllers\Admin\ProductVariantController;
+use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\TherapyController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserLoginActivityController;
@@ -146,6 +148,14 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/device-maintenances/{deviceMaintenance}', [DeviceMaintenanceController::class, 'show'])->name('device-maintenances.show');
     Route::put('/device-maintenances/{deviceMaintenance}/status', [DeviceMaintenanceController::class, 'updateStatus'])->name('device-maintenances.status.update');
 
+    Route::get('/maintenance-banners', [MaintenanceBannerController::class, 'index'])->name('maintenance-banners.index');
+    Route::get('/maintenance-banners/create', [MaintenanceBannerController::class, 'create'])->name('maintenance-banners.create');
+    Route::post('/maintenance-banners', [MaintenanceBannerController::class, 'store'])->name('maintenance-banners.store');
+    Route::get('/maintenance-banners/{maintenanceBanner}', [MaintenanceBannerController::class, 'show'])->name('maintenance-banners.show');
+    Route::get('/maintenance-banners/{maintenanceBanner}/edit', [MaintenanceBannerController::class, 'edit'])->name('maintenance-banners.edit');
+    Route::put('/maintenance-banners/{maintenanceBanner}', [MaintenanceBannerController::class, 'update'])->name('maintenance-banners.update');
+    Route::delete('/maintenance-banners/{maintenanceBanner}', [MaintenanceBannerController::class, 'destroy'])->name('maintenance-banners.destroy');
+
     Route::get('/device-locations', [DeviceLocationController::class, 'index'])->name('device-locations.index');
     Route::get('/device-locations/{userDevice}', [DeviceLocationController::class, 'show'])->name('device-locations.show');
 
@@ -154,4 +164,11 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::post('/health-reports', [HealthReportController::class, 'store'])->name('health-reports.store');
     Route::get('/health-reports/{healthReport}', [HealthReportController::class, 'show'])->name('health-reports.show');
     Route::delete('/health-reports/{healthReport}', [HealthReportController::class, 'destroy'])->name('health-reports.destroy');
+
+    Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscription.index');
+    Route::get('/subscriptions/create', [SubscriptionController::class, 'create'])->name('subscription.create');
+    Route::post('/subscriptions', [SubscriptionController::class, 'store'])->name('subscription.store');
+    Route::get('/subscriptions/{subscription}/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');
+    Route::put('/subscriptions/{subscription}', [SubscriptionController::class, 'update'])->name('subscription.update');
+    Route::delete('/subscriptions/{subscription}', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');
 });

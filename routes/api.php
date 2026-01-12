@@ -15,9 +15,11 @@ use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\GeneralSettingController;
 use App\Http\Controllers\Api\HealthReportController;
 use App\Http\Controllers\Api\KnowledgeController;
+use App\Http\Controllers\Api\MaintenanceBannerController;
 use App\Http\Controllers\Api\MusicController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TherapyController;
 use App\Http\Controllers\Api\UsageHistoryController;
 use App\Http\Controllers\Api\VideoStreamController;
@@ -50,6 +52,8 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
     Route::post('/register', [AuthenticationController::class, 'register'])->name('api.register');
     Route::post('/send-verify', [AuthenticationController::class, 'sendVerify'])->name('api.send_verify');
     Route::post('/verify-phone', [AuthenticationController::class, 'verifyPhone'])->name('api.verify_phone');
+    Route::post('/forgot-password', [AuthenticationController::class, 'forgotPassword'])->name('api.forgot_password');
+    Route::post('/reset-password', [AuthenticationController::class, 'resetPassword'])->name('api.reset_password');
 
     Route::post('/device-retrieve', [DeviceController::class, 'retrieve'])->name('api.device.retrieve');
 
@@ -91,6 +95,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::post('/custom-therapies', [CustomTherapyController::class, 'store'])->name('api.custom-therapies.store');
 
         Route::post('/usage-histories', [UsageHistoryController::class, 'store'])->name('api.usage-histories.store');
+        Route::get('/usage-histories/chart', [UsageHistoryController::class, 'chart'])->name('api.usage-histories.chart');
 
         Route::get('/notifications', [NotificationController::class, 'index'])->name('api.notifications.index');
 
@@ -121,8 +126,15 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::get('/device-maintenances', [DeviceMaintenanceController::class, 'index'])->name('api.device-maintenances.index');
         Route::post('/device-maintenances', [DeviceMaintenanceController::class, 'store'])->name('api.device-maintenances.store');
         Route::get('/device-maintenances/{deviceMaintenance}', [DeviceMaintenanceController::class, 'show'])->name('api.device-maintenances.show');
+        Route::delete('/device-maintenances/{deviceMaintenance}/cancel', [DeviceMaintenanceController::class, 'cancel'])->name('api.device-maintenances.cancel');
+
+        Route::get('/maintenance-banners', [MaintenanceBannerController::class, 'index'])->name('api.maintenance-banners.index');
 
         Route::get('/health-reports', [HealthReportController::class, 'index'])->name('api.health-reports.index');
         Route::get('/health-reports/{healthReport}', [HealthReportController::class, 'show'])->name('api.health-reports.show');
+
+        // Subscription routes
+        Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('api.subscriptions.index');
+        Route::get('/user/subscription', [SubscriptionController::class, 'userSubscription'])->name('api.user.subscription');
     });
 });

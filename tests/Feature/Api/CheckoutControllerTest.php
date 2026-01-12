@@ -27,7 +27,7 @@ class CheckoutControllerTest extends TestCase
 
         // Create default Language for Lunar PHP
         Language::factory()->create(['default' => true, 'code' => 'en']);
-        
+
         // Create default TaxClass for shipping
         TaxClass::factory()->create(['default' => true, 'name' => 'Default']);
 
@@ -148,7 +148,7 @@ class CheckoutControllerTest extends TestCase
     {
         // Without device headers, EnsureDevice middleware returns 400
         $user = User::factory()->create();
-        
+
         $response = $this->actingAs($user, 'sanctum')
             ->postJson('/api/checkout/set-addresses', [
                 'shipping_address' => [],
@@ -207,7 +207,7 @@ class CheckoutControllerTest extends TestCase
             // This is acceptable in test environment - skip the test
             $this->markTestSkipped('Shipping options configuration required for full payment flow');
         }
-        
+
         $response->assertStatus(200);
         $response->assertJson([
             'status' => 200,
@@ -474,7 +474,7 @@ class CheckoutControllerTest extends TestCase
             'contact_email' => 'john@example.com',
             'contact_phone' => '+60123456789',
         ]);
-        
+
         // Shipping options are calculated during cart->calculate()
         $cart->calculate();
     }

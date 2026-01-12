@@ -28,7 +28,7 @@ class RevpayCallbackControllerTest extends TestCase
 
         // Create default Language for Lunar PHP
         \Lunar\Models\Language::factory()->create(['default' => true, 'code' => 'en']);
-        
+
         // Create default TaxClass
         \Lunar\Models\TaxClass::factory()->create(['default' => true, 'name' => 'Default']);
 
@@ -40,7 +40,7 @@ class RevpayCallbackControllerTest extends TestCase
             'services.revpay.currency' => 'MYR',
         ]);
 
-        $this->signatureService = new RevpaySignatureService();
+        $this->signatureService = new RevpaySignatureService;
     }
 
     #[Test]

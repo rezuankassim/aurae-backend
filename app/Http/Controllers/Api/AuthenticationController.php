@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Models\User;
 use App\Models\Verification;
+use App\Services\FirebaseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -146,6 +147,86 @@ class AuthenticationController extends Controller
             ->additional([
                 'status' => 200,
                 'message' => 'Phone verified successfully.',
+            ]);
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'phone' => ['required', 'string', 'max:20'],
+        ]);
+
+        $user = User::where('phone', $request->phone)->first();
+
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'phone' => ['No user found with this phone number.'],
+            ]);
+        }
+
+        $code = rand(100000, 999999);
+
+        Verification::updateOrCreate(
+            ['phone' => $request->phone],
+            ['code' => $code]
+        );
+
+        // Send OTP via Firebase push notification
+        $firebaseService = app(FirebaseService::class);
+        $firebaseService->sendToUser(
+            $user,
+            'Password Reset OTP',
+            "Your OTP code is: {$code}",
+            [
+                'type' => 'password_reset',
+                'code' => (string) $code,
+            ],
+            'password_reset'
+        );
+
+        return BaseResource::make(null)
+            ->additional([
+                'status' => 200,
+                'message' => 'OTP sent to your device successfully.',
+            ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'phone' => ['required', 'string', 'max:20'],
+            'code' => ['required', 'string', 'min:6', 'max:6'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $verification = Verification::where('phone', $request->phone)->first();
+
+        if (! $verification || $verification->code !== $request->code) {
+            throw ValidationException::withMessages([
+                'code' => ['The provided verification code is incorrect.'],
+            ]);
+        }
+
+        $user = User::where('phone', $request->phone)->first();
+
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'phone' => ['No user found with this phone number.'],
+            ]);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        $verification->delete();
+
+        // Revoke all existing tokens for security
+        $user->tokens()->delete();
+
+        return BaseResource::make(null)
+            ->additional([
+                'status' => 200,
+                'message' => 'Password reset successfully.',
             ]);
     }
 }

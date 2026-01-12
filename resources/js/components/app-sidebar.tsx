@@ -12,10 +12,12 @@ import { index as indexFirebaseTest } from '@/routes/admin/firebase-test';
 import { edit as editGeneralSettings } from '@/routes/admin/general-settings';
 import { index as indexAdminHealthReports } from '@/routes/admin/health-reports';
 import { index as indexKnowledge } from '@/routes/admin/knowledge';
+import { index as indexMaintenanceBanners } from '@/routes/admin/maintenance-banners';
 import { index as indexMusic } from '@/routes/admin/music';
 import { index as indexNews } from '@/routes/admin/news';
 import { index as indexProducts } from '@/routes/admin/products';
 import { edit as editSocialMedia } from '@/routes/admin/social-media';
+import { index as indexSubscriptions } from '@/routes/admin/subscription';
 import { index as indexTherapies } from '@/routes/admin/therapies';
 import { index as indexUsers } from '@/routes/admin/users';
 import { index as indexWebSocketTest } from '@/routes/admin/websocket-test';
@@ -33,7 +35,9 @@ import {
     BookOpenText,
     CogIcon,
     Construction,
+    CreditCard,
     FileBox,
+    ImageIcon,
     LayoutGrid,
     MapPin,
     MessageCircleQuestion,
@@ -114,6 +118,11 @@ const managementNavItems: NavItem[] = [
         icon: Construction,
     },
     {
+        title: 'Maintenance Banners',
+        href: indexMaintenanceBanners(),
+        icon: ImageIcon,
+    },
+    {
         title: 'Device Locations',
         href: indexDeviceLocations(),
         icon: MapPin,
@@ -146,6 +155,11 @@ const managementNavItems: NavItem[] = [
                 href: indexCollectionGroups(),
             },
         ],
+    },
+    {
+        title: 'Subscriptions',
+        href: indexSubscriptions(),
+        icon: CreditCard,
     },
     {
         title: 'Social Media',

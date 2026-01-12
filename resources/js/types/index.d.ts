@@ -196,6 +196,18 @@ export interface DeviceMaintenance {
     [key: string]: unknown; // This allows for additional properties...
 }
 
+export interface MaintenanceBanner {
+    id: number;
+    image: string;
+    title: string | null;
+    is_active: boolean;
+    order: number;
+    created_at: string;
+    updated_at: string;
+    image_url?: string | null;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
 export interface Product {
     id: number;
     product_type_id: number;
