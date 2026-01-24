@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { edit, index } from '@/routes/admin/maintenance-banners';
+import { useState } from 'react';
 
 const breadcrumbs = (banner: MaintenanceBanner): BreadcrumbItem[] => [
     {
@@ -23,6 +24,8 @@ const breadcrumbs = (banner: MaintenanceBanner): BreadcrumbItem[] => [
 ];
 
 export default function EditMaintenanceBanner({ banner }: { banner: MaintenanceBanner }) {
+    const [isActive, setIsActive] = useState(banner.is_active);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs(banner)}>
             <Head title="Edit Maintenance Banner" />
@@ -31,17 +34,16 @@ export default function EditMaintenanceBanner({ banner }: { banner: MaintenanceB
 
                 <Form
                     {...MaintenanceBannerController.update.form(banner.id)}
-                    data={{
-                        title: banner.title || '',
-                        order: banner.order,
-                        is_active: banner.is_active,
-                    }}
                     options={{
                         preserveScroll: true,
                     }}
+                    transform={(data) => ({
+                        ...data,
+                        is_active: isActive,
+                    })}
                     className="space-y-6"
                 >
-                    {({ processing, errors, data, setData }) => (
+                    {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
                                 <Label>Current Image</Label>
@@ -83,8 +85,8 @@ export default function EditMaintenanceBanner({ banner }: { banner: MaintenanceB
                                     <Checkbox
                                         id="is_active"
                                         name="is_active"
-                                        checked={data.is_active}
-                                        onCheckedChange={(checked) => setData('is_active', checked as boolean)}
+                                        checked={isActive}
+                                        onCheckedChange={(checked) => setIsActive(checked as boolean)}
                                     />
                                     <Label htmlFor="is_active" className="cursor-pointer">
                                         Active
