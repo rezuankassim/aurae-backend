@@ -280,6 +280,47 @@ Key `.env` variables:
 - `QUEUE_CONNECTION`: Default is `database`
 - `SESSION_DRIVER`: Default is `database`
 
+### File Upload Limits
+
+The application supports large file uploads (APK files up to 500MB, music files up to 1GB). To enable these uploads, you need to configure PHP settings:
+
+#### Development (php.ini or .user.ini)
+```ini
+; Maximum upload file size
+upload_max_filesize = 600M
+
+; Maximum POST data size (should be larger than upload_max_filesize)
+post_max_size = 650M
+
+; Maximum execution time (increase for large uploads)
+max_execution_time = 300
+
+; Maximum input time
+max_input_time = 300
+
+; Memory limit
+memory_limit = 512M
+```
+
+#### Production (Web Server Configuration)
+
+**For Nginx:**
+Add to your server block:
+```nginx
+client_max_body_size 650M;
+```
+
+**For Apache:**
+Add to your `.htaccess` or VirtualHost configuration:
+```apache
+LimitRequestBody 681574400
+```
+
+**Laravel Validation:**
+- APK files: Maximum 500MB (configured in `GeneralSettingUpdateRequest.php`)
+- Music files: Maximum 1GB (configured in `MusicController.php`)
+- Ensure server PHP limits are higher than Laravel validation limits to provide clear error messages
+
 ## Additional Notes
 
 - **Server-Side Rendering (SSR)**: Supported via Inertia SSR - use `composer dev:ssr`

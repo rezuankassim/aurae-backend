@@ -5,10 +5,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Field, FieldError, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import UploadProgress from '@/components/upload-progress';
 import AppLayout from '@/layouts/app-layout';
 import { edit } from '@/routes/admin/general-settings';
 import { BreadcrumbItem, GeneralSetting } from '@/types';
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Head, Link, router } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,12 +20,52 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function GeneralSettingsEdit({ generalSetting }: { generalSetting: GeneralSetting }) {
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [isUploading, setIsUploading] = useState(false);
+
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isUploading) {
+                e.preventDefault();
+                e.returnValue = 'File upload is in progress. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [isUploading]);
+
+    useEffect(() => {
+        const progressListener = router.on('progress', (event) => {
+            if (event.detail.progress) {
+                setUploadProgress(Math.round(event.detail.progress.percentage));
+                setIsUploading(true);
+            }
+        });
+
+        const finishListener = router.on('finish', () => {
+            setIsUploading(false);
+            setUploadProgress(0);
+        });
+
+        return () => {
+            progressListener();
+            finishListener();
+        };
+    }, []);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="General Settings" />
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl px-4 py-6">
                 <HeadingSmall title="General Settings" description="Manage general application settings" />
+
+                <UploadProgress progress={uploadProgress} isUploading={isUploading} />
 
                 <Form
                     {...GeneralSettingController.update.form()}
@@ -80,7 +122,7 @@ export default function GeneralSettingsEdit({ generalSetting }: { generalSetting
                                         <Field className="col-span-2">
                                             <FieldLabel htmlFor="apk_file">APK File</FieldLabel>
                                             <Input id="apk_file" name="apk_file" type="file" accept=".apk" />
-                                            <p className="mt-1 text-sm text-muted-foreground">Maximum file size: 100MB</p>
+                                            <p className="mt-1 text-sm text-muted-foreground">Maximum file size: 500MB</p>
                                             {errors.apk_file ? <FieldError>{errors.apk_file}</FieldError> : null}
                                         </Field>
 
@@ -138,7 +180,7 @@ export default function GeneralSettingsEdit({ generalSetting }: { generalSetting
                                         <Field className="col-span-2">
                                             <FieldLabel htmlFor="tablet_apk_file">Tablet APK File</FieldLabel>
                                             <Input id="tablet_apk_file" name="tablet_apk_file" type="file" accept=".apk" />
-                                            <p className="mt-1 text-sm text-muted-foreground">Maximum file size: 100MB</p>
+                                            <p className="mt-1 text-sm text-muted-foreground">Maximum file size: 500MB</p>
                                             {errors.tablet_apk_file ? <FieldError>{errors.tablet_apk_file}</FieldError> : null}
                                         </Field>
 
@@ -170,7 +212,7 @@ export default function GeneralSettingsEdit({ generalSetting }: { generalSetting
                             </Card>
 
                             <div className="flex gap-2">
-                                <Button type="submit" disabled={processing}>
+                                <Button type="submit" disabled={processing || isUploading}>
                                     Submit
                                 </Button>
 

@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { Music, type BreadcrumbItem } from '@/types';
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, router } from '@inertiajs/react';
 
 import MusicController from '@/actions/App/Http/Controllers/Admin/MusicController';
 import Heading from '@/components/heading';
@@ -10,7 +10,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import UploadProgress from '@/components/upload-progress';
 import { edit, index } from '@/routes/admin/music';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,13 +26,53 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function MusicEdit({ music }: { music: Music }) {
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [isUploading, setIsUploading] = useState(false);
+
     breadcrumbs[1].href = edit(music.id).url;
+
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isUploading) {
+                e.preventDefault();
+                e.returnValue = 'File upload is in progress. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [isUploading]);
+
+    useEffect(() => {
+        const progressListener = router.on('progress', (event) => {
+            if (event.detail.progress) {
+                setUploadProgress(Math.round(event.detail.progress.percentage));
+                setIsUploading(true);
+            }
+        });
+
+        const finishListener = router.on('finish', () => {
+            setIsUploading(false);
+            setUploadProgress(0);
+        });
+
+        return () => {
+            progressListener();
+            finishListener();
+        };
+    }, []);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Music" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl px-4 py-6">
                 <Heading title="Edit Music" description="Edit music details" />
+
+                <UploadProgress progress={uploadProgress} isUploading={isUploading} />
 
                 <Form
                     {...MusicController.update.form(music.id)}
@@ -78,7 +120,7 @@ export default function MusicEdit({ music }: { music: Music }) {
                                 </CardContent>
                             </Card>
 
-                            <Button type="submit" disabled={processing}>
+                            <Button type="submit" disabled={processing || isUploading}>
                                 Save Changes
                             </Button>
                         </>
