@@ -53,6 +53,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
     Route::post('/send-verify', [AuthenticationController::class, 'sendVerify'])->name('api.send_verify');
     Route::post('/verify-phone', [AuthenticationController::class, 'verifyPhone'])->name('api.verify_phone');
     Route::post('/forgot-password', [AuthenticationController::class, 'forgotPassword'])->name('api.forgot_password');
+    Route::post('/verify-reset-otp', [AuthenticationController::class, 'verifyResetOtp'])->name('api.verify_reset_otp');
     Route::post('/reset-password', [AuthenticationController::class, 'resetPassword'])->name('api.reset_password');
 
     Route::post('/device-retrieve', [DeviceController::class, 'retrieve'])->name('api.device.retrieve');

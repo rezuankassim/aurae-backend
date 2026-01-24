@@ -78,16 +78,19 @@ export default function EditMaintenanceBanner({ banner }: { banner: MaintenanceB
                                 <InputError message={errors.order} />
                             </div>
 
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="is_active"
-                                    name="is_active"
-                                    checked={data.is_active}
-                                    onCheckedChange={(checked) => setData('is_active', checked as boolean)}
-                                />
-                                <Label htmlFor="is_active" className="cursor-pointer">
-                                    Active
-                                </Label>
+                            <div className="grid gap-2">
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id="is_active"
+                                        name="is_active"
+                                        checked={data.is_active}
+                                        onCheckedChange={(checked) => setData('is_active', checked as boolean)}
+                                    />
+                                    <Label htmlFor="is_active" className="cursor-pointer">
+                                        Active
+                                    </Label>
+                                </div>
+                                <InputError message={errors.is_active} />
                             </div>
 
                             <Button type="submit" disabled={processing}>

@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { create, index } from '@/routes/admin/maintenance-banners';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,6 +24,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CreateMaintenanceBanner() {
+    const [isActive, setIsActive] = useState(true);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Maintenance Banner" />
@@ -35,6 +38,10 @@ export default function CreateMaintenanceBanner() {
                         preserveScroll: true,
                     }}
                     resetOnSuccess
+                    transform={(data) => ({
+                        ...data,
+                        is_active: isActive,
+                    })}
                     className="space-y-6"
                 >
                     {({ processing, errors }) => (
@@ -63,11 +70,19 @@ export default function CreateMaintenanceBanner() {
                                 <InputError message={errors.order} />
                             </div>
 
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="is_active" name="is_active" defaultChecked={true} />
-                                <Label htmlFor="is_active" className="cursor-pointer">
-                                    Active
-                                </Label>
+                            <div className="grid gap-2">
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id="is_active"
+                                        name="is_active"
+                                        checked={isActive}
+                                        onCheckedChange={(checked) => setIsActive(checked as boolean)}
+                                    />
+                                    <Label htmlFor="is_active" className="cursor-pointer">
+                                        Active
+                                    </Label>
+                                </div>
+                                <InputError message={errors.is_active} />
                             </div>
 
                             <Button type="submit" disabled={processing}>

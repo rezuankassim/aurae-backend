@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('phone')->unique();
             $table->string('code');
+            $table->timestamp('verified_at')->nullable();
             $table->timestamps();
         });
     }

@@ -71,8 +71,15 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
                         preserveScroll: true,
                         onSuccess: () => {
                             setSelectedFiles([]);
+                            if (fileInputRef.current) {
+                                fileInputRef.current.value = '';
+                            }
                         },
                     }}
+                    transform={(data) => ({
+                        ...data,
+                        files: selectedFiles,
+                    })}
                     className="space-y-6"
                 >
                     {({ processing, errors }) => (

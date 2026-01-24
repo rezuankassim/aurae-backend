@@ -191,12 +191,14 @@ class AuthenticationController extends Controller
             ]);
     }
 
-    public function resetPassword(Request $request)
+    /**
+     * Step 1: Verify OTP for password reset
+     */
+    public function verifyResetOtp(Request $request)
     {
         $request->validate([
             'phone' => ['required', 'string', 'max:20'],
             'code' => ['required', 'string', 'min:6', 'max:6'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
         $verification = Verification::where('phone', $request->phone)->first();
@@ -204,6 +206,48 @@ class AuthenticationController extends Controller
         if (! $verification || $verification->code !== $request->code) {
             throw ValidationException::withMessages([
                 'code' => ['The provided verification code is incorrect.'],
+            ]);
+        }
+
+        $user = User::where('phone', $request->phone)->first();
+
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'phone' => ['No user found with this phone number.'],
+            ]);
+        }
+
+        // Mark verification as verified (update with a flag)
+        $verification->update(['verified_at' => now()]);
+
+        return BaseResource::make([
+            'phone' => $request->phone,
+        ])
+            ->additional([
+                'status' => 200,
+                'message' => 'OTP verified successfully. You can now reset your password.',
+            ]);
+    }
+
+    /**
+     * Step 2: Reset password after OTP verification
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'phone' => ['required', 'string', 'max:20'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        // Check if OTP was verified recently (within last 5 minutes)
+        $verification = Verification::where('phone', $request->phone)
+            ->whereNotNull('verified_at')
+            ->where('verified_at', '>=', now()->subMinutes(5))
+            ->first();
+
+        if (! $verification) {
+            throw ValidationException::withMessages([
+                'phone' => ['OTP verification expired or not completed. Please request a new OTP.'],
             ]);
         }
 
@@ -226,7 +270,7 @@ class AuthenticationController extends Controller
         return BaseResource::make(null)
             ->additional([
                 'status' => 200,
-                'message' => 'Password reset successfully.',
+                'message' => 'Password reset successfully. Please login with your new password.',
             ]);
     }
 }
