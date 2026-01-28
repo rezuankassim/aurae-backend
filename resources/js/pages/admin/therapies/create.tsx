@@ -130,6 +130,7 @@ export default function TherapiesCreate({ music }: { music: Music[] }) {
                                                     <SelectItem value="Blue">Blue</SelectItem>
                                                     <SelectItem value="Purple">Purple</SelectItem>
                                                     <SelectItem value="White">White</SelectItem>
+                                                    <SelectItem value="Cyan">Cyan</SelectItem>
                                                 </SelectContent>
                                             </Select>
 

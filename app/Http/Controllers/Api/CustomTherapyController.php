@@ -39,7 +39,7 @@ class CustomTherapyController extends Controller
             'duration' => ['required', 'numeric', 'min:0'],
             'temperature' => ['required', 'numeric'],
             'light' => ['required', 'numeric'],
-            'color_led' => ['required', 'string', 'in:Off,Red,Orange,Yellow,Green,Blue,Purple,White'],
+            'color_led' => ['required', 'string', 'in:Off,Red,Orange,Yellow,Green,Blue,Purple,White,Cyan'],
             'status' => ['nullable', 'boolean'],
         ]);
 

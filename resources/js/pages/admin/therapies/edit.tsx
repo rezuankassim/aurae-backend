@@ -190,6 +190,7 @@ export default function TherapiesEdit({ therapy, music }: { therapy: Therapy; mu
                                                     <SelectItem value="Blue">Blue</SelectItem>
                                                     <SelectItem value="Purple">Purple</SelectItem>
                                                     <SelectItem value="White">White</SelectItem>
+                                                    <SelectItem value="Cyan">Cyan</SelectItem>
                                                 </SelectContent>
                                             </Select>
 
