@@ -22,12 +22,12 @@ class CheckAppVersion
         $generalSetting = GeneralSetting::first();
 
         // Check mobile app version if header is present
-        if ($mobileAppVersion) {
-            $requiredVersion = config('app.mobile_app_version');
+        if ($mobileAppVersion && $generalSetting && $generalSetting->apk_version) {
+            $requiredVersion = $generalSetting->apk_version;
 
             // Compare versions
             if (version_compare($mobileAppVersion, $requiredVersion, '<')) {
-                $downloadUrl = $generalSetting && $generalSetting->apk_file_path
+                $downloadUrl = $generalSetting->apk_file_path
                     ? url('storage/'.$generalSetting->apk_file_path)
                     : '';
 
@@ -50,12 +50,12 @@ class CheckAppVersion
         }
 
         // Check tablet app version if header is present
-        if ($tabletAppVersion) {
-            $requiredVersion = config('app.mobile_tablet_app_version');
+        if ($tabletAppVersion && $generalSetting && $generalSetting->tablet_apk_version) {
+            $requiredVersion = $generalSetting->tablet_apk_version;
 
             // Compare versions
             if (version_compare($tabletAppVersion, $requiredVersion, '<')) {
-                $downloadUrl = $generalSetting && $generalSetting->tablet_apk_file_path
+                $downloadUrl = $generalSetting->tablet_apk_file_path
                     ? url('storage/'.$generalSetting->tablet_apk_file_path)
                     : '';
 

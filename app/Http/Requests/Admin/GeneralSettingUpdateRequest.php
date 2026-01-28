@@ -24,11 +24,24 @@ class GeneralSettingUpdateRequest extends FormRequest
         return [
             'contact_no' => ['required', 'string', 'max:255'],
             'apk_file' => ['nullable', 'file', 'extensions:apk', 'max:512000'], // Max 500MB
-            'apk_version' => ['nullable', 'string', 'max:255'],
+            'apk_version' => ['nullable', 'string', 'max:255', 'regex:/^\d+\.\d+\.\d+$/'],
             'apk_release_notes' => ['nullable', 'string'],
             'tablet_apk_file' => ['nullable', 'file', 'extensions:apk', 'max:512000'], // Max 500MB
-            'tablet_apk_version' => ['nullable', 'string', 'max:255'],
+            'tablet_apk_version' => ['nullable', 'string', 'max:255', 'regex:/^\d+\.\d+\.\d+$/'],
             'tablet_apk_release_notes' => ['nullable', 'string'],
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'apk_version.regex' => 'The APK version must be in semantic versioning format (e.g., 1.0.0).',
+            'tablet_apk_version.regex' => 'The tablet APK version must be in semantic versioning format (e.g., 1.0.0).',
         ];
     }
 }

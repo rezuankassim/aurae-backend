@@ -23,6 +23,27 @@ export default function GeneralSettingsEdit({ generalSetting }: { generalSetting
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isUploading, setIsUploading] = useState(false);
 
+    const handleVersionInput = (e: React.FormEvent<HTMLInputElement>) => {
+        const input = e.currentTarget;
+        let value = input.value.replace(/[^0-9.]/g, '');
+
+        // Prevent multiple consecutive dots
+        value = value.replace(/\.{2,}/g, '.');
+
+        // Ensure it starts with a number
+        if (value.startsWith('.')) {
+            value = value.substring(1);
+        }
+
+        // Limit to x.y.z format (major.minor.patch)
+        const parts = value.split('.');
+        if (parts.length > 3) {
+            value = parts.slice(0, 3).join('.');
+        }
+
+        input.value = value;
+    };
+
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             if (isUploading) {
@@ -133,6 +154,7 @@ export default function GeneralSettingsEdit({ generalSetting }: { generalSetting
                                                 name="apk_version"
                                                 placeholder="e.g., 1.0.0"
                                                 defaultValue={generalSetting.apk_version || ''}
+                                                onInput={handleVersionInput}
                                             />
                                             <p className="mt-1 text-sm text-muted-foreground">Semantic version format (e.g., 1.0.0)</p>
                                             {errors.apk_version ? <FieldError>{errors.apk_version}</FieldError> : null}
@@ -191,6 +213,7 @@ export default function GeneralSettingsEdit({ generalSetting }: { generalSetting
                                                 name="tablet_apk_version"
                                                 placeholder="e.g., 1.0.0"
                                                 defaultValue={generalSetting.tablet_apk_version || ''}
+                                                onInput={handleVersionInput}
                                             />
                                             <p className="mt-1 text-sm text-muted-foreground">Semantic version format (e.g., 1.0.0)</p>
                                             {errors.tablet_apk_version ? <FieldError>{errors.tablet_apk_version}</FieldError> : null}

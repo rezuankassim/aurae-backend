@@ -39,9 +39,10 @@ class GeneralSettingController extends Controller
                 Storage::disk('public')->delete($generalSetting->apk_file_path);
             }
 
-            // Store new APK file
+            // Store new APK file with original extension
             $file = $request->file('apk_file');
-            $path = $file->store('apk', 'public');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $path = $file->storeAs('apk', $filename, 'public');
 
             $generalSetting->apk_file_path = $path;
             $generalSetting->apk_file_size = $file->getSize();
@@ -63,9 +64,10 @@ class GeneralSettingController extends Controller
                 Storage::disk('public')->delete($generalSetting->tablet_apk_file_path);
             }
 
-            // Store new tablet APK file
+            // Store new tablet APK file with original extension
             $file = $request->file('tablet_apk_file');
-            $path = $file->store('apk/tablet', 'public');
+            $filename = time().'_tablet_'.$file->getClientOriginalName();
+            $path = $file->storeAs('apk/tablet', $filename, 'public');
 
             $generalSetting->tablet_apk_file_path = $path;
             $generalSetting->tablet_apk_file_size = $file->getSize();
