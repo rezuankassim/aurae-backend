@@ -17,7 +17,7 @@ class TherapyController extends Controller
      */
     public function index()
     {
-        $therapies = Therapy::orderBy('order', 'asc')->get();
+        $therapies = Therapy::orderBy('order', 'asc')->where('is_custom', 0)->get();
 
         $therapies->map(function ($therapy) {
             $therapy->image_url = $therapy->image_url;
@@ -134,7 +134,7 @@ class TherapyController extends Controller
             Therapy::where('id', $therapy['id'])->update(['order' => $therapy['order']]);
         }
 
-        return response()->json(['message' => 'Therapies reordered successfully.']);
+        return back()->with('success', 'Therapies reordered successfully.');
     }
 
     /**
