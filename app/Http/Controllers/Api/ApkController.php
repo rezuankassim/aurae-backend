@@ -26,10 +26,14 @@ class ApkController extends Controller
                 ->setStatusCode(404);
         }
 
+        $downloadUrl = url('storage/'.$generalSetting->apk_file_path);
+
         return BaseResource::make([
             'version' => $generalSetting->apk_version,
-            'file_size' => $generalSetting->apk_file_size,
-            'release_notes' => $generalSetting->apk_release_notes,
+            'message' => $generalSetting->apk_release_notes ?? '',
+            'mobile_app_id' => config('app.mobile_apple_app_store_id', ''),
+            'mobile_android_package_name' => config('app.mobile_android_package_name', ''),
+            'mobile_android_url' => $downloadUrl,
         ])
             ->additional([
                 'status' => 200,
@@ -86,10 +90,14 @@ class ApkController extends Controller
                 ->setStatusCode(404);
         }
 
+        $downloadUrl = url('storage/'.$generalSetting->tablet_apk_file_path);
+
         return BaseResource::make([
             'version' => $generalSetting->tablet_apk_version,
-            'file_size' => $generalSetting->tablet_apk_file_size,
-            'release_notes' => $generalSetting->tablet_apk_release_notes,
+            'message' => $generalSetting->tablet_apk_release_notes ?? '',
+            'mobile_app_id' => config('app.mobile_apple_app_store_id', ''),
+            'tablet_android_package_name' => config('app.tablet_android_package_name', ''),
+            'tablet_android_url' => $downloadUrl,
         ])
             ->additional([
                 'status' => 200,

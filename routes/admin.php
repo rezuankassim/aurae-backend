@@ -111,6 +111,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/therapies', [TherapyController::class, 'index'])->name('therapies.index');
     Route::get('/therapies/create', [TherapyController::class, 'create'])->name('therapies.create');
     Route::post('/therapies', [TherapyController::class, 'store'])->name('therapies.store');
+    Route::post('/therapies/reorder', [TherapyController::class, 'reorder'])->name('therapies.reorder');
     Route::get('/therapies/{therapy}/edit', [TherapyController::class, 'edit'])->name('therapies.edit');
     Route::put('/therapies/{therapy}', [TherapyController::class, 'update'])->name('therapies.update');
     Route::delete('/therapies/{therapy}', [TherapyController::class, 'destroy'])->name('therapies.destroy');

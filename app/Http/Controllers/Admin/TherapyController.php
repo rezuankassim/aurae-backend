@@ -17,7 +17,13 @@ class TherapyController extends Controller
      */
     public function index()
     {
-        $therapies = Therapy::all();
+        $therapies = Therapy::orderBy('order', 'asc')->get();
+
+        $therapies->map(function ($therapy) {
+            $therapy->image_url = $therapy->image_url;
+            $therapy->music_url = $therapy->music_url;
+            return $therapy;
+        });
 
         return Inertia::render('admin/therapies/index', [
             'therapies' => $therapies,
@@ -111,6 +117,24 @@ class TherapyController extends Controller
         $therapy->update($validated);
 
         return to_route('admin.therapies.index')->with('success', 'Therapy updated successfully.');
+    }
+
+    /**
+     * Update the order of therapies.
+     */
+    public function reorder()
+    {
+        $therapies = request()->validate([
+            'therapies' => 'required|array',
+            'therapies.*.id' => 'required|exists:therapies,id',
+            'therapies.*.order' => 'required|integer',
+        ]);
+
+        foreach ($therapies['therapies'] as $therapy) {
+            Therapy::where('id', $therapy['id'])->update(['order' => $therapy['order']]);
+        }
+
+        return response()->json(['message' => 'Therapies reordered successfully.']);
     }
 
     /**

@@ -23,6 +23,7 @@ class HealthReportController extends Controller
                 return [
                     'id' => $report->id,
                     'file' => $report->file,
+                    'type' => $report->type,
                     'file_name' => Str::afterLast($report->file, '/'),
                     'file_url' => asset('storage/'.$report->file),
                     'user' => $report->user,
@@ -58,17 +59,32 @@ class HealthReportController extends Controller
     public function store(HealthReportCreateRequest $request)
     {
         $validated = $request->validated();
+        $uploadedCount = 0;
 
-        foreach ($validated['files'] as $file) {
-            $path = $file->store('health-reports');
+        $fileTypes = [
+            'full_body_file' => 'full_body',
+            'meridian_file' => 'meridian',
+            'multidimensional_file' => 'multidimensional',
+        ];
 
-            HealthReport::create([
-                'file' => $path,
-                'user_id' => $validated['user_id'],
-            ]);
+        foreach ($fileTypes as $fileKey => $type) {
+            if ($request->hasFile($fileKey)) {
+                $file = $request->file($fileKey);
+                $path = $file->store('health-reports');
+
+                HealthReport::create([
+                    'file' => $path,
+                    'type' => $type,
+                    'user_id' => $validated['user_id'],
+                ]);
+
+                $uploadedCount++;
+            }
         }
 
-        return redirect()->route('admin.health-reports.index')->with('success', 'Health report(s) uploaded successfully.');
+        $message = $uploadedCount > 1 ? "$uploadedCount health reports uploaded successfully." : 'Health report uploaded successfully.';
+
+        return redirect()->route('admin.health-reports.index')->with('success', $message);
     }
 
     /**

@@ -9,6 +9,7 @@ import { Download, ExternalLink, MoreHorizontal } from 'lucide-react';
 interface HealthReport {
     id: string;
     file: string;
+    type: 'full_body' | 'meridian' | 'multidimensional' | null;
     file_name: string;
     file_url: string;
     user: {
@@ -38,6 +39,19 @@ export const columns: ColumnDef<HealthReport>[] = [
                     <span className="text-sm text-muted-foreground">{row.original.user.email}</span>
                 </div>
             );
+        },
+    },
+    {
+        accessorKey: 'type',
+        header: 'Report Type',
+        cell: ({ row }) => {
+            const type = row.getValue('type') as string | null;
+            const typeLabels: Record<string, string> = {
+                full_body: 'Full Body (全身健康评估)',
+                meridian: 'Meridian (经络健康评估)',
+                multidimensional: 'Multidimensional (多维健康评估)',
+            };
+            return type ? typeLabels[type] || type : '-';
         },
     },
     {

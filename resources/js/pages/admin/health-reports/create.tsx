@@ -1,10 +1,10 @@
 import HealthReportController from '@/actions/App/Http/Controllers/Admin/HealthReportController';
+import { Combobox } from '@/components/combobox';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/admin/health-reports';
 import { BreadcrumbItem } from '@/types';
@@ -30,22 +30,38 @@ interface User {
 }
 
 export default function HealthReportsCreate({ users }: { users: User[] }) {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const fullBodyFileInputRef = useRef<HTMLInputElement>(null);
+    const meridianFileInputRef = useRef<HTMLInputElement>(null);
+    const multidimensionalFileInputRef = useRef<HTMLInputElement>(null);
+    const [fullBodyFile, setFullBodyFile] = useState<File | null>(null);
+    const [meridianFile, setMeridianFile] = useState<File | null>(null);
+    const [multidimensionalFile, setMultidimensionalFile] = useState<File | null>(null);
+    const [selectedUserId, setSelectedUserId] = useState<string | number | null>(null);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (type: 'full_body' | 'meridian' | 'multidimensional') => (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
-        if (files) {
-            setSelectedFiles((prev) => [...prev, ...Array.from(files)]);
+        if (files && files[0]) {
+            if (type === 'full_body') setFullBodyFile(files[0]);
+            else if (type === 'meridian') setMeridianFile(files[0]);
+            else if (type === 'multidimensional') setMultidimensionalFile(files[0]);
         }
     };
 
-    const handleRemoveFile = (index: number) => {
-        setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    const handleRemoveFile = (type: 'full_body' | 'meridian' | 'multidimensional') => () => {
+        if (type === 'full_body') {
+            setFullBodyFile(null);
+            if (fullBodyFileInputRef.current) fullBodyFileInputRef.current.value = '';
+        } else if (type === 'meridian') {
+            setMeridianFile(null);
+            if (meridianFileInputRef.current) meridianFileInputRef.current.value = '';
+        } else if (type === 'multidimensional') {
+            setMultidimensionalFile(null);
+            if (multidimensionalFileInputRef.current) multidimensionalFileInputRef.current.value = '';
+        }
     };
 
-    const handleBrowseClick = () => {
-        fileInputRef.current?.click();
+    const handleBrowseClick = (ref: React.RefObject<HTMLInputElement>) => () => {
+        ref.current?.click();
     };
 
     const formatFileSize = (bytes: number) => {
@@ -70,15 +86,21 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
                     options={{
                         preserveScroll: true,
                         onSuccess: () => {
-                            setSelectedFiles([]);
-                            if (fileInputRef.current) {
-                                fileInputRef.current.value = '';
-                            }
+                            setFullBodyFile(null);
+                            setMeridianFile(null);
+                            setMultidimensionalFile(null);
+                            setSelectedUserId(null);
+                            if (fullBodyFileInputRef.current) fullBodyFileInputRef.current.value = '';
+                            if (meridianFileInputRef.current) meridianFileInputRef.current.value = '';
+                            if (multidimensionalFileInputRef.current) multidimensionalFileInputRef.current.value = '';
                         },
                     }}
                     transform={(data) => ({
                         ...data,
-                        files: selectedFiles,
+                        user_id: selectedUserId,
+                        full_body_file: fullBodyFile,
+                        meridian_file: meridianFile,
+                        multidimensional_file: multidimensionalFile,
                     })}
                     className="space-y-6"
                 >
@@ -89,85 +111,187 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
                                     <div className="grid gap-2">
                                         <Label htmlFor="user_id">Select User</Label>
 
-                                        <Select name="user_id">
-                                            <SelectTrigger id="user_id">
-                                                <SelectValue placeholder="Select a user" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {users.map((user) => (
-                                                    <SelectItem key={user.id} value={String(user.id)}>
-                                                        {user.name} ({user.email})
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                        <Combobox
+                                            value={selectedUserId}
+                                            onValueChange={setSelectedUserId}
+                                            options={users.map((user) => ({
+                                                value: user.id,
+                                                label: `${user.name} (${user.email})`,
+                                            }))}
+                                        />
 
                                         <InputError message={errors.user_id} />
                                     </div>
 
+                                    {/* Full Body Health Report */}
                                     <div className="grid gap-2">
-                                        <Label htmlFor="files">Health Report Files (PDF)</Label>
+                                        <Label htmlFor="full_body_file">Full Body Health Report (全身健康评估报告): PDF</Label>
 
                                         <input
-                                            ref={fileInputRef}
+                                            ref={fullBodyFileInputRef}
                                             type="file"
-                                            name="files[]"
-                                            id="files"
-                                            multiple
+                                            name="full_body_file"
+                                            id="full_body_file"
                                             accept=".pdf"
-                                            onChange={handleFileChange}
+                                            onChange={handleFileChange('full_body')}
                                             className="hidden"
                                         />
 
-                                        <div className="space-y-4">
-                                            <Button type="button" variant="outline" onClick={handleBrowseClick} className="w-full">
+                                        <div className="space-y-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={handleBrowseClick(fullBodyFileInputRef)}
+                                                className="w-full"
+                                            >
                                                 <FileText className="mr-2 h-4 w-4" />
-                                                Browse Files
+                                                Browse File
                                             </Button>
 
-                                            {selectedFiles.length > 0 && (
-                                                <div className="space-y-2">
-                                                    <div className="text-sm font-medium">Selected Files ({selectedFiles.length})</div>
-                                                    <div className="space-y-2 rounded-md border p-4">
-                                                        {selectedFiles.map((file, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className="flex items-center justify-between rounded-md border bg-muted/50 p-2"
-                                                            >
-                                                                <div className="flex items-center gap-2">
-                                                                    <FileText className="h-4 w-4 text-muted-foreground" />
-                                                                    <div className="flex flex-col">
-                                                                        <span className="text-sm font-medium">{file.name}</span>
-                                                                        <span className="text-xs text-muted-foreground">
-                                                                            {formatFileSize(file.size)}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    onClick={() => handleRemoveFile(index)}
-                                                                    className="h-8 w-8"
-                                                                >
-                                                                    <X className="h-4 w-4" />
-                                                                </Button>
-                                                            </div>
-                                                        ))}
+                                            {fullBodyFile && (
+                                                <div className="flex items-center justify-between rounded-md border bg-muted/50 p-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <FileText className="h-4 w-4 text-muted-foreground" />
+                                                        <div className="flex flex-col">
+                                                            <span className="text-sm font-medium">{fullBodyFile.name}</span>
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {formatFileSize(fullBodyFile.size)}
+                                                            </span>
+                                                        </div>
                                                     </div>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={handleRemoveFile('full_body')}
+                                                        className="h-8 w-8"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
                                                 </div>
                                             )}
                                         </div>
 
-                                        <InputError message={errors.files} />
-                                        {errors['files.0'] && <InputError message={errors['files.0']} />}
+                                        <InputError message={errors.full_body_file} />
                                     </div>
+
+                                    {/* Meridian Health Report */}
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="meridian_file">Meridian Health Report (经络健康评估报告): PDF</Label>
+
+                                        <input
+                                            ref={meridianFileInputRef}
+                                            type="file"
+                                            name="meridian_file"
+                                            id="meridian_file"
+                                            accept=".pdf"
+                                            onChange={handleFileChange('meridian')}
+                                            className="hidden"
+                                        />
+
+                                        <div className="space-y-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={handleBrowseClick(meridianFileInputRef)}
+                                                className="w-full"
+                                            >
+                                                <FileText className="mr-2 h-4 w-4" />
+                                                Browse File
+                                            </Button>
+
+                                            {meridianFile && (
+                                                <div className="flex items-center justify-between rounded-md border bg-muted/50 p-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <FileText className="h-4 w-4 text-muted-foreground" />
+                                                        <div className="flex flex-col">
+                                                            <span className="text-sm font-medium">{meridianFile.name}</span>
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {formatFileSize(meridianFile.size)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={handleRemoveFile('meridian')}
+                                                        className="h-8 w-8"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <InputError message={errors.meridian_file} />
+                                    </div>
+
+                                    {/* Multidimensional Health Report */}
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="multidimensional_file">
+                                            Multidimensional Health Report (多维健康评估报告): PDF
+                                        </Label>
+
+                                        <input
+                                            ref={multidimensionalFileInputRef}
+                                            type="file"
+                                            name="multidimensional_file"
+                                            id="multidimensional_file"
+                                            accept=".pdf"
+                                            onChange={handleFileChange('multidimensional')}
+                                            className="hidden"
+                                        />
+
+                                        <div className="space-y-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={handleBrowseClick(multidimensionalFileInputRef)}
+                                                className="w-full"
+                                            >
+                                                <FileText className="mr-2 h-4 w-4" />
+                                                Browse File
+                                            </Button>
+
+                                            {multidimensionalFile && (
+                                                <div className="flex items-center justify-between rounded-md border bg-muted/50 p-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <FileText className="h-4 w-4 text-muted-foreground" />
+                                                        <div className="flex flex-col">
+                                                            <span className="text-sm font-medium">{multidimensionalFile.name}</span>
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {formatFileSize(multidimensionalFile.size)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={handleRemoveFile('multidimensional')}
+                                                        className="h-8 w-8"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <InputError message={errors.multidimensional_file} />
+                                    </div>
+
+                                    {/* General files error */}
+                                    <InputError message={errors.files} />
                                 </CardContent>
                             </Card>
 
                             <div className="flex gap-2">
-                                <Button type="submit" disabled={processing || selectedFiles.length === 0}>
-                                    Upload Report{selectedFiles.length > 1 ? 's' : ''}
+                                <Button
+                                    type="submit"
+                                    disabled={processing || (!fullBodyFile && !meridianFile && !multidimensionalFile)}
+                                >
+                                    Upload Report{(fullBodyFile ? 1 : 0) + (meridianFile ? 1 : 0) + (multidimensionalFile ? 1 : 0) > 1 ? 's' : ''}
                                 </Button>
 
                                 <Button type="button" variant="outline" asChild>

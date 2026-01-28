@@ -16,6 +16,7 @@ class HealthReportResource extends BaseResource
         return [
             'id' => $this->id,
             'file' => $this->file,
+            'type' => $this->type,
             'file_url' => $this->file ? url('storage/'.$this->file) : null,
             'user_id' => $this->user_id,
             'created_at' => $this->created_at,

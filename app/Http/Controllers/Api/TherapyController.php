@@ -19,6 +19,7 @@ class TherapyController extends Controller
         ]);
 
         $query = Therapy::where('is_active', true)
+            ->orderBy('order', 'asc')
             ->orderBy('created_at', 'desc');
 
         // If include_custom is true, include user's custom therapies

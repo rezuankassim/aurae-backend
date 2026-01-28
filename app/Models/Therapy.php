@@ -21,6 +21,7 @@ class Therapy extends Model
         'configuration',
         'is_active',
         'is_custom',
+        'order',
     ];
 
     /**

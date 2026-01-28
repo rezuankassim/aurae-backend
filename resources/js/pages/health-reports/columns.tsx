@@ -14,6 +14,19 @@ export const columns: ColumnDef<HealthReport>[] = [
         },
     },
     {
+        accessorKey: 'type',
+        header: 'Report Type',
+        cell: ({ row }) => {
+            const type = row.getValue('type') as string | null;
+            const typeLabels: Record<string, string> = {
+                full_body: 'Full Body (全身健康评估)',
+                meridian: 'Meridian (经络健康评估)',
+                multidimensional: 'Multidimensional (多维健康评估)',
+            };
+            return type ? typeLabels[type] || type : '-';
+        },
+    },
+    {
         accessorKey: 'file_url',
         header: 'File',
         cell: ({ row }) => {

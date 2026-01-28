@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Http\Resources\BaseResource;
+use App\Models\GeneralSetting;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,16 +19,7 @@ class CheckAppVersion
     {
         $mobileAppVersion = $request->header('X-Device-App-Version');
         $tabletAppVersion = $request->header('X-Device-Tablet-App-Version');
-
-        $mobile_apple_app_store_id = config('app.mobile_apple_app_store_id');
-        $mobile_android_package_name = config('app.mobile_android_package_name');
-        $tablet_android_package_name = config('app.tablet_android_package_name');
-
-        $data = [
-            'mobile_app_id' => $mobile_apple_app_store_id,
-            'mobile_android_package_name' => $mobile_android_package_name,
-            'tablet_android_package_name' => $tablet_android_package_name,
-        ];
+        $generalSetting = GeneralSetting::first();
 
         // Check mobile app version if header is present
         if ($mobileAppVersion) {
@@ -35,13 +27,22 @@ class CheckAppVersion
 
             // Compare versions
             if (version_compare($mobileAppVersion, $requiredVersion, '<')) {
+                $downloadUrl = $generalSetting && $generalSetting->apk_file_path
+                    ? url('storage/'.$generalSetting->apk_file_path)
+                    : '';
+
+                $data = [
+                    'version' => $requiredVersion,
+                    'message' => $generalSetting->apk_release_notes ?? 'Please update your app to the latest version to continue using this service.',
+                    'mobile_app_id' => config('app.mobile_apple_app_store_id', ''),
+                    'mobile_android_package_name' => config('app.mobile_android_package_name', ''),
+                    'mobile_android_url' => $downloadUrl,
+                ];
+
                 return BaseResource::make($data)
                     ->additional([
                         'status' => 426,
                         'message' => 'Please update your app to the latest version to continue using this service.',
-                        'current_version' => $mobileAppVersion,
-                        'required_version' => $requiredVersion,
-                        'update_required' => true,
                     ])
                     ->response()
                     ->setStatusCode(426); // 426 Upgrade Required
@@ -54,13 +55,22 @@ class CheckAppVersion
 
             // Compare versions
             if (version_compare($tabletAppVersion, $requiredVersion, '<')) {
+                $downloadUrl = $generalSetting && $generalSetting->tablet_apk_file_path
+                    ? url('storage/'.$generalSetting->tablet_apk_file_path)
+                    : '';
+
+                $data = [
+                    'version' => $requiredVersion,
+                    'message' => $generalSetting->tablet_apk_release_notes ?? 'Please update your app to the latest version to continue using this service.',
+                    'mobile_app_id' => config('app.mobile_apple_app_store_id', ''),
+                    'tablet_android_package_name' => config('app.tablet_android_package_name', ''),
+                    'tablet_android_url' => $downloadUrl,
+                ];
+
                 return BaseResource::make($data)
                     ->additional([
                         'status' => 426,
                         'message' => 'Please update your app to the latest version to continue using this service.',
-                        'current_version' => $tabletAppVersion,
-                        'required_version' => $requiredVersion,
-                        'update_required' => true,
                     ])
                     ->response()
                     ->setStatusCode(426); // 426 Upgrade Required

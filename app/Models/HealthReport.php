@@ -19,6 +19,7 @@ class HealthReport extends Model
      */
     protected $fillable = [
         'file',
+        'type',
         'user_id',
     ];
 

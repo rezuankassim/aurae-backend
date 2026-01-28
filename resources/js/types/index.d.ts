@@ -56,6 +56,7 @@ export interface Therapy {
     music: string;
     configuration: Record<string, string>;
     is_active: boolean;
+    order: number;
     created_at: string;
     updated_at: string;
     image_url?: string | null;
@@ -149,6 +150,7 @@ export interface HealthReport {
     id: number;
     user_id: number;
     file: string;
+    type: 'full_body' | 'meridian' | 'multidimensional' | null;
     file_url: string;
     created_at: string;
     updated_at: string;
