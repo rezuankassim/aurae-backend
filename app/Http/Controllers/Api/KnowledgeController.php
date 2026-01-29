@@ -18,7 +18,7 @@ class KnowledgeController extends Controller
                 $query->whereNull('published_at')
                     ->orWhere('published_at', '<=', now());
             })
-            ->orderBy('published_at', 'desc')
+            ->orderBy('order', 'asc')
             ->get();
 
         return KnowledgeResource::collection($knowledge)

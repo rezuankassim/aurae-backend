@@ -1,12 +1,19 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Knowledge } from '@/types';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 
-import { edit, show } from '@/routes/admin/knowledge';
-import { Link } from '@inertiajs/react';
+import { destroy, edit, show } from '@/routes/admin/knowledge';
+import { Link, router } from '@inertiajs/react';
 import dayjs from 'dayjs';
 
 export const columns: ColumnDef<Knowledge>[] = [
@@ -39,6 +46,12 @@ export const columns: ColumnDef<Knowledge>[] = [
     {
         id: 'actions',
         cell: ({ row }) => {
+            const handleDelete = () => {
+                if (confirm('Are you sure you want to delete this knowledge entry?')) {
+                    router.delete(destroy(row.original.id).url);
+                }
+            };
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -58,6 +71,10 @@ export const columns: ColumnDef<Knowledge>[] = [
                             <Link className="hover:cursor-pointer" href={edit(row.original.id).url}>
                                 Edit
                             </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-destructive hover:cursor-pointer focus:text-destructive" onClick={handleDelete}>
+                            Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

@@ -20,6 +20,7 @@ class Knowledge extends Model
         'video_path',
         'is_published',
         'published_at',
+        'order',
     ];
 
     /**
@@ -32,5 +33,13 @@ class Knowledge extends Model
         return [
             'published_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Get the cover image URL
+     */
+    public function getCoverImageUrlAttribute(): ?string
+    {
+        return $this->cover_image ? asset('storage/'.$this->cover_image) : null;
     }
 }

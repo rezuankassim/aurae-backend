@@ -103,6 +103,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/knowledge', [KnowledgeController::class, 'index'])->name('knowledge.index');
     Route::get('/knowledge/create', [KnowledgeController::class, 'create'])->name('knowledge.create');
     Route::post('/knowledge', [KnowledgeController::class, 'store'])->name('knowledge.store');
+    Route::post('/knowledge/reorder', [KnowledgeController::class, 'reorder'])->name('knowledge.reorder');
     Route::get('/knowledge/{knowledge}', [KnowledgeController::class, 'show'])->name('knowledge.show');
     Route::get('/knowledge/{knowledge}/edit', [KnowledgeController::class, 'edit'])->name('knowledge.edit');
     Route::put('/knowledge/{knowledge}', [KnowledgeController::class, 'update'])->name('knowledge.update');

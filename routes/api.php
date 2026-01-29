@@ -65,6 +65,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
     Route::get('/device-guests', [DeviceGuestController::class, 'index'])->name('api.device.guests.index');
     Route::post('/device-guest-create', [DeviceGuestController::class, 'store'])->name('api.device.guests.store');
     Route::post('/device-guest-login', [DeviceGuestController::class, 'login'])->name('api.device.guests.login');
+    Route::delete('/device-guests/{guestId}', [DeviceGuestController::class, 'destroy'])->name('api.device.guests.destroy');
 
     Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/user', function (Request $request) {
@@ -94,6 +95,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
 
         Route::get('/custom-therapies', [CustomTherapyController::class, 'index'])->name('api.custom-therapies.index');
         Route::post('/custom-therapies', [CustomTherapyController::class, 'store'])->name('api.custom-therapies.store');
+        Route::delete('/custom-therapies/{customTherapy}', [CustomTherapyController::class, 'destroy'])->name('api.custom-therapies.destroy');
 
         Route::post('/usage-histories', [UsageHistoryController::class, 'store'])->name('api.usage-histories.store');
         Route::get('/usage-histories/chart', [UsageHistoryController::class, 'chart'])->name('api.usage-histories.chart');

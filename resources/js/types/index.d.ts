@@ -122,6 +122,8 @@ export interface Knowledge {
     updated_at: string;
     video_url: string | null;
     video_path: string | null;
+    order: number;
+    cover_image_url?: string | null;
     [key: string]: unknown; // This allows for additional properties...
 }
 

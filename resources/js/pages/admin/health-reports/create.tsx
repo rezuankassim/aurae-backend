@@ -154,9 +154,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
                                                         <FileText className="h-4 w-4 text-muted-foreground" />
                                                         <div className="flex flex-col">
                                                             <span className="text-sm font-medium">{fullBodyFile.name}</span>
-                                                            <span className="text-xs text-muted-foreground">
-                                                                {formatFileSize(fullBodyFile.size)}
-                                                            </span>
+                                                            <span className="text-xs text-muted-foreground">{formatFileSize(fullBodyFile.size)}</span>
                                                         </div>
                                                     </div>
                                                     <Button
@@ -206,9 +204,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
                                                         <FileText className="h-4 w-4 text-muted-foreground" />
                                                         <div className="flex flex-col">
                                                             <span className="text-sm font-medium">{meridianFile.name}</span>
-                                                            <span className="text-xs text-muted-foreground">
-                                                                {formatFileSize(meridianFile.size)}
-                                                            </span>
+                                                            <span className="text-xs text-muted-foreground">{formatFileSize(meridianFile.size)}</span>
                                                         </div>
                                                     </div>
                                                     <Button
@@ -229,9 +225,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
 
                                     {/* Multidimensional Health Report */}
                                     <div className="grid gap-2">
-                                        <Label htmlFor="multidimensional_file">
-                                            Multidimensional Health Report (多维健康评估报告): PDF
-                                        </Label>
+                                        <Label htmlFor="multidimensional_file">Multidimensional Health Report (多维健康评估报告): PDF</Label>
 
                                         <input
                                             ref={multidimensionalFileInputRef}
@@ -287,10 +281,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
                             </Card>
 
                             <div className="flex gap-2">
-                                <Button
-                                    type="submit"
-                                    disabled={processing || (!fullBodyFile && !meridianFile && !multidimensionalFile)}
-                                >
+                                <Button type="submit" disabled={processing || (!fullBodyFile && !meridianFile && !multidimensionalFile)}>
                                     Upload Report{(fullBodyFile ? 1 : 0) + (meridianFile ? 1 : 0) + (multidimensionalFile ? 1 : 0) > 1 ? 's' : ''}
                                 </Button>
 

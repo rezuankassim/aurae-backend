@@ -22,6 +22,7 @@ class TherapyController extends Controller
         $therapies->map(function ($therapy) {
             $therapy->image_url = $therapy->image_url;
             $therapy->music_url = $therapy->music_url;
+
             return $therapy;
         });
 
@@ -140,8 +141,15 @@ class TherapyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Therapy $therapy)
     {
-        //
+        // Delete associated image file if exists
+        if ($therapy->image) {
+            Storage::disk('public')->delete($therapy->image);
+        }
+
+        $therapy->delete();
+
+        return to_route('admin.therapies.index')->with('success', 'Therapy deleted successfully.');
     }
 }

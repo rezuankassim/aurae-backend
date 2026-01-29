@@ -170,4 +170,63 @@ class DeviceGuestController extends Controller
                 'message' => 'Guests retrieved successfully.',
             ]);
     }
+
+    /**
+     * Delete a guest from a device.
+     */
+    public function destroy(Request $request, string $guestId)
+    {
+        $request->validate([
+            'device_uuid' => ['required', 'exists:devices,uuid'],
+        ]);
+
+        $device = Device::where('uuid', $request->device_uuid)->firstOrFail();
+
+        // Find guest and ensure it belongs to the specified device
+        $guest = Guest::where('id', $guestId)
+            ->where('device_id', $device->id)
+            ->firstOrFail();
+
+        try {
+            DB::beginTransaction();
+
+            // Get the user and customer before deleting guest
+            $user = $guest->user;
+            $customer = $guest->customer;
+
+            // Delete the guest record
+            $guest->delete();
+
+            // Revoke all tokens for the guest user
+            if ($user) {
+                $user->tokens()->delete();
+
+                // Delete the user account
+                $user->delete();
+            }
+
+            // Optionally delete the Lunar customer record
+            // Note: You might want to keep customer records for order history
+            // Uncomment the line below if you want to delete customers as well
+            // $customer?->delete();
+
+            DB::commit();
+
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 200,
+                    'message' => 'Guest deleted successfully.',
+                ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 500,
+                    'message' => 'Failed to delete guest: '.$e->getMessage(),
+                ])
+                ->response()
+                ->setStatusCode(500);
+        }
+    }
 }

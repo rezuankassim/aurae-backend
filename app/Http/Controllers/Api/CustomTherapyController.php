@@ -69,4 +69,30 @@ class CustomTherapyController extends Controller
                 'message' => 'Custom therapy created successfully.',
             ]);
     }
+
+    /**
+     * Remove the specified custom therapy from storage.
+     */
+    public function destroy(Request $request, Therapy $customTherapy)
+    {
+        // Ensure the therapy is custom and belongs to the authenticated user
+        if (! $customTherapy->is_custom || $customTherapy->user_id !== $request->user()->id) {
+            return response()->json([
+                'status' => 403,
+                'message' => 'You are not authorized to delete this therapy.',
+            ], 403);
+        }
+
+        // Delete associated image file if exists
+        if ($customTherapy->image) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($customTherapy->image);
+        }
+
+        $customTherapy->delete();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Custom therapy deleted successfully.',
+        ]);
+    }
 }

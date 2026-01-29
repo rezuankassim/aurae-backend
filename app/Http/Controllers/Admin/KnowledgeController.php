@@ -17,7 +17,7 @@ class KnowledgeController extends Controller
      */
     public function index()
     {
-        $knowledge = Knowledge::all();
+        $knowledge = Knowledge::orderBy('order', 'asc')->get();
 
         return Inertia::render('admin/knowledge/index', [
             'knowledge' => $knowledge,
@@ -136,6 +136,24 @@ class KnowledgeController extends Controller
         $knowledge->update($validated);
 
         return to_route('admin.knowledge.index')->with('success', 'Knowledge entry updated successfully.');
+    }
+
+    /**
+     * Update the order of knowledge entries.
+     */
+    public function reorder()
+    {
+        $knowledgeEntries = request()->validate([
+            'knowledge' => 'required|array',
+            'knowledge.*.id' => 'required|exists:knowledge,id',
+            'knowledge.*.order' => 'required|integer',
+        ]);
+
+        foreach ($knowledgeEntries['knowledge'] as $entry) {
+            Knowledge::where('id', $entry['id'])->update(['order' => $entry['order']]);
+        }
+
+        return back()->with('success', 'Knowledge entries reordered successfully.');
     }
 
     /**
