@@ -124,7 +124,7 @@ class CheckoutController extends Controller
     public function initiatePayment(Request $request)
     {
         $validated = $request->validate([
-            'payment_method' => ['required', 'string', 'in:revpay,cash-in-hand'],
+            'payment_method' => ['required', 'string', 'in:senangpay,cash-in-hand'],
         ]);
 
         // Get user's cart
@@ -151,12 +151,12 @@ class CheckoutController extends Controller
         $cart->calculate();
 
         // Initiate payment based on method
-        if ($validated['payment_method'] === 'revpay') {
+        if ($validated['payment_method'] === 'senangpay') {
             try {
-                $paymentDriver = Payments::driver('revpay')
+                $paymentDriver = Payments::driver('senangpay')
                     ->cart($cart)
                     ->withData([])
-                    ->setConfig(config('lunar.payments.types.revpay'));
+                    ->setConfig(config('lunar.payments.types.senangpay'));
 
                 $response = $paymentDriver->authorize();
 
@@ -215,8 +215,11 @@ class CheckoutController extends Controller
      */
     public function checkPaymentStatus(string $reference)
     {
-        // Find order by reference
-        $order = Order::whereJsonContains('meta->revpay_reference', $reference)->first();
+        // Find order by reference (check both senangpay and revpay for backward compatibility)
+        $order = Order::where(function ($query) use ($reference) {
+            $query->whereJsonContains('meta->senangpay_reference', $reference)
+                  ->orWhereJsonContains('meta->revpay_reference', $reference);
+        })->first();
 
         if (! $order) {
             return response()->json([
@@ -226,9 +229,9 @@ class CheckoutController extends Controller
             ], 404);
         }
 
-        // Get latest transaction
+        // Get latest transaction (check both senangpay and revpay)
         $transaction = Transaction::where('reference', $reference)
-            ->where('driver', 'revpay')
+            ->whereIn('driver', ['senangpay', 'revpay'])
             ->latest()
             ->first();
 

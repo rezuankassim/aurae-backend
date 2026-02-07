@@ -8,7 +8,7 @@ use App\Listeners\LogFailedLogin;
 use App\Listeners\LogLogout;
 use App\Listeners\LogSuccessfulLogin;
 use App\Modifiers\CustomShippingModifier;
-use App\PaymentTypes\RevpayPayment;
+use App\PaymentTypes\SenangpayPayment;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
@@ -43,8 +43,8 @@ class AppServiceProvider extends ServiceProvider
                     ]);
             })->register();
 
-        // Register RevPay payment driver
-        \Lunar\Facades\Payments::extend('revpay', fn ($app) => $app->make(RevpayPayment::class));
+        // Register SenangPay payment driver
+        \Lunar\Facades\Payments::extend('senangpay', fn ($app) => $app->make(SenangpayPayment::class));
     }
 
     /**

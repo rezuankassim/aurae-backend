@@ -8,7 +8,7 @@ use App\Http\Controllers\DeviceMaintenanceController;
 use App\Http\Controllers\HealthReportController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\OrderHistoryController;
-use App\Http\Controllers\Payment\RevpayCallbackController;
+use App\Http\Controllers\Payment\SenangpayCallbackController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UsageHistoryController;
 use Illuminate\Support\Facades\Route;
@@ -16,9 +16,8 @@ use Inertia\Inertia;
 
 Route::redirect('/', '/login')->name('home');
 
-// RevPay payment callbacks (no auth middleware)
-Route::post('/payment/revpay/callback', [RevpayCallbackController::class, 'backendCallback'])->name('payment.revpay.callback');
-Route::get('/payment/revpay/return', [RevpayCallbackController::class, 'returnUrl'])->name('payment.revpay.return');
+// SenangPay payment callbacks (no auth middleware)
+Route::get('/payment/senangpay/return', [SenangpayCallbackController::class, 'returnUrl'])->name('payment.senangpay.return');
 
 // Public product routes
 Route::get('products', [ProductController::class, 'index'])->name('products.index');

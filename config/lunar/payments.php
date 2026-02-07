@@ -9,8 +9,8 @@ return [
             'driver' => 'offline',
             'authorized' => 'payment-offline',
         ],
-        'revpay' => [
-            'driver' => 'revpay',
+        'senangpay' => [
+            'driver' => 'senangpay',
             'authorized' => 'payment-received',
         ],
     ],
