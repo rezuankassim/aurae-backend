@@ -29,6 +29,24 @@ class FirebaseService
      */
     public function sendToUser(User $user, string $title, string $body, array $data = [], string $type = 'general')
     {
+        // Check if user has disabled app notifications
+        $setting = $user->setting;
+        if ($setting && ! $setting->allow_app_notification) {
+            // Store notification record but don't send
+            NotificationModel::create([
+                'user_id' => $user->id,
+                'title' => $title,
+                'body' => $body,
+                'data' => $data,
+                'type' => $type,
+                'is_sent' => false,
+                'sent_at' => now(),
+                'error_message' => 'User has disabled app notifications',
+            ]);
+
+            return [['success' => false, 'error' => 'User has disabled app notifications']];
+        }
+
         $devices = UserDevice::where('deviceable_type', User::class)
             ->where('deviceable_id', $user->id)
             ->whereNotNull('fcm_token')

@@ -133,6 +133,24 @@ class User extends Authenticatable implements FilamentUser, LunarUserInterface
     }
 
     /**
+     * Get the user's settings.
+     */
+    public function setting(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(UserSetting::class);
+    }
+
+    /**
+     * Get or create user settings.
+     */
+    public function getOrCreateSetting(): UserSetting
+    {
+        return $this->setting ?? $this->setting()->create([
+            'allow_app_notification' => true,
+        ]);
+    }
+
+    /**
      * Determine if the user can access the Filament panel.
      */
     public function canAccessPanel(Panel $panel): bool

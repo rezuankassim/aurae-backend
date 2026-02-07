@@ -21,5 +21,9 @@ class GeneralSetting extends Model
         'tablet_apk_version',
         'tablet_apk_file_size',
         'tablet_apk_release_notes',
+        'terms_and_conditions_content',
+        'terms_and_conditions_html',
+        'privacy_policy_content',
+        'privacy_policy_html',
     ];
 }

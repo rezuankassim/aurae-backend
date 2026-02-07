@@ -420,6 +420,10 @@ export interface GeneralSetting {
     tablet_apk_version: string | null;
     tablet_apk_file_size: number | null;
     tablet_apk_release_notes: string | null;
+    terms_and_conditions_content: string | null;
+    terms_and_conditions_html: string | null;
+    privacy_policy_content: string | null;
+    privacy_policy_html: string | null;
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...

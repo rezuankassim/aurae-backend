@@ -10,6 +10,7 @@ import { index as indexFAQs } from '@/routes/admin/faqs';
 import { index as indexFeedbacks } from '@/routes/admin/feedbacks';
 import { index as indexFirebaseTest } from '@/routes/admin/firebase-test';
 import { edit as editGeneralSettings } from '@/routes/admin/general-settings';
+import { edit as editLegalSettings } from '@/routes/admin/legal-settings';
 import { index as indexAdminHealthReports } from '@/routes/admin/health-reports';
 import { index as indexKnowledge } from '@/routes/admin/knowledge';
 import { index as indexMaintenanceBanners } from '@/routes/admin/maintenance-banners';
@@ -45,6 +46,7 @@ import {
     Music,
     Newspaper,
     Radio,
+    Scale,
     ShoppingBag,
     ShoppingCart,
     TabletSmartphone,
@@ -191,6 +193,11 @@ const managementNavItems: NavItem[] = [
         title: 'General Settings',
         href: editGeneralSettings(),
         icon: CogIcon,
+    },
+    {
+        title: 'Legal Settings',
+        href: editLegalSettings(),
+        icon: Scale,
     },
     {
         title: 'WebSocket Test',

@@ -101,6 +101,9 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'edit'])->name('general-settings.edit');
     Route::put('/general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'update'])->name('general-settings.update');
 
+    Route::get('/legal-settings', [\App\Http\Controllers\Admin\LegalSettingController::class, 'edit'])->name('legal-settings.edit');
+    Route::put('/legal-settings', [\App\Http\Controllers\Admin\LegalSettingController::class, 'update'])->name('legal-settings.update');
+
     Route::get('/knowledge', [KnowledgeController::class, 'index'])->name('knowledge.index');
     Route::get('/knowledge/create', [KnowledgeController::class, 'create'])->name('knowledge.create');
     Route::post('/knowledge', [KnowledgeController::class, 'store'])->name('knowledge.store');

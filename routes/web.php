@@ -6,6 +6,7 @@ use App\Http\Controllers\CustomTherapyController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceMaintenanceController;
 use App\Http\Controllers\HealthReportController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\Payment\SenangpayCallbackController;
@@ -22,6 +23,10 @@ Route::get('/payment/senangpay/return', [SenangpayCallbackController::class, 're
 // Public product routes
 Route::get('products', [ProductController::class, 'index'])->name('products.index');
 Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
+
+// Public legal pages
+Route::get('terms-and-conditions', [LegalController::class, 'termsAndConditions'])->name('legal.terms');
+Route::get('privacy-policy', [LegalController::class, 'privacyPolicy'])->name('legal.privacy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
