@@ -28,18 +28,23 @@ class SenangpayPayment extends AbstractPayment
     {
         // Ensure order exists
         if (! $this->order) {
-            $draftOrder = $this->cart?->draftOrder()->first();
+            // Check for existing completed order with failed payment
+            // completedOrder() looks for orders with placed_at set
+            $existingOrder = $this->cart?->completedOrder()->first();
 
-            // If draft order exists but payment failed, create a new order
-            // This ensures a new order reference is generated for retry attempts
-            if ($draftOrder && $draftOrder->status === 'payment-failed') {
+            if ($existingOrder && $existingOrder->status === 'payment-failed') {
                 // Dissociate the failed order from the cart so a new one can be created
-                $draftOrder->update(['cart_id' => null]);
+                $existingOrder->update(['cart_id' => null]);
+                // Refresh the cart to clear cached relationships
+                $this->cart->refresh();
                 $this->order = $this->cart->createOrder();
-            } elseif ($draftOrder) {
-                $this->order = $draftOrder;
+            } elseif ($existingOrder) {
+                // Existing order with successful or pending payment - reuse it
+                $this->order = $existingOrder;
             } else {
-                $this->order = $this->cart->createOrder();
+                // Check for draft order (no placed_at)
+                $draftOrder = $this->cart?->draftOrder()->first();
+                $this->order = $draftOrder ?? $this->cart->createOrder();
             }
         }
 
