@@ -11,7 +11,7 @@ return [
         ],
         'senangpay' => [
             'driver' => 'senangpay',
-            'authorized' => 'payment-received',
+            'authorized' => 'payment-pending',
         ],
     ],
 

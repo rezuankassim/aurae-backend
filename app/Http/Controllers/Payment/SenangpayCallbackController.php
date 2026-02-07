@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Lunar\Facades\Payments;
+use Lunar\Models\Cart;
 use Lunar\Models\Order;
 use Lunar\Models\Transaction;
 
@@ -244,6 +245,23 @@ class SenangpayCallbackController extends Controller
                 'payment_completed_at' => now()->toIso8601String(),
             ]),
         ]);
+
+        // Complete and delete user's cart
+        if ($order->user_id) {
+            $cart = Cart::where('user_id', $order->user_id)
+                ->whereNull('completed_at')
+                ->first();
+
+            if ($cart) {
+                $cart->update(['completed_at' => now()]);
+                $cart->delete();
+
+                Log::info('SenangPay capture: Cart completed and deleted', [
+                    'cart_id' => $cart->id,
+                    'user_id' => $order->user_id,
+                ]);
+            }
+        }
 
         Log::info('SenangPay capture: Payment captured', [
             'order_id' => $order->id,
