@@ -32,9 +32,9 @@ class OrderResource extends BaseResource
             'tax_total' => $this->taxTotal?->formatted,
             'total' => $this->total?->formatted,
             'currency_code' => $this->currency?->code,
-            'placed_at' => $this->placed_at?->toIso8601String(),
-            'created_at' => $this->created_at->toIso8601String(),
-            'updated_at' => $this->updated_at->toIso8601String(),
+            'placed_at' => $this->placed_at instanceof \Carbon\Carbon ? $this->placed_at->toIso8601String() : $this->placed_at,
+            'created_at' => $this->created_at instanceof \Carbon\Carbon ? $this->created_at->toIso8601String() : $this->created_at,
+            'updated_at' => $this->updated_at instanceof \Carbon\Carbon ? $this->updated_at->toIso8601String() : $this->updated_at,
             'lines' => $this->whenLoaded('lines', function () {
                 return $this->lines->map(function ($line) {
                     // Handle ShippingOption lines differently (they don't have a real purchasable model)
