@@ -119,29 +119,96 @@ class DeviceMaintenanceController extends Controller
     }
 
     /**
-     * Get dates that should be disabled due to scheduled maintenance.
+     * Default available time slots for maintenance.
+     */
+    private const AVAILABLE_TIME_SLOTS = [
+        '10:00',
+        '11:00',
+        '12:00',
+        '13:00',
+        '15:00',
+        '16:00',
+        '17:00',
+    ];
+
+    /**
+     * Get availability information including disabled dates and time slots.
      */
     public function availability(Request $request)
     {
-        // Get all dates that have maintenance scheduled
-        $disabledDates = DeviceMaintenance::whereNotNull('maintenance_requested_at')
-            ->select(DB::raw('DATE(maintenance_requested_at) as date'))
-            ->distinct()
-            ->pluck('date')
-            ->toArray();
+        $request->validate([
+            'from' => 'required|date',
+            'to' => 'required|date|after_or_equal:from',
+        ]);
 
-        // Also get factory maintenance dates
-        $factoryDates = DeviceMaintenance::whereNotNull('factory_maintenance_requested_at')
-            ->select(DB::raw('DATE(factory_maintenance_requested_at) as date'))
-            ->distinct()
-            ->pluck('date')
-            ->toArray();
+        $from = $request->input('from');
+        $to = $request->input('to');
 
-        // Merge and get unique dates
-        $allDisabledDates = array_unique(array_merge($disabledDates, $factoryDates));
-        sort($allDisabledDates);
+        // Get user maintenance slots within date range
+        $userMaintenanceSlots = DeviceMaintenance::whereNotNull('maintenance_requested_at')
+            ->whereDate('maintenance_requested_at', '>=', $from)
+            ->whereDate('maintenance_requested_at', '<=', $to)
+            ->select(
+                DB::raw('DATE(maintenance_requested_at) as date'),
+                DB::raw('TIME_FORMAT(maintenance_requested_at, "%H:%i") as time')
+            )
+            ->get();
 
-        return BaseResource::make(['disabled_dates' => array_values($allDisabledDates)])
+        // Get factory maintenance slots within date range
+        $factoryMaintenanceSlots = DeviceMaintenance::whereNotNull('factory_maintenance_requested_at')
+            ->whereDate('factory_maintenance_requested_at', '>=', $from)
+            ->whereDate('factory_maintenance_requested_at', '<=', $to)
+            ->select(
+                DB::raw('DATE(factory_maintenance_requested_at) as date'),
+                DB::raw('TIME_FORMAT(factory_maintenance_requested_at, "%H:%i") as time')
+            )
+            ->get();
+
+        // Merge all maintenance slots
+        $allMaintenanceSlots = $userMaintenanceSlots->concat($factoryMaintenanceSlots);
+
+        // Group by date and collect disabled time slots
+        $disabledSlotsByDate = [];
+        foreach ($allMaintenanceSlots as $slot) {
+            $date = $slot->date;
+            $time = $slot->time;
+
+            if (! isset($disabledSlotsByDate[$date])) {
+                $disabledSlotsByDate[$date] = [];
+            }
+
+            if (! in_array($time, $disabledSlotsByDate[$date])) {
+                $disabledSlotsByDate[$date][] = $time;
+            }
+        }
+
+        // Sort time slots within each date and identify fully disabled dates
+        $disabledDates = [];
+        $disabledTimeSlots = [];
+
+        foreach ($disabledSlotsByDate as $date => $slots) {
+            sort($slots);
+
+            // Check if all time slots are disabled for this date
+            if (count(array_intersect($slots, self::AVAILABLE_TIME_SLOTS)) === count(self::AVAILABLE_TIME_SLOTS)) {
+                $disabledDates[] = $date;
+            }
+
+            $disabledTimeSlots[] = [
+                'date' => $date,
+                'time_slots' => $slots,
+            ];
+        }
+
+        // Sort results by date
+        sort($disabledDates);
+        usort($disabledTimeSlots, fn ($a, $b) => strcmp($a['date'], $b['date']));
+
+        return BaseResource::make([
+            'available_time_slots' => self::AVAILABLE_TIME_SLOTS,
+            'disabled_dates' => $disabledDates,
+            'disabled_time_slots' => $disabledTimeSlots,
+        ])
             ->additional([
                 'status' => 200,
                 'message' => 'Maintenance availability retrieved successfully.',
