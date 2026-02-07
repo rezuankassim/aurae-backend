@@ -11,11 +11,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Lunar\Base\LunarUser as LunarUserInterface;
 use Lunar\Base\Traits\LunarUser;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements LunarUserInterface
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, LunarUser, Notifiable;
+    use HasApiTokens, HasFactory, HasRoles, LunarUser, Notifiable;
 
     /**
      * The attributes that are mass assignable.

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Lunar\Facades\CartSession;
+use Lunar\Facades\ShippingManifest;
 use Lunar\Models\Country;
 use Lunar\Models\Order;
 
@@ -176,6 +177,15 @@ class CheckoutController extends Controller
         if (! $cart->shippingAddress || ! $cart->billingAddress) {
             return redirect()->route('checkout.index')
                 ->with('error', 'Please complete your shipping information.');
+        }
+
+        // Calculate cart and set default shipping option
+        $cart->calculate();
+
+        // Set default shipping option (BASDEL - Basic Delivery)
+        $shippingOption = ShippingManifest::getOption($cart, 'BASDEL');
+        if ($shippingOption) {
+            $cart->setShippingOption($shippingOption);
         }
 
         // Create the order

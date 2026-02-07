@@ -19,6 +19,7 @@
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
         "lunarphp/lunar": "^1.0",
+        "spatie/laravel-permission": "^6.24",
         "tuncaybahadir/quar": "^1.7"
     },
     "require-dev": {

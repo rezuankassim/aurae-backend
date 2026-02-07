@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use Illuminate\Http\Request;
 use Lunar\Facades\Payments;
+use Lunar\Facades\ShippingManifest;
 use Lunar\Models\Cart;
 use Lunar\Models\Order;
 use Lunar\Models\Transaction;
@@ -147,8 +148,14 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Calculate cart
+        // Calculate cart and set default shipping option
         $cart->calculate();
+
+        // Set default shipping option (BASDEL - Basic Delivery)
+        $shippingOption = ShippingManifest::getOption($cart, 'BASDEL');
+        if ($shippingOption) {
+            $cart->setShippingOption($shippingOption);
+        }
 
         // Initiate payment based on method
         if ($validated['payment_method'] === 'senangpay') {
