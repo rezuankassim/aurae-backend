@@ -56,8 +56,8 @@ class SenangpayPayment extends AbstractPayment
             $customerPhone = $this->order->billingAddress->contact_phone;
         }
 
-        // Build detail description
-        $detail = 'Order '.$referenceNumber;
+        // Build detail description (use underscores instead of spaces per SenangPay docs)
+        $detail = 'Order_'.$referenceNumber;
 
         // Generate hash for payment form: md5(secret_key + detail + amount + order_id)
         $hash = $this->signatureService->generatePaymentHash(

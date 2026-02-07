@@ -57,7 +57,7 @@ class SenangpaySignatureService
 
     /**
      * Generate hash for payment form.
-     * Format: md5(secret_key + detail + amount + order_id)
+     * Format: hash_hmac('sha256', secret_key + detail + amount + order_id, secret_key)
      */
     public function generatePaymentHash(
         string $secretKey,
@@ -67,7 +67,7 @@ class SenangpaySignatureService
     ): string {
         $string = $secretKey.$detail.$amount.$orderId;
 
-        return md5($string);
+        return hash_hmac('sha256', $string, $secretKey);
     }
 
     /**
