@@ -9,6 +9,7 @@ use Lunar\Facades\Payments;
 use Lunar\Facades\ShippingManifest;
 use Lunar\Models\Cart;
 use Lunar\Models\Order;
+use Lunar\Models\ProductVariant;
 use Lunar\Models\Transaction;
 
 class CheckoutController extends Controller
@@ -273,18 +274,20 @@ class CheckoutController extends Controller
     public function orderHistory(Request $request)
     {
         $orders = Order::where('user_id', $request->user()->id)
-            ->with(['currency', 'lines'])
+            ->with([
+                'currency',
+                'lines' => function ($query) {
+                    $query->with([
+                        'purchasable' => function ($morphTo) {
+                            $morphTo->morphWith([
+                                ProductVariant::class => ['product.productType', 'product.thumbnail'],
+                            ]);
+                        },
+                    ]);
+                },
+            ])
             ->latest()
             ->get();
-
-        // Load purchasable relationship only for ProductVariant lines to avoid morphTo issues with ShippingOption
-        $orders->each(function ($order) {
-            $order->lines->each(function ($line) {
-                if ($line->purchasable_type === 'Lunar\Models\ProductVariant') {
-                    $line->load(['purchasable.product.productType', 'purchasable.product.thumbnail']);
-                }
-            });
-        });
 
         return OrderResource::collection($orders)
             ->additional([
@@ -309,18 +312,19 @@ class CheckoutController extends Controller
 
         $order->load([
             'currency',
-            'lines',
+            'lines' => function ($query) {
+                $query->with([
+                    'purchasable' => function ($morphTo) {
+                        $morphTo->morphWith([
+                            ProductVariant::class => ['product.productType', 'product.thumbnail'],
+                        ]);
+                    },
+                ]);
+            },
             'shippingAddress.country',
             'billingAddress.country',
             'transactions',
         ]);
-
-        // Load purchasable relationship only for ProductVariant lines to avoid morphTo issues with ShippingOption
-        $order->lines->each(function ($line) {
-            if ($line->purchasable_type === 'Lunar\Models\ProductVariant') {
-                $line->load(['purchasable.product.productType', 'purchasable.product.thumbnail']);
-            }
-        });
 
         return OrderResource::make($order)
             ->additional([

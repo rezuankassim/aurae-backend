@@ -38,7 +38,19 @@ class OrderResource extends BaseResource
             'lines' => $this->whenLoaded('lines', function () {
                 return $this->lines->map(function ($line) {
                     // Handle ShippingOption lines differently (they don't have a real purchasable model)
-                    $isShippingLine = $line->purchasable_type === 'Lunar\DataTypes\ShippingOption';
+                    // Use the line type field which is more reliable
+                    $isShippingLine = $line->type === 'shipping';
+
+                    // For non-shipping lines, safely get the purchasable (may be null if deleted)
+                    $purchasable = null;
+                    if (! $isShippingLine) {
+                        try {
+                            $purchasable = $line->purchasable;
+                        } catch (\Throwable $e) {
+                            // Purchasable could not be loaded
+                            $purchasable = null;
+                        }
+                    }
 
                     return [
                         'id' => $line->id,
@@ -49,13 +61,13 @@ class OrderResource extends BaseResource
                         'discount_total' => $line->discountTotal?->formatted,
                         'total' => $line->total?->formatted,
                         'product' => $isShippingLine ? null : [
-                            'id' => $line->relationLoaded('purchasable') ? $line->purchasable?->product?->id : null,
-                            'name' => $line->relationLoaded('purchasable') ? $line->purchasable?->product?->translateAttribute('name') : null,
-                            'thumbnail' => $line->relationLoaded('purchasable') ? $line->purchasable?->product?->thumbnail?->getUrl('medium') : null,
+                            'id' => $purchasable?->product?->id,
+                            'name' => $purchasable?->product?->translateAttribute('name'),
+                            'thumbnail' => $purchasable?->product?->thumbnail?->getUrl('medium'),
                         ],
                         'variant' => $isShippingLine ? null : [
-                            'id' => $line->relationLoaded('purchasable') ? $line->purchasable?->id : null,
-                            'sku' => $line->relationLoaded('purchasable') ? $line->purchasable?->sku : null,
+                            'id' => $purchasable?->id,
+                            'sku' => $purchasable?->sku,
                         ],
                     ];
                 });
