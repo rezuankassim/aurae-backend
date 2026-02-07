@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Models\User;
 use App\Models\Verification;
-use App\Services\FirebaseService;
+use App\Services\TwilioService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -171,23 +171,14 @@ class AuthenticationController extends Controller
             ['code' => $code]
         );
 
-        // Send OTP via Firebase push notification
-        $firebaseService = app(FirebaseService::class);
-        $firebaseService->sendToUser(
-            $user,
-            'Password Reset OTP',
-            "Your OTP code is: {$code}",
-            [
-                'type' => 'password_reset',
-                'code' => (string) $code,
-            ],
-            'password_reset'
-        );
+        // Send OTP via Twilio SMS
+        $twilioService = app(TwilioService::class);
+        $twilioService->sendOtp($request->phone, (string) $code);
 
         return BaseResource::make(null)
             ->additional([
                 'status' => 200,
-                'message' => 'OTP sent to your device successfully.',
+                'message' => 'OTP sent to your phone number successfully.',
             ]);
     }
 

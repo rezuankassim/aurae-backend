@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Models\User;
 use App\Models\Verification;
-use App\Services\FirebaseService;
+use App\Services\TwilioService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -79,19 +79,9 @@ class ProfileController extends Controller
 
             $user->save();
 
-            // Send OTP via Firebase push notification
-            $firebaseService = app(FirebaseService::class);
-            $firebaseService->sendToUser(
-                $user,
-                'Phone Verification OTP',
-                "Your OTP code for phone verification is: {$code}",
-                [
-                    'type' => 'phone_verification',
-                    'code' => (string) $code,
-                    'new_phone' => $validated['phone'],
-                ],
-                'phone_verification'
-            );
+            // Send OTP via Twilio SMS to the new phone number
+            $twilioService = app(TwilioService::class);
+            $twilioService->sendOtp($validated['phone'], (string) $code);
 
             return BaseResource::make([
                 'user' => $user,
@@ -190,24 +180,14 @@ class ProfileController extends Controller
             'verified_at' => null,
         ]);
 
-        // Send OTP via Firebase push notification
-        $firebaseService = app(FirebaseService::class);
-        $firebaseService->sendToUser(
-            $user,
-            'Phone Verification OTP',
-            "Your OTP code for phone verification is: {$code}",
-            [
-                'type' => 'phone_verification',
-                'code' => (string) $code,
-                'new_phone' => $request->phone,
-            ],
-            'phone_verification'
-        );
+        // Send OTP via Twilio SMS
+        $twilioService = app(TwilioService::class);
+        $twilioService->sendOtp($request->phone, (string) $code);
 
         return BaseResource::make(null)
             ->additional([
                 'status' => 200,
-                'message' => 'OTP sent to your device successfully.',
+                'message' => 'OTP sent to your phone number successfully.',
             ]);
     }
 }
