@@ -201,6 +201,14 @@ class DeviceGuestController extends Controller
             if ($user) {
                 $user->tokens()->delete();
 
+                // Detach customer relationship from pivot table before deleting user
+                // This prevents foreign key constraint violation
+                if ($customer) {
+                    DB::table('lunar_customer_user')
+                        ->where('user_id', $user->id)
+                        ->delete();
+                }
+
                 // Delete the user account
                 $user->delete();
             }
