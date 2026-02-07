@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\MarketplaceBannerController;
 use App\Http\Controllers\Api\MusicController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\NewsController;
+use App\Http\Controllers\Api\PaymentHistoryController;
 use App\Http\Controllers\Api\UserSettingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\SubscriptionController;
@@ -124,6 +125,8 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::get('/checkout/payment-status/{reference}', [CheckoutController::class, 'checkPaymentStatus'])->name('api.checkout.payment-status');
         Route::get('/orders', [CheckoutController::class, 'orderHistory'])->name('api.orders.index');
         Route::get('/orders/{order}', [CheckoutController::class, 'orderDetail'])->name('api.orders.show');
+
+        Route::get('/payment-history', [PaymentHistoryController::class, 'index'])->name('api.payment-history.index');
 
         Route::get('/addresses', [AddressController::class, 'index'])->name('api.addresses.index');
         Route::post('/addresses', [AddressController::class, 'store'])->name('api.addresses.store');
