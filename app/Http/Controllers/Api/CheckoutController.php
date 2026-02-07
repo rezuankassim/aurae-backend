@@ -273,19 +273,17 @@ class CheckoutController extends Controller
     public function orderHistory(Request $request)
     {
         $orders = Order::where('user_id', $request->user()->id)
-            ->with(['currency'])
+            ->with(['currency', 'lines'])
             ->latest()
             ->get();
 
-        // Load product lines separately to avoid morphTo issues with ShippingOption
+        // Load purchasable relationship only for ProductVariant lines to avoid morphTo issues with ShippingOption
         $orders->each(function ($order) {
-            $order->setRelation(
-                'lines',
-                $order->lines()
-                    ->where('purchasable_type', 'Lunar\Models\ProductVariant')
-                    ->with(['purchasable.product.productType', 'purchasable.product.thumbnail'])
-                    ->get()
-            );
+            $order->lines->each(function ($line) {
+                if ($line->purchasable_type === 'Lunar\Models\ProductVariant') {
+                    $line->load(['purchasable.product.productType', 'purchasable.product.thumbnail']);
+                }
+            });
         });
 
         return OrderResource::collection($orders)
@@ -311,19 +309,18 @@ class CheckoutController extends Controller
 
         $order->load([
             'currency',
+            'lines',
             'shippingAddress.country',
             'billingAddress.country',
             'transactions',
         ]);
 
-        // Load product lines separately to avoid morphTo issues with ShippingOption
-        $order->setRelation(
-            'lines',
-            $order->lines()
-                ->where('purchasable_type', 'Lunar\Models\ProductVariant')
-                ->with(['purchasable.product.productType', 'purchasable.product.thumbnail'])
-                ->get()
-        );
+        // Load purchasable relationship only for ProductVariant lines to avoid morphTo issues with ShippingOption
+        $order->lines->each(function ($line) {
+            if ($line->purchasable_type === 'Lunar\Models\ProductVariant') {
+                $line->load(['purchasable.product.productType', 'purchasable.product.thumbnail']);
+            }
+        });
 
         return OrderResource::make($order)
             ->additional([
