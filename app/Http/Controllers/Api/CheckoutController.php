@@ -273,13 +273,20 @@ class CheckoutController extends Controller
     public function orderHistory(Request $request)
     {
         $orders = Order::where('user_id', $request->user()->id)
-            ->with([
-                'lines.purchasable.product.productType',
-                'lines.purchasable.product.thumbnail',
-                'currency',
-            ])
+            ->with(['currency'])
             ->latest()
             ->get();
+
+        // Load product lines separately to avoid morphTo issues with ShippingOption
+        $orders->each(function ($order) {
+            $order->setRelation(
+                'lines',
+                $order->lines()
+                    ->where('purchasable_type', 'Lunar\Models\ProductVariant')
+                    ->with(['purchasable.product.productType', 'purchasable.product.thumbnail'])
+                    ->get()
+            );
+        });
 
         return OrderResource::collection($orders)
             ->additional([
@@ -303,13 +310,20 @@ class CheckoutController extends Controller
         }
 
         $order->load([
-            'lines.purchasable.product.productType',
-            'lines.purchasable.product.thumbnail',
             'currency',
             'shippingAddress.country',
             'billingAddress.country',
             'transactions',
         ]);
+
+        // Load product lines separately to avoid morphTo issues with ShippingOption
+        $order->setRelation(
+            'lines',
+            $order->lines()
+                ->where('purchasable_type', 'Lunar\Models\ProductVariant')
+                ->with(['purchasable.product.productType', 'purchasable.product.thumbnail'])
+                ->get()
+        );
 
         return OrderResource::make($order)
             ->additional([
