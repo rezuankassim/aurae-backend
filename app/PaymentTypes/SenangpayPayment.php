@@ -38,13 +38,12 @@ class SenangpayPayment extends AbstractPayment
         $merchantId = config('services.senangpay.merchant_id');
         $secretKey = config('services.senangpay.secret_key');
         $baseUrl = config('services.senangpay.base_url', 'https://app.senangpay.my');
-        $currency = config('services.senangpay.currency', 'MYR');
 
         // Generate reference number from order
         $referenceNumber = 'ORD-'.date('Y').'-'.str_pad($this->order->id, 5, '0', STR_PAD_LEFT);
 
-        // Format amount to cents
-        $amountInCents = $this->signatureService->formatAmount($this->order->total->value / 100);
+        // Format amount to decimal (e.g., 34.90)
+        $amount = $this->signatureService->formatAmount($this->order->total->value);
 
         // Get customer details
         $customerName = '';
@@ -57,8 +56,16 @@ class SenangpayPayment extends AbstractPayment
             $customerPhone = $this->order->billingAddress->contact_phone;
         }
 
-        // Build return URL
-        $returnUrl = url('/payment/senangpay/return');
+        // Build detail description
+        $detail = 'Order '.$referenceNumber;
+
+        // Generate hash for payment form: md5(secret_key + detail + amount + order_id)
+        $hash = $this->signatureService->generatePaymentHash(
+            $secretKey,
+            $detail,
+            $amount,
+            $referenceNumber
+        );
 
         // Create intent transaction
         Transaction::create([
@@ -76,20 +83,21 @@ class SenangpayPayment extends AbstractPayment
                 'customer_name' => $customerName,
                 'customer_email' => $customerEmail,
                 'customer_phone' => $customerPhone,
-                'amount_cents' => $amountInCents,
+                'amount' => $amount,
+                'detail' => $detail,
             ],
         ]);
 
-        // Build payment URL - SenangPay requires redirect to their payment page
-        // Using the standard payment form redirect
-        $paymentUrl = $baseUrl.'/payment/form?'.http_build_query([
-            'merchant_id' => $merchantId,
+        // Build payment URL - SenangPay uses POST to /payment/{merchantID}
+        // We'll provide the URL and params for the mobile app to submit via POST or redirect
+        $paymentUrl = $baseUrl.'/payment/'.$merchantId.'?'.http_build_query([
+            'detail' => $detail,
+            'amount' => $amount,
             'order_id' => $referenceNumber,
+            'hash' => $hash,
             'name' => $customerName,
             'email' => $customerEmail,
             'phone' => $customerPhone,
-            'amount' => $amountInCents,
-            'return_url' => $returnUrl,
         ]);
 
         // Update order meta with reference number
@@ -105,7 +113,7 @@ class SenangpayPayment extends AbstractPayment
         Log::info('SenangPay payment initiated', [
             'order_id' => $this->order->id,
             'reference' => $referenceNumber,
-            'amount_cents' => $amountInCents,
+            'amount' => $amount,
         ]);
 
         $response = new PaymentAuthorize(

@@ -56,12 +56,27 @@ class SenangpaySignatureService
     }
 
     /**
-     * Format amount to integer in cents (SenangPay requirement).
-     * E.g., 2.00 becomes 200
+     * Generate hash for payment form.
+     * Format: md5(secret_key + detail + amount + order_id)
      */
-    public function formatAmount(float|int $amount): int
+    public function generatePaymentHash(
+        string $secretKey,
+        string $detail,
+        string $amount,
+        string $orderId
+    ): string {
+        $string = $secretKey.$detail.$amount.$orderId;
+
+        return md5($string);
+    }
+
+    /**
+     * Format amount to decimal string (SenangPay requirement).
+     * E.g., 3490 cents becomes "34.90"
+     */
+    public function formatAmount(int $amountInCents): string
     {
-        return (int) round($amount * 100);
+        return number_format($amountInCents / 100, 2, '.', '');
     }
 
     /**
