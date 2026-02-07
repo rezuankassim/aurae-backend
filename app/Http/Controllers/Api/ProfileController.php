@@ -42,8 +42,13 @@ class ProfileController extends Controller
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'phone' => ['required', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($user->id)],
+            'phone' => ['required', 'string', 'max:20'],
         ];
+
+        // Only check phone uniqueness if phone is being changed
+        if ($request->phone !== $user->phone) {
+            $rules['phone'][] = Rule::unique('users', 'phone');
+        }
 
         // Only validate password fields if password is provided and not empty
         if ($request->filled('password')) {
