@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\KnowledgeController;
 use App\Http\Controllers\Api\MaintenanceBannerController;
 use App\Http\Controllers\Api\MarketplaceBannerController;
 use App\Http\Controllers\Api\MusicController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\SubscriptionController;
@@ -142,5 +143,11 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         // Subscription routes
         Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('api.subscriptions.index');
         Route::get('/user/subscription', [SubscriptionController::class, 'userSubscription'])->name('api.user.subscription');
+
+        // Profile routes
+        Route::get('/profile', [ProfileController::class, 'show'])->name('api.profile.show');
+        Route::post('/profile', [ProfileController::class, 'update'])->name('api.profile.update');
+        Route::post('/profile/verify-phone', [ProfileController::class, 'verifyPhoneChange'])->name('api.profile.verify-phone');
+        Route::post('/profile/resend-otp', [ProfileController::class, 'resendPhoneVerificationOtp'])->name('api.profile.resend-otp');
     });
 });
