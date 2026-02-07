@@ -9,7 +9,6 @@ use Lunar\Facades\Payments;
 use Lunar\Facades\ShippingManifest;
 use Lunar\Models\Cart;
 use Lunar\Models\Order;
-use Lunar\Models\ProductVariant;
 use Lunar\Models\Transaction;
 
 class CheckoutController extends Controller
@@ -274,20 +273,17 @@ class CheckoutController extends Controller
     public function orderHistory(Request $request)
     {
         $orders = Order::where('user_id', $request->user()->id)
-            ->with([
-                'currency',
-                'lines' => function ($query) {
-                    $query->with([
-                        'purchasable' => function ($morphTo) {
-                            $morphTo->morphWith([
-                                ProductVariant::class => ['product.productType', 'product.thumbnail'],
-                            ]);
-                        },
-                    ]);
-                },
-            ])
+            ->with(['currency', 'lines'])
             ->latest()
             ->get();
+
+        // Load purchasable only for non-shipping lines to avoid morphTo issues
+        $orders->each(function ($order) {
+            $productLines = $order->lines->where('type', '!=', 'shipping');
+            if ($productLines->isNotEmpty()) {
+                $productLines->load(['purchasable.product.productType', 'purchasable.product.thumbnail']);
+            }
+        });
 
         return OrderResource::collection($orders)
             ->additional([
@@ -312,19 +308,17 @@ class CheckoutController extends Controller
 
         $order->load([
             'currency',
-            'lines' => function ($query) {
-                $query->with([
-                    'purchasable' => function ($morphTo) {
-                        $morphTo->morphWith([
-                            ProductVariant::class => ['product.productType', 'product.thumbnail'],
-                        ]);
-                    },
-                ]);
-            },
+            'lines',
             'shippingAddress.country',
             'billingAddress.country',
             'transactions',
         ]);
+
+        // Load purchasable only for non-shipping lines to avoid morphTo issues
+        $productLines = $order->lines->where('type', '!=', 'shipping');
+        if ($productLines->isNotEmpty()) {
+            $productLines->load(['purchasable.product.productType', 'purchasable.product.thumbnail']);
+        }
 
         return OrderResource::make($order)
             ->additional([
