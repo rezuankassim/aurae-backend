@@ -13,13 +13,22 @@ class OrderResource extends BaseResource
      */
     public function toArray(Request $request): array
     {
+        // Get shipping total safely to avoid ShippingOption instantiation errors
+        $shippingTotal = null;
+        try {
+            $shippingTotal = $this->shippingTotal?->formatted;
+        } catch (\Throwable $e) {
+            // Handle cases where shipping_breakdown is malformed
+            $shippingTotal = null;
+        }
+
         return [
             'id' => $this->id,
             'reference' => $this->reference,
             'status' => $this->status,
             'sub_total' => $this->subTotal?->formatted,
             'discount_total' => $this->discountTotal?->formatted,
-            'shipping_total' => $this->shippingTotal?->formatted,
+            'shipping_total' => $shippingTotal,
             'tax_total' => $this->taxTotal?->formatted,
             'total' => $this->total?->formatted,
             'currency_code' => $this->currency?->code,

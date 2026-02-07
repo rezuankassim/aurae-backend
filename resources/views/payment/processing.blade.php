@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Processing Payment</title>
+    <title>Payment {{ isset($status) && $status === 'success' ? 'Successful' : (isset($status) ? 'Failed' : 'Processing') }}</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -20,33 +20,35 @@
             background: white;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 320px;
         }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
         }
         .success { color: #27ae60; }
         .failed { color: #e74c3c; }
+        .message {
+            color: #666;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="spinner"></div>
-        <h2>Processing Payment...</h2>
-        <p>Please do not close this window.</p>
-        @if(isset($status))
-            <p class="{{ $status === 'success' ? 'success' : 'failed' }}">
-                Payment {{ $status === 'success' ? 'Successful' : 'Failed' }}
-            </p>
+        @if(isset($status) && $status === 'success')
+            <div class="icon success">✓</div>
+            <h2 class="success">Payment Successful</h2>
+            <p class="message">Your payment has been processed successfully.</p>
+        @elseif(isset($status) && $status === 'failed')
+            <div class="icon failed">✕</div>
+            <h2 class="failed">Payment Failed</h2>
+            <p class="message">Your payment could not be processed. Please try again.</p>
+        @else
+            <div class="icon">⏳</div>
+            <h2>Processing Payment...</h2>
+            <p class="message">Please wait while we process your payment.</p>
         @endif
     </div>
 </body>
