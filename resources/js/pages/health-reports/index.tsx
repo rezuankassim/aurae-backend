@@ -1,16 +1,16 @@
 import AppLayout from '@/layouts/app-layout';
-import { HealthReport, type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 import Heading from '@/components/heading';
-import healthReports from '@/routes/health-reports';
-import { columns } from './columns';
+import healthReportsRoute from '@/routes/health-reports';
+import { columns, HealthReport } from './columns';
 import { DataTable } from './data-table';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Health Reports',
-        href: healthReports.index().url,
+        href: healthReportsRoute.index().url,
     },
 ];
 
@@ -20,7 +20,7 @@ export default function HealthReportIndex({ healthReports }: { healthReports: He
             <Head title="Health Reports" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl px-4 py-6">
                 <div className="flex items-center justify-between">
-                    <Heading title="Health Reports" description="View your previous uploaded health reports or upload new one" />
+                    <Heading title="Health Reports" description="View your health reports" />
                 </div>
 
                 <DataTable columns={columns} data={healthReports} />

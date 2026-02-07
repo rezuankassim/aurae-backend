@@ -149,11 +149,14 @@ export interface Feedback {
 }
 
 export interface HealthReport {
-    id: number;
+    id: string;
     user_id: number;
-    file: string;
-    type: 'full_body' | 'meridian' | 'multidimensional' | null;
-    file_url: string;
+    full_body_file: string | null;
+    full_body_file_url: string | null;
+    meridian_file: string | null;
+    meridian_file_url: string | null;
+    multidimensional_file: string | null;
+    multidimensional_file_url: string | null;
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...

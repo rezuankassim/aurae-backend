@@ -17,9 +17,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface HealthReport {
     id: string;
-    file: string;
-    file_name: string;
-    file_url: string;
+    full_body_file: string | null;
+    full_body_file_name: string | null;
+    full_body_file_url: string | null;
+    meridian_file: string | null;
+    meridian_file_name: string | null;
+    meridian_file_url: string | null;
+    multidimensional_file: string | null;
+    multidimensional_file_name: string | null;
+    multidimensional_file_url: string | null;
     user: {
         id: number;
         name: string;

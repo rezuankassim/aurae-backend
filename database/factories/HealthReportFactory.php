@@ -17,7 +17,9 @@ class HealthReportFactory extends Factory
     public function definition(): array
     {
         return [
-            'file' => $this->faker->word.'.pdf',
+            'full_body_file' => $this->faker->optional()->randomElement([null, 'health-reports/'.$this->faker->uuid.'.pdf']),
+            'meridian_file' => $this->faker->optional()->randomElement([null, 'health-reports/'.$this->faker->uuid.'.pdf']),
+            'multidimensional_file' => $this->faker->optional()->randomElement([null, 'health-reports/'.$this->faker->uuid.'.pdf']),
             'user_id' => \App\Models\User::factory(),
         ];
     }

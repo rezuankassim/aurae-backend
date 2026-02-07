@@ -22,10 +22,15 @@ class HealthReportController extends Controller
             ->map(function ($report) {
                 return [
                     'id' => $report->id,
-                    'file' => $report->file,
-                    'type' => $report->type,
-                    'file_name' => Str::afterLast($report->file, '/'),
-                    'file_url' => asset('storage/'.$report->file),
+                    'full_body_file' => $report->full_body_file,
+                    'full_body_file_name' => $report->full_body_file ? Str::afterLast($report->full_body_file, '/') : null,
+                    'full_body_file_url' => $report->full_body_file ? asset('storage/'.$report->full_body_file) : null,
+                    'meridian_file' => $report->meridian_file,
+                    'meridian_file_name' => $report->meridian_file ? Str::afterLast($report->meridian_file, '/') : null,
+                    'meridian_file_url' => $report->meridian_file ? asset('storage/'.$report->meridian_file) : null,
+                    'multidimensional_file' => $report->multidimensional_file,
+                    'multidimensional_file_name' => $report->multidimensional_file ? Str::afterLast($report->multidimensional_file, '/') : null,
+                    'multidimensional_file_url' => $report->multidimensional_file ? asset('storage/'.$report->multidimensional_file) : null,
                     'user' => $report->user,
                     'created_at' => $report->created_at,
                     'updated_at' => $report->updated_at,
@@ -59,45 +64,47 @@ class HealthReportController extends Controller
     public function store(HealthReportCreateRequest $request)
     {
         $validated = $request->validated();
-        $uploadedCount = 0;
 
-        $fileTypes = [
-            'full_body_file' => 'full_body',
-            'meridian_file' => 'meridian',
-            'multidimensional_file' => 'multidimensional',
+        $data = [
+            'user_id' => $validated['user_id'],
         ];
 
-        foreach ($fileTypes as $fileKey => $type) {
-            if ($request->hasFile($fileKey)) {
-                $file = $request->file($fileKey);
-                $path = $file->store('health-reports');
-
-                HealthReport::create([
-                    'file' => $path,
-                    'type' => $type,
-                    'user_id' => $validated['user_id'],
-                ]);
-
-                $uploadedCount++;
-            }
+        if ($request->hasFile('full_body_file')) {
+            $data['full_body_file'] = $request->file('full_body_file')->store('health-reports');
         }
 
-        $message = $uploadedCount > 1 ? "$uploadedCount health reports uploaded successfully." : 'Health report uploaded successfully.';
+        if ($request->hasFile('meridian_file')) {
+            $data['meridian_file'] = $request->file('meridian_file')->store('health-reports');
+        }
 
-        return redirect()->route('admin.health-reports.index')->with('success', $message);
+        if ($request->hasFile('multidimensional_file')) {
+            $data['multidimensional_file'] = $request->file('multidimensional_file')->store('health-reports');
+        }
+
+        HealthReport::create($data);
+
+        return redirect()->route('admin.health-reports.index')->with('success', 'Health report uploaded successfully.');
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource (PDF file).
      */
-    public function show(HealthReport $healthReport)
+    public function show(HealthReport $healthReport, string $type)
     {
-        abort_unless($healthReport->file && file_exists(storage_path('app/private/'.$healthReport->file)), 404);
+        $fileField = match ($type) {
+            'full_body' => 'full_body_file',
+            'meridian' => 'meridian_file',
+            'multidimensional' => 'multidimensional_file',
+            default => abort(404),
+        };
 
-        // stream pdf file
-        return response()->file(storage_path('app/private/'.$healthReport->file), [
+        $file = $healthReport->{$fileField};
+
+        abort_unless($file && file_exists(storage_path('app/private/'.$file)), 404);
+
+        return response()->file(storage_path('app/private/'.$file), [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="'.Str::afterLast($healthReport->file, '/').'"',
+            'Content-Disposition' => 'inline; filename="'.Str::afterLast($file, '/').'"',
         ]);
     }
 
@@ -106,9 +113,13 @@ class HealthReportController extends Controller
      */
     public function destroy(HealthReport $healthReport)
     {
-        // Delete file from storage
-        if ($healthReport->file && file_exists(storage_path('app/private/'.$healthReport->file))) {
-            unlink(storage_path('app/private/'.$healthReport->file));
+        // Delete files from storage
+        $fileFields = ['full_body_file', 'meridian_file', 'multidimensional_file'];
+
+        foreach ($fileFields as $field) {
+            if ($healthReport->{$field} && file_exists(storage_path('app/private/'.$healthReport->{$field}))) {
+                unlink(storage_path('app/private/'.$healthReport->{$field}));
+            }
         }
 
         $healthReport->delete();

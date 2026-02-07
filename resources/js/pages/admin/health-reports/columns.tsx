@@ -4,14 +4,19 @@ import { destroy, show } from '@/routes/admin/health-reports';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
-import { Download, ExternalLink, MoreHorizontal } from 'lucide-react';
+import { ExternalLink, MoreHorizontal, Trash2 } from 'lucide-react';
 
 interface HealthReport {
     id: string;
-    file: string;
-    type: 'full_body' | 'meridian' | 'multidimensional' | null;
-    file_name: string;
-    file_url: string;
+    full_body_file: string | null;
+    full_body_file_name: string | null;
+    full_body_file_url: string | null;
+    meridian_file: string | null;
+    meridian_file_name: string | null;
+    meridian_file_url: string | null;
+    multidimensional_file: string | null;
+    multidimensional_file_name: string | null;
+    multidimensional_file_url: string | null;
     user: {
         id: number;
         name: string;
@@ -42,21 +47,58 @@ export const columns: ColumnDef<HealthReport>[] = [
         },
     },
     {
-        accessorKey: 'type',
-        header: 'Report Type',
+        id: 'full_body',
+        header: 'Full Body (全身健康评估)',
         cell: ({ row }) => {
-            const type = row.getValue('type') as string | null;
-            const typeLabels: Record<string, string> = {
-                full_body: 'Full Body (全身健康评估)',
-                meridian: 'Meridian (经络健康评估)',
-                multidimensional: 'Multidimensional (多维健康评估)',
-            };
-            return type ? typeLabels[type] || type : '-';
+            if (!row.original.full_body_file) return <span className="text-muted-foreground">-</span>;
+            return (
+                <a
+                    href={show([row.original.id, 'full_body']).url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-primary hover:underline"
+                >
+                    <ExternalLink className="h-3 w-3" />
+                    View
+                </a>
+            );
         },
     },
     {
-        accessorKey: 'file_name',
-        header: 'File Name',
+        id: 'meridian',
+        header: 'Meridian (经络健康评估)',
+        cell: ({ row }) => {
+            if (!row.original.meridian_file) return <span className="text-muted-foreground">-</span>;
+            return (
+                <a
+                    href={show([row.original.id, 'meridian']).url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-primary hover:underline"
+                >
+                    <ExternalLink className="h-3 w-3" />
+                    View
+                </a>
+            );
+        },
+    },
+    {
+        id: 'multidimensional',
+        header: 'Multidimensional (多维健康评估)',
+        cell: ({ row }) => {
+            if (!row.original.multidimensional_file) return <span className="text-muted-foreground">-</span>;
+            return (
+                <a
+                    href={show([row.original.id, 'multidimensional']).url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-primary hover:underline"
+                >
+                    <ExternalLink className="h-3 w-3" />
+                    View
+                </a>
+            );
+        },
     },
     {
         accessorKey: 'created_at',
@@ -70,7 +112,7 @@ export const columns: ColumnDef<HealthReport>[] = [
         id: 'actions',
         cell: ({ row }) => {
             const handleDelete = () => {
-                if (confirm('Are you sure you want to delete this health report?')) {
+                if (confirm('Are you sure you want to delete this health report record? All associated files will be deleted.')) {
                     router.delete(destroy(row.original.id).url, {
                         preserveScroll: true,
                     });
@@ -87,24 +129,8 @@ export const columns: ColumnDef<HealthReport>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                            <a
-                                href={show(row.original.id).url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex cursor-pointer items-center gap-2"
-                            >
-                                <ExternalLink className="h-4 w-4" />
-                                View
-                            </a>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <a href={row.original.file_url} download className="flex cursor-pointer items-center gap-2">
-                                <Download className="h-4 w-4" />
-                                Download
-                            </a>
-                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleDelete} className="text-red-600 hover:cursor-pointer focus:text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" />
                             Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>

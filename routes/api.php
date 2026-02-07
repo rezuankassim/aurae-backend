@@ -135,6 +135,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
 
         Route::get('/health-reports', [HealthReportController::class, 'index'])->name('api.health-reports.index');
         Route::get('/health-reports/{healthReport}', [HealthReportController::class, 'show'])->name('api.health-reports.show');
+        Route::get('/health-reports/{healthReport}/file/{type}', [HealthReportController::class, 'file'])->name('api.health-reports.file');
 
         // Subscription routes
         Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('api.subscriptions.index');

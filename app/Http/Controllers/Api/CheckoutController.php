@@ -225,7 +225,7 @@ class CheckoutController extends Controller
         // Find order by reference (check both senangpay and revpay for backward compatibility)
         $order = Order::where(function ($query) use ($reference) {
             $query->whereJsonContains('meta->senangpay_reference', $reference)
-                  ->orWhereJsonContains('meta->revpay_reference', $reference);
+                ->orWhereJsonContains('meta->revpay_reference', $reference);
         })->first();
 
         if (! $order) {

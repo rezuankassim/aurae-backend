@@ -3,7 +3,6 @@
 namespace App\PaymentTypes;
 
 use App\Services\SenangpaySignatureService;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Lunar\Base\DataTransferObjects\PaymentAuthorize;
 use Lunar\Base\DataTransferObjects\PaymentCapture;

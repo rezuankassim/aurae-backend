@@ -164,7 +164,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/health-reports', [HealthReportController::class, 'index'])->name('health-reports.index');
     Route::get('/health-reports/create', [HealthReportController::class, 'create'])->name('health-reports.create');
     Route::post('/health-reports', [HealthReportController::class, 'store'])->name('health-reports.store');
-    Route::get('/health-reports/{healthReport}', [HealthReportController::class, 'show'])->name('health-reports.show');
+    Route::get('/health-reports/{healthReport}/{type}', [HealthReportController::class, 'show'])->name('health-reports.show');
     Route::delete('/health-reports/{healthReport}', [HealthReportController::class, 'destroy'])->name('health-reports.destroy');
 
     Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscription.index');

@@ -18,8 +18,9 @@ class HealthReport extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'file',
-        'type',
+        'full_body_file',
+        'meridian_file',
+        'multidimensional_file',
         'user_id',
     ];
 
