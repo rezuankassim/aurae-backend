@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\FirebaseTestController;
 use App\Http\Controllers\Admin\HealthReportController;
 use App\Http\Controllers\Admin\KnowledgeController;
 use App\Http\Controllers\Admin\MaintenanceBannerController;
+use App\Http\Controllers\Admin\MarketplaceBannerController;
 use App\Http\Controllers\Admin\MusicController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\OrderController;
@@ -157,6 +158,14 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/maintenance-banners/{maintenanceBanner}/edit', [MaintenanceBannerController::class, 'edit'])->name('maintenance-banners.edit');
     Route::put('/maintenance-banners/{maintenanceBanner}', [MaintenanceBannerController::class, 'update'])->name('maintenance-banners.update');
     Route::delete('/maintenance-banners/{maintenanceBanner}', [MaintenanceBannerController::class, 'destroy'])->name('maintenance-banners.destroy');
+
+    Route::get('/marketplace-banners', [MarketplaceBannerController::class, 'index'])->name('marketplace-banners.index');
+    Route::get('/marketplace-banners/create', [MarketplaceBannerController::class, 'create'])->name('marketplace-banners.create');
+    Route::post('/marketplace-banners', [MarketplaceBannerController::class, 'store'])->name('marketplace-banners.store');
+    Route::get('/marketplace-banners/{marketplaceBanner}', [MarketplaceBannerController::class, 'show'])->name('marketplace-banners.show');
+    Route::get('/marketplace-banners/{marketplaceBanner}/edit', [MarketplaceBannerController::class, 'edit'])->name('marketplace-banners.edit');
+    Route::put('/marketplace-banners/{marketplaceBanner}', [MarketplaceBannerController::class, 'update'])->name('marketplace-banners.update');
+    Route::delete('/marketplace-banners/{marketplaceBanner}', [MarketplaceBannerController::class, 'destroy'])->name('marketplace-banners.destroy');
 
     Route::get('/device-locations', [DeviceLocationController::class, 'index'])->name('device-locations.index');
     Route::get('/device-locations/{userDevice}', [DeviceLocationController::class, 'show'])->name('device-locations.show');

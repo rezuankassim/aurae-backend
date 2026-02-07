@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\GeneralSettingController;
 use App\Http\Controllers\Api\HealthReportController;
 use App\Http\Controllers\Api\KnowledgeController;
 use App\Http\Controllers\Api\MaintenanceBannerController;
+use App\Http\Controllers\Api\MarketplaceBannerController;
 use App\Http\Controllers\Api\MusicController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\NotificationController;
@@ -132,6 +133,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::delete('/device-maintenances/{deviceMaintenance}/cancel', [DeviceMaintenanceController::class, 'cancel'])->name('api.device-maintenances.cancel');
 
         Route::get('/maintenance-banners', [MaintenanceBannerController::class, 'index'])->name('api.maintenance-banners.index');
+        Route::get('/marketplace-banners', [MarketplaceBannerController::class, 'index'])->name('api.marketplace-banners.index');
 
         Route::get('/health-reports', [HealthReportController::class, 'index'])->name('api.health-reports.index');
         Route::get('/health-reports/{healthReport}', [HealthReportController::class, 'show'])->name('api.health-reports.show');

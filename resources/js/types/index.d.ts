@@ -215,6 +215,18 @@ export interface MaintenanceBanner {
     [key: string]: unknown; // This allows for additional properties...
 }
 
+export interface MarketplaceBanner {
+    id: number;
+    image: string;
+    title: string | null;
+    is_active: boolean;
+    order: number;
+    created_at: string;
+    updated_at: string;
+    image_url?: string | null;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
 export interface Product {
     id: number;
     product_type_id: number;

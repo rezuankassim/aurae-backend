@@ -13,6 +13,7 @@ import { edit as editGeneralSettings } from '@/routes/admin/general-settings';
 import { index as indexAdminHealthReports } from '@/routes/admin/health-reports';
 import { index as indexKnowledge } from '@/routes/admin/knowledge';
 import { index as indexMaintenanceBanners } from '@/routes/admin/maintenance-banners';
+import { index as indexMarketplaceBanners } from '@/routes/admin/marketplace-banners';
 import { index as indexMusic } from '@/routes/admin/music';
 import { index as indexNews } from '@/routes/admin/news';
 import { index as indexProducts } from '@/routes/admin/products';
@@ -120,6 +121,11 @@ const managementNavItems: NavItem[] = [
     {
         title: 'Maintenance Banners',
         href: indexMaintenanceBanners(),
+        icon: ImageIcon,
+    },
+    {
+        title: 'Marketplace Banners',
+        href: indexMarketplaceBanners(),
         icon: ImageIcon,
     },
     {
