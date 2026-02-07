@@ -219,6 +219,8 @@ class SenangpayCallbackController extends Controller
             'amount' => $intentTransaction->amount,
             'reference' => $orderId,
             'status' => 'captured',
+            'card_type' => '',
+            'last_four' => '',
             'notes' => 'Payment captured successfully',
             'captured_at' => now(),
             'meta' => [

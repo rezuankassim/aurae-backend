@@ -69,6 +69,8 @@ class SenangpayPayment extends AbstractPayment
             'amount' => $this->order->total,
             'reference' => $referenceNumber,
             'status' => 'pending',
+            'card_type' => '',
+            'last_four' => '',
             'notes' => 'Payment intent created',
             'meta' => [
                 'customer_name' => $customerName,
@@ -152,6 +154,8 @@ class SenangpayPayment extends AbstractPayment
             'amount' => $amount > 0 ? $amount : $intentTransaction->amount,
             'reference' => $intentTransaction->reference,
             'status' => 'captured',
+            'card_type' => $transaction->card_type ?? '',
+            'last_four' => $transaction->last_four ?? '',
             'notes' => 'Payment captured',
             'captured_at' => now(),
             'meta' => $transaction->meta,
