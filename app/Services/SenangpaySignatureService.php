@@ -56,6 +56,22 @@ class SenangpaySignatureService
     }
 
     /**
+     * Generate hash for return URL verification.
+     * Format: hash_hmac('sha256', secret_key + status_id + order_id + transaction_id + msg, secret_key)
+     */
+    public function generateReturnHash(
+        string $secretKey,
+        string $statusId,
+        string $orderId,
+        string $transactionId,
+        string $msg
+    ): string {
+        $string = $secretKey.$statusId.$orderId.$transactionId.$msg;
+
+        return hash_hmac('sha256', $string, $secretKey);
+    }
+
+    /**
      * Generate hash for payment form.
      * Format: hash_hmac('sha256', secret_key + detail + amount + order_id, secret_key)
      */

@@ -30,12 +30,15 @@ class SenangpayCallbackController extends Controller
         $statusId = $request->input('status_id');
         $orderId = $request->input('order_id');
         $transactionId = $request->input('transaction_id');
+        $msg = $request->input('msg');
+        $hash = $request->input('hash');
 
         Log::info('SenangPay return URL received', [
             'status_id' => $statusId,
             'order_id' => $orderId,
             'transaction_id' => $transactionId,
-            'all_params' => $request->all(),
+            'msg' => $msg,
+            'hash' => $hash,
         ]);
 
         // Get order by reference number stored in meta
@@ -49,25 +52,30 @@ class SenangpayCallbackController extends Controller
             ]);
         }
 
-        // Query payment status from SenangPay API to verify
-        $paymentStatus = $this->queryPaymentStatus($orderId);
+        // Verify hash from return URL parameters
+        $secretKey = config('services.senangpay.secret_key');
+        $expectedHash = $this->signatureService->generateReturnHash(
+            $secretKey,
+            $statusId,
+            $orderId,
+            $transactionId,
+            $msg
+        );
 
-        if (! $paymentStatus) {
-            Log::error('SenangPay return: Could not verify payment status', ['order_id' => $orderId]);
+        if (! $this->signatureService->verifySignature($expectedHash, $hash)) {
+            Log::error('SenangPay return: Hash verification failed', [
+                'order_id' => $orderId,
+                'expected_hash' => $expectedHash,
+                'received_hash' => $hash,
+            ]);
 
             return response()->view('payment.error', [
-                'message' => 'Could not verify payment status',
+                'message' => 'Payment verification failed',
             ]);
         }
 
-        // Extract status from response
-        $status = 'failed';
-        $completeTransactionId = $transactionId;
-
-        if (isset($paymentStatus['status']) && $paymentStatus['status'] === 1) {
-            $status = 'success';
-            $completeTransactionId = $paymentStatus['transaction_id'] ?? $transactionId;
-        }
+        // Determine status based on status_id (1 = success, 0 = failed)
+        $status = $statusId === '1' ? 'success' : 'failed';
 
         // Broadcast WebSocket event to mobile app
         if ($order->user_id) {
@@ -76,7 +84,7 @@ class SenangpayCallbackController extends Controller
                 referenceNumber: $orderId,
                 status: $status,
                 orderId: $order->id,
-                transactionId: $completeTransactionId,
+                transactionId: $transactionId,
                 amount: $order->total->formatted_amount,
                 currency: 'MYR'
             ));
@@ -91,7 +99,7 @@ class SenangpayCallbackController extends Controller
         // If payment successful, capture it
         if ($status === 'success') {
             try {
-                $this->capturePayment($order, $orderId, $completeTransactionId);
+                $this->capturePayment($order, $orderId, $transactionId);
             } catch (\Exception $e) {
                 Log::error('SenangPay return: Capture failed', [
                     'order_id' => $orderId,
@@ -103,7 +111,7 @@ class SenangpayCallbackController extends Controller
             $order->update([
                 'status' => 'payment-failed',
                 'meta' => array_merge((array) $order->meta, [
-                    'senangpay_transaction_id' => $completeTransactionId,
+                    'senangpay_transaction_id' => $transactionId,
                     'payment_failed_at' => now()->toIso8601String(),
                 ]),
             ]);
