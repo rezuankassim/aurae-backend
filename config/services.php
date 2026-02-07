@@ -43,4 +43,11 @@ return [
         'currency' => env('REVPAY_CURRENCY', 'MYR'),
     ],
 
+    'senangpay' => [
+        'merchant_id' => env('SENANGPAY_MERCHANT_ID'),
+        'secret_key' => env('SENANGPAY_SECRET_KEY'),
+        'base_url' => env('SENANGPAY_BASE_URL', 'https://app.senangpay.my'),
+        'currency' => env('SENANGPAY_CURRENCY', 'MYR'),
+    ],
+
 ];
