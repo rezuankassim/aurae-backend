@@ -32,6 +32,7 @@ class User extends Authenticatable implements FilamentUser, LunarUserInterface
         'email',
         'password',
         'phone',
+        'phone_country_code',
         'status',
         'phone_verified_at',
     ];

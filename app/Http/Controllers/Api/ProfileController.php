@@ -21,6 +21,10 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
+        // Ensure newly added columns are always present in the response payload,
+        // even if the user model instance was loaded with a limited select.
+        $user->setAttribute('phone_country_code', $user->phone_country_code);
+
         return BaseResource::make($user)
             ->additional([
                 'status' => 200,
@@ -43,6 +47,7 @@ class ProfileController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'phone' => ['required', 'string', 'max:20'],
+            'phone_country_code' => ['nullable', 'string', 'max:10'],
         ];
 
         // Only check phone uniqueness if phone is being changed
@@ -64,9 +69,10 @@ class ProfileController extends Controller
 
         $phoneChanged = $user->phone !== $validated['phone'];
 
-        // Update name and email immediately
+        // Update name, email, and phone_country_code immediately
         $user->name = $validated['name'];
         $user->email = $validated['email'];
+        $user->phone_country_code = $validated['phone_country_code'] ?? $user->phone_country_code;
 
         // If phone is changed, require verification
         if ($phoneChanged) {
