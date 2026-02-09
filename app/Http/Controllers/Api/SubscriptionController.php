@@ -26,25 +26,33 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Get user's active subscription.
+     * Get user's active subscriptions.
      */
     public function userSubscription(Request $request)
     {
         $user = $request->user();
-        $activeSubscription = $user->activeSubscription()->with('subscription')->first();
+        $activeSubscriptions = $user->subscriptions()
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('ends_at')
+                    ->orWhere('ends_at', '>', now());
+            })
+            ->with('subscription')
+            ->latest()
+            ->get();
 
-        if (! $activeSubscription) {
-            return BaseResource::make(null)
+        if ($activeSubscriptions->isEmpty()) {
+            return BaseResource::make([])
                 ->additional([
                     'status' => 200,
-                    'message' => 'No active subscription found.',
+                    'message' => 'No active subscriptions found.',
                 ]);
         }
 
-        return UserSubscriptionResource::make($activeSubscription)
+        return UserSubscriptionResource::collection($activeSubscriptions)
             ->additional([
                 'status' => 200,
-                'message' => 'User subscription retrieved successfully.',
+                'message' => 'User subscriptions retrieved successfully.',
             ]);
     }
 }

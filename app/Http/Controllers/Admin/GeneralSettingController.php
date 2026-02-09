@@ -5,20 +5,27 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\GeneralSettingUpdateRequest;
 use App\Models\GeneralSetting;
+use App\Services\MachineSerialService;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class GeneralSettingController extends Controller
 {
+    public function __construct(
+        protected MachineSerialService $serialService
+    ) {}
+
     /**
      * Show the form for editing the specified resource.
      */
     public function edit()
     {
         $generalSetting = GeneralSetting::firstOrCreate();
+        $nextSerial = $this->serialService->generateNextSerialNumber();
 
         return Inertia::render('admin/general-settings/edit', [
             'generalSetting' => $generalSetting,
+            'next_serial_preview' => $nextSerial,
         ]);
     }
 
@@ -80,6 +87,19 @@ class GeneralSettingController extends Controller
 
         if ($request->filled('tablet_apk_release_notes')) {
             $generalSetting->tablet_apk_release_notes = $validated['tablet_apk_release_notes'];
+        }
+
+        // Update machine serial format settings
+        if ($request->filled('machine_serial_format')) {
+            $generalSetting->machine_serial_format = $validated['machine_serial_format'];
+        }
+
+        if ($request->filled('machine_serial_prefix')) {
+            $generalSetting->machine_serial_prefix = $validated['machine_serial_prefix'];
+        }
+
+        if ($request->filled('machine_serial_length')) {
+            $generalSetting->machine_serial_length = $validated['machine_serial_length'];
         }
 
         $generalSetting->save();

@@ -97,21 +97,6 @@ export default function EditSubscription({ subscription }: { subscription: Subsc
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="max_devices">Maximum Devices</Label>
-
-                                <Input
-                                    type="number"
-                                    id="max_devices"
-                                    name="max_devices"
-                                    placeholder="1"
-                                    min="1"
-                                    defaultValue={subscription.max_devices}
-                                />
-
-                                <InputError message={errors.max_devices} />
-                            </div>
-
-                            <div className="grid gap-2">
                                 <Label htmlFor="price">Price (RM)</Label>
 
                                 <Input

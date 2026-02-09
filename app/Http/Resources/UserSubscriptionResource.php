@@ -14,6 +14,15 @@ class UserSubscriptionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $this->relationLoaded('user') ? $this->user : $request->user();
+        $currentMachineCount = $user ? $user->machines()->count() : 0;
+        $maxMachines = $this->subscription?->max_machines ?? 1;
+
+        $daysRemaining = null;
+        if ($this->ends_at) {
+            $daysRemaining = max(0, now()->diffInDays($this->ends_at, false));
+        }
+
         return [
             'id' => $this->id,
             'subscription' => new SubscriptionResource($this->whenLoaded('subscription')),
@@ -21,6 +30,14 @@ class UserSubscriptionResource extends JsonResource
             'ends_at' => $this->ends_at,
             'status' => $this->status,
             'is_active' => $this->isActive(),
+            'payment_method' => $this->payment_method,
+            'payment_status' => $this->payment_status,
+            'paid_at' => $this->paid_at,
+            'transaction_id' => $this->transaction_id,
+            'days_remaining' => $daysRemaining,
+            'current_machine_count' => $currentMachineCount,
+            'max_machines' => $maxMachines,
+            'machines_available' => max(0, $maxMachines - $currentMachineCount),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

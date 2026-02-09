@@ -23,6 +23,8 @@ use App\Http\Controllers\Admin\ProductMediaController;
 use App\Http\Controllers\Admin\ProductPricingController;
 use App\Http\Controllers\Admin\ProductVariantController;
 use App\Http\Controllers\Admin\SubscriptionController;
+use App\Http\Controllers\Admin\MachineController;
+use App\Http\Controllers\Admin\UserSubscriptionController;
 use App\Http\Controllers\Admin\TherapyController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserLoginActivityController;
@@ -185,4 +187,22 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/subscriptions/{subscription}/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');
     Route::put('/subscriptions/{subscription}', [SubscriptionController::class, 'update'])->name('subscription.update');
     Route::delete('/subscriptions/{subscription}', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');
+
+    // User subscriptions
+    Route::get('/user-subscriptions', [UserSubscriptionController::class, 'index'])->name('user-subscriptions.index');
+    Route::get('/user-subscriptions/{userSubscription}', [UserSubscriptionController::class, 'show'])->name('user-subscriptions.show');
+    Route::post('/user-subscriptions/{userSubscription}/cancel', [UserSubscriptionController::class, 'cancel'])->name('user-subscriptions.cancel');
+    Route::post('/user-subscriptions/{userSubscription}/extend', [UserSubscriptionController::class, 'extend'])->name('user-subscriptions.extend');
+
+    // Machines
+    Route::get('/machines', [MachineController::class, 'index'])->name('machines.index');
+    Route::get('/machines/create', [MachineController::class, 'create'])->name('machines.create');
+    Route::post('/machines', [MachineController::class, 'store'])->name('machines.store');
+    Route::get('/machines/{machine}', [MachineController::class, 'show'])->name('machines.show');
+    Route::get('/machines/{machine}/edit', [MachineController::class, 'edit'])->name('machines.edit');
+    Route::put('/machines/{machine}', [MachineController::class, 'update'])->name('machines.update');
+    Route::delete('/machines/{machine}', [MachineController::class, 'destroy'])->name('machines.destroy');
+    Route::post('/machines/{machine}/unbind', [MachineController::class, 'unbind'])->name('machines.unbind');
+    Route::post('/machines/{machine}/activate', [MachineController::class, 'activate'])->name('machines.activate');
+    Route::post('/machines/{machine}/deactivate', [MachineController::class, 'deactivate'])->name('machines.deactivate');
 });

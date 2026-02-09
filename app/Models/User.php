@@ -110,7 +110,7 @@ class User extends Authenticatable implements FilamentUser, LunarUserInterface
     }
 
     /**
-     * Get the user's active subscription.
+     * Get the user's active subscription (latest one).
      */
     public function activeSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
@@ -124,13 +124,33 @@ class User extends Authenticatable implements FilamentUser, LunarUserInterface
     }
 
     /**
-     * Get the maximum number of devices this user can have based on subscription.
+     * Get all user's active subscriptions.
      */
-    public function getMaxDevices(): int
+    public function activeSubscriptions(): HasMany
     {
-        $activeSubscription = $this->activeSubscription()->with('subscription')->first();
+        return $this->hasMany(UserSubscription::class)
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('ends_at')
+                    ->orWhere('ends_at', '>', now());
+            });
+    }
 
-        return $activeSubscription?->subscription?->max_devices ?? 1;
+    /**
+     * Get the machines bound to this user.
+     */
+    public function machines(): HasMany
+    {
+        return $this->hasMany(Machine::class);
+    }
+
+    /**
+     * Get the maximum number of machines this user can have based on subscriptions.
+     * Each active subscription allows 1 machine.
+     */
+    public function getMaxMachines(): int
+    {
+        return $this->activeSubscriptions()->count();
     }
 
     /**

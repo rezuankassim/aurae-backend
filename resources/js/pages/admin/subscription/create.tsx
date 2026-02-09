@@ -80,14 +80,6 @@ export default function CreateSubscription() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="max_devices">Maximum Devices</Label>
-
-                                <Input type="number" id="max_devices" name="max_devices" placeholder="1" min="1" defaultValue="1" />
-
-                                <InputError message={errors.max_devices} />
-                            </div>
-
-                            <div className="grid gap-2">
                                 <Label htmlFor="price">Price (RM)</Label>
 
                                 <Input type="number" id="price" name="price" placeholder="59.90" min="0" step="0.01" />

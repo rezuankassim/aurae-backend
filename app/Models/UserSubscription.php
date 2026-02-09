@@ -2,22 +2,30 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserSubscription extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'subscription_id',
         'starts_at',
         'ends_at',
         'status',
+        'transaction_id',
+        'payment_method',
+        'payment_status',
+        'paid_at',
     ];
 
     protected $casts = [
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
+        'paid_at' => 'datetime',
     ];
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Payment;
 
 use App\Events\PaymentCompleted;
 use App\Http\Controllers\Controller;
+use App\Models\UserSubscription;
 use App\Services\SenangpaySignatureService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -40,6 +41,18 @@ class SenangpayCallbackController extends Controller
             'msg' => $msg,
             'hash' => $hash,
         ]);
+
+        // Check if this is a subscription payment
+        $transaction = Transaction::where('reference', $orderId)
+            ->where('driver', 'senangpay')
+            ->where('type', 'intent')
+            ->first();
+
+        $isSubscription = $transaction && isset($transaction->meta['type']) && $transaction->meta['type'] === 'subscription';
+
+        if ($isSubscription) {
+            return $this->handleSubscriptionPayment($statusId, $orderId, $transactionId, $msg, $hash, $transaction);
+        }
 
         // Get order by reference number stored in meta
         $order = Order::whereJsonContains('meta->senangpay_reference', $orderId)->first();
@@ -266,6 +279,125 @@ class SenangpayCallbackController extends Controller
             'order_id' => $order->id,
             'reference' => $orderId,
             'transaction_id' => $transactionId,
+        ]);
+    }
+
+    /**
+     * Handle subscription payment callback.
+     */
+    protected function handleSubscriptionPayment(
+        string $statusId,
+        string $orderId,
+        string $transactionId,
+        string $msg,
+        string $hash,
+        Transaction $intentTransaction
+    ) {
+        // Verify hash
+        $secretKey = config('services.senangpay.secret_key');
+        $expectedHash = $this->signatureService->generateReturnHash(
+            $secretKey,
+            $statusId,
+            $orderId,
+            $transactionId,
+            $msg
+        );
+
+        if (! $this->signatureService->verifySignature($expectedHash, $hash)) {
+            Log::error('SenangPay subscription: Hash verification failed', [
+                'order_id' => $orderId,
+                'expected_hash' => $expectedHash,
+                'received_hash' => $hash,
+            ]);
+
+            return response()->view('payment.error', [
+                'message' => 'Payment verification failed',
+            ]);
+        }
+
+        // Get user subscription
+        $userSubscriptionId = $intentTransaction->meta['user_subscription_id'] ?? null;
+        if (! $userSubscriptionId) {
+            Log::error('SenangPay subscription: User subscription ID not found', ['order_id' => $orderId]);
+
+            return response()->view('payment.error', [
+                'message' => 'Subscription not found',
+            ]);
+        }
+
+        $userSubscription = UserSubscription::find($userSubscriptionId);
+        if (! $userSubscription) {
+            Log::error('SenangPay subscription: User subscription not found', [
+                'order_id' => $orderId,
+                'user_subscription_id' => $userSubscriptionId,
+            ]);
+
+            return response()->view('payment.error', [
+                'message' => 'Subscription not found',
+            ]);
+        }
+
+        // Determine status
+        $status = $statusId === '1' ? 'success' : 'failed';
+
+        if ($status === 'success') {
+            // Check if already captured
+            if (! Transaction::where('parent_transaction_id', $intentTransaction->id)
+                ->where('type', 'capture')
+                ->exists()) {
+                // Create capture transaction
+                Transaction::create([
+                    'parent_transaction_id' => $intentTransaction->id,
+                    'order_id' => null,
+                    'success' => true,
+                    'type' => 'capture',
+                    'driver' => 'senangpay',
+                    'amount' => $intentTransaction->amount,
+                    'reference' => $orderId,
+                    'status' => 'captured',
+                    'card_type' => '',
+                    'last_four' => '',
+                    'notes' => 'Subscription payment captured',
+                    'captured_at' => now(),
+                    'meta' => [
+                        'transaction_id' => $transactionId,
+                        'type' => 'subscription',
+                        'subscription_id' => $intentTransaction->meta['subscription_id'],
+                        'user_subscription_id' => $userSubscriptionId,
+                    ],
+                ]);
+
+                // Update user subscription
+                $userSubscription->update([
+                    'status' => 'active',
+                    'payment_status' => 'completed',
+                    'paid_at' => now(),
+                    'starts_at' => now(),
+                    'ends_at' => now()->addMonth(),
+                ]);
+
+                Log::info('SenangPay subscription: Payment captured', [
+                    'user_subscription_id' => $userSubscriptionId,
+                    'reference' => $orderId,
+                    'transaction_id' => $transactionId,
+                ]);
+            }
+        } else {
+            // Payment failed
+            $userSubscription->update([
+                'status' => 'cancelled',
+                'payment_status' => 'failed',
+            ]);
+
+            Log::warning('SenangPay subscription: Payment failed', [
+                'user_subscription_id' => $userSubscriptionId,
+                'reference' => $orderId,
+            ]);
+        }
+
+        return response()->view('payment.processing', [
+            'status' => $status,
+            'reference' => $orderId,
         ]);
     }
 }

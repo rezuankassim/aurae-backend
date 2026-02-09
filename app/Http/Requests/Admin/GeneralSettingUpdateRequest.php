@@ -29,6 +29,9 @@ class GeneralSettingUpdateRequest extends FormRequest
             'tablet_apk_file' => ['nullable', 'file', 'extensions:apk', 'max:512000'], // Max 500MB
             'tablet_apk_version' => ['nullable', 'string', 'max:255', 'regex:/^\d+\.\d+\.\d+$/'],
             'tablet_apk_release_notes' => ['nullable', 'string'],
+            'machine_serial_format' => ['nullable', 'string', 'max:255'],
+            'machine_serial_prefix' => ['nullable', 'string', 'max:50'],
+            'machine_serial_length' => ['nullable', 'integer', 'min:4', 'max:20'],
         ];
     }
 

@@ -25,6 +25,8 @@ use App\Http\Controllers\Api\PaymentHistoryController;
 use App\Http\Controllers\Api\UserSettingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\SubscriptionPaymentController;
+use App\Http\Controllers\Api\MachineController;
 use App\Http\Controllers\Api\TherapyController;
 use App\Http\Controllers\Api\UsageHistoryController;
 use App\Http\Controllers\Api\VideoStreamController;
@@ -151,6 +153,15 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         // Subscription routes
         Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('api.subscriptions.index');
         Route::get('/user/subscription', [SubscriptionController::class, 'userSubscription'])->name('api.user.subscription');
+
+        // Subscription payment routes
+        Route::post('/subscription/subscribe', [SubscriptionPaymentController::class, 'subscribe'])->name('api.subscription.subscribe');
+        Route::get('/subscription/payment-status/{reference}', [SubscriptionPaymentController::class, 'checkPaymentStatus'])->name('api.subscription.payment-status');
+
+        // Machine management routes
+        Route::post('/machine/bind', [MachineController::class, 'bind'])->name('api.machine.bind');
+        Route::get('/machines', [MachineController::class, 'index'])->name('api.machines.index');
+        Route::post('/machine/{machine}/unbind', [MachineController::class, 'unbind'])->name('api.machine.unbind');
 
         // Profile routes
         Route::get('/profile', [ProfileController::class, 'show'])->name('api.profile.show');
