@@ -3,21 +3,19 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { index as indexCollectionGroups } from '@/routes/admin/collection-groups';
 import { index as indexDeviceLocations } from '@/routes/admin/device-locations';
 import { index as indexAdminDeviceMaintenances } from '@/routes/admin/device-maintenances';
 import { index as indexFAQs } from '@/routes/admin/faqs';
 import { index as indexFeedbacks } from '@/routes/admin/feedbacks';
 import { index as indexFirebaseTest } from '@/routes/admin/firebase-test';
 import { edit as editGeneralSettings } from '@/routes/admin/general-settings';
-import { edit as editLegalSettings } from '@/routes/admin/legal-settings';
 import { index as indexAdminHealthReports } from '@/routes/admin/health-reports';
 import { index as indexKnowledge } from '@/routes/admin/knowledge';
+import { edit as editLegalSettings } from '@/routes/admin/legal-settings';
 import { index as indexMaintenanceBanners } from '@/routes/admin/maintenance-banners';
 import { index as indexMarketplaceBanners } from '@/routes/admin/marketplace-banners';
 import { index as indexMusic } from '@/routes/admin/music';
 import { index as indexNews } from '@/routes/admin/news';
-import { index as indexProducts } from '@/routes/admin/products';
 import { edit as editSocialMedia } from '@/routes/admin/social-media';
 import { index as indexSubscriptions } from '@/routes/admin/subscription';
 import { index as indexTherapies } from '@/routes/admin/therapies';
@@ -47,7 +45,6 @@ import {
     Newspaper,
     Radio,
     Scale,
-    ShoppingBag,
     ShoppingCart,
     TabletSmartphone,
     UsersIcon,
@@ -149,20 +146,6 @@ const managementNavItems: NavItem[] = [
         title: 'News',
         href: indexNews(),
         icon: Newspaper,
-    },
-    {
-        title: 'Shop',
-        icon: ShoppingBag,
-        children: [
-            {
-                title: 'Products',
-                href: indexProducts(),
-            },
-            {
-                title: 'Collection Groups',
-                href: indexCollectionGroups(),
-            },
-        ],
     },
     {
         title: 'Subscriptions',
