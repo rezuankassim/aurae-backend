@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\MaintenanceBannerController;
 use App\Http\Controllers\Admin\MarketplaceBannerController;
 use App\Http\Controllers\Admin\MusicController;
 use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Admin\S3UploadController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductCollectionController;
 use App\Http\Controllers\Admin\ProductController;
@@ -137,6 +138,9 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status.update');
+
+    // S3 direct upload
+    Route::post('/s3-upload/presigned-url', [S3UploadController::class, 'presignedUrl'])->name('s3-upload.presigned-url');
 
     Route::get('/music', [MusicController::class, 'index'])->name('music.index');
     Route::get('/music/create', [MusicController::class, 'create'])->name('music.create');

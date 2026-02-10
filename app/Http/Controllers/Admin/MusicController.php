@@ -42,19 +42,36 @@ class MusicController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'thumbnail' => ['nullable', 'image', 'max:10240'], // 10MB max
-            'music' => ['required', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:1073741824'], // 1GB max
-            'is_active' => ['boolean'],
-        ]);
+        // Determine if this is a direct S3 upload or traditional file upload
+        $isS3Upload = $request->has('music_s3_key');
 
-        $disk = $this->storageDisk();
-        $path = $request->file('music')->store('music', $disk);
-        $thumbnail = null;
+        if ($isS3Upload) {
+            // Direct S3 upload - validate S3 keys
+            $validated = $request->validate([
+                'title' => ['required', 'string', 'max:255'],
+                'thumbnail_s3_key' => ['nullable', 'string'],
+                'music_s3_key' => ['required', 'string'],
+                'is_active' => ['boolean'],
+            ]);
 
-        if ($request->hasFile('thumbnail')) {
-            $thumbnail = $request->file('thumbnail')->store('music/thumbnails', $disk);
+            $path = $validated['music_s3_key'];
+            $thumbnail = $validated['thumbnail_s3_key'] ?? null;
+        } else {
+            // Traditional file upload (development)
+            $validated = $request->validate([
+                'title' => ['required', 'string', 'max:255'],
+                'thumbnail' => ['nullable', 'image', 'max:10240'], // 10MB max
+                'music' => ['required', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:1073741824'], // 1GB max
+                'is_active' => ['boolean'],
+            ]);
+
+            $disk = $this->storageDisk();
+            $path = $request->file('music')->store('music', $disk);
+            $thumbnail = null;
+
+            if ($request->hasFile('thumbnail')) {
+                $thumbnail = $request->file('thumbnail')->store('music/thumbnails', $disk);
+            }
         }
 
         Music::create([
@@ -62,7 +79,6 @@ class MusicController extends Controller
             'thumbnail' => $thumbnail,
             'path' => $path,
             'is_active' => $request->input('is_active', true),
-            // Duration could be extracted if we had a library for it, skipping for now
         ]);
 
         return to_route('admin.music.index')->with('success', 'Music added successfully.');
@@ -86,34 +102,71 @@ class MusicController extends Controller
      */
     public function update(Request $request, Music $music)
     {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'thumbnail' => ['nullable', 'image', 'max:10240'],
-            'music' => ['nullable', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:1073741824'], // 1GB
-            'is_active' => ['boolean'],
-        ]);
+        // Determine if this is a direct S3 upload or traditional file upload
+        $isS3Upload = $request->has('music_s3_key') || $request->has('thumbnail_s3_key');
 
-        $data = [
-            'title' => $validated['title'],
-            'is_active' => $request->input('is_active', true),
-        ];
+        if ($isS3Upload) {
+            // Direct S3 upload
+            $validated = $request->validate([
+                'title' => ['required', 'string', 'max:255'],
+                'thumbnail_s3_key' => ['nullable', 'string'],
+                'music_s3_key' => ['nullable', 'string'],
+                'is_active' => ['boolean'],
+            ]);
 
-        $disk = $this->storageDisk();
+            $data = [
+                'title' => $validated['title'],
+                'is_active' => $request->input('is_active', true),
+            ];
 
-        if ($request->hasFile('thumbnail')) {
-            // Delete old thumbnail
-            if ($music->thumbnail && Storage::disk($disk)->exists($music->thumbnail)) {
-                Storage::disk($disk)->delete($music->thumbnail);
+            $disk = $this->storageDisk();
+
+            if (! empty($validated['thumbnail_s3_key'])) {
+                // Delete old thumbnail
+                if ($music->thumbnail && Storage::disk($disk)->exists($music->thumbnail)) {
+                    Storage::disk($disk)->delete($music->thumbnail);
+                }
+                $data['thumbnail'] = $validated['thumbnail_s3_key'];
             }
-            $data['thumbnail'] = $request->file('thumbnail')->store('music/thumbnails', $disk);
-        }
 
-        if ($request->hasFile('music')) {
-            // Delete old file
-            if ($music->path && Storage::disk($disk)->exists($music->path)) {
-                Storage::disk($disk)->delete($music->path);
+            if (! empty($validated['music_s3_key'])) {
+                // Delete old file
+                if ($music->path && Storage::disk($disk)->exists($music->path)) {
+                    Storage::disk($disk)->delete($music->path);
+                }
+                $data['path'] = $validated['music_s3_key'];
             }
-            $data['path'] = $request->file('music')->store('music', $disk);
+        } else {
+            // Traditional file upload (development)
+            $validated = $request->validate([
+                'title' => ['required', 'string', 'max:255'],
+                'thumbnail' => ['nullable', 'image', 'max:10240'],
+                'music' => ['nullable', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:1073741824'], // 1GB
+                'is_active' => ['boolean'],
+            ]);
+
+            $data = [
+                'title' => $validated['title'],
+                'is_active' => $request->input('is_active', true),
+            ];
+
+            $disk = $this->storageDisk();
+
+            if ($request->hasFile('thumbnail')) {
+                // Delete old thumbnail
+                if ($music->thumbnail && Storage::disk($disk)->exists($music->thumbnail)) {
+                    Storage::disk($disk)->delete($music->thumbnail);
+                }
+                $data['thumbnail'] = $request->file('thumbnail')->store('music/thumbnails', $disk);
+            }
+
+            if ($request->hasFile('music')) {
+                // Delete old file
+                if ($music->path && Storage::disk($disk)->exists($music->path)) {
+                    Storage::disk($disk)->delete($music->path);
+                }
+                $data['path'] = $request->file('music')->store('music', $disk);
+            }
         }
 
         $music->update($data);
