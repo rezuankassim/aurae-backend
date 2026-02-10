@@ -179,14 +179,22 @@ class MusicController extends Controller
      */
     public function destroy(Music $music)
     {
-        $disk = $this->storageDisk();
+        // Try to delete from both disks to ensure cleanup
+        $disksToCheck = ['public', 's3'];
 
-        if ($music->thumbnail && Storage::disk($disk)->exists($music->thumbnail)) {
-            Storage::disk($disk)->delete($music->thumbnail);
-        }
+        foreach ($disksToCheck as $disk) {
+            try {
+                if ($music->thumbnail && Storage::disk($disk)->exists($music->thumbnail)) {
+                    Storage::disk($disk)->delete($music->thumbnail);
+                }
 
-        if ($music->path && Storage::disk($disk)->exists($music->path)) {
-            Storage::disk($disk)->delete($music->path);
+                if ($music->path && Storage::disk($disk)->exists($music->path)) {
+                    Storage::disk($disk)->delete($music->path);
+                }
+            } catch (\Exception $e) {
+                // Silently continue if disk is not configured (e.g., S3 in development)
+                continue;
+            }
         }
 
         $music->delete();
