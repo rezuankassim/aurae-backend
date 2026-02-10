@@ -66,8 +66,17 @@ class UserSubscriptionController extends Controller
 
         $userSubscription->update([
             'status' => 'cancelled',
+            'cancelled_at' => now(),
             'ends_at' => now(),
         ]);
+
+        // Check if this is a recurring subscription - admin needs to cancel in SenangPay
+        if ($userSubscription->is_recurring) {
+            return back()->with([
+                'success' => 'Subscription cancelled in the system.',
+                'warning' => 'IMPORTANT: This is a recurring subscription. Please also cancel it manually in the SenangPay dashboard to stop future charges.',
+            ]);
+        }
 
         return back()->with('success', 'Subscription cancelled successfully.');
     }

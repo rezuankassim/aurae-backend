@@ -19,7 +19,9 @@ import { index as indexNews } from '@/routes/admin/news';
 import { edit as editSocialMedia } from '@/routes/admin/social-media';
 import { index as indexSubscriptions } from '@/routes/admin/subscription';
 import { index as indexTherapies } from '@/routes/admin/therapies';
+import { index as indexUserSubscriptions } from '@/routes/admin/user-subscriptions';
 import { index as indexUsers } from '@/routes/admin/users';
+import { index as indexMachines } from '@/routes/admin/machines';
 import { index as indexWebSocketTest } from '@/routes/admin/websocket-test';
 import { index as indexCustomTherapies } from '@/routes/custom-therapies';
 import { index as indexDeviceMaintenance } from '@/routes/device-maintenance';
@@ -37,6 +39,7 @@ import {
     Construction,
     CreditCard,
     FileBox,
+    HardDrive,
     ImageIcon,
     LayoutGrid,
     MapPin,
@@ -47,6 +50,7 @@ import {
     Scale,
     ShoppingCart,
     TabletSmartphone,
+    UserCheck,
     UsersIcon,
     Waypoints,
 } from 'lucide-react';
@@ -151,6 +155,16 @@ const managementNavItems: NavItem[] = [
         title: 'Subscriptions',
         href: indexSubscriptions(),
         icon: CreditCard,
+    },
+    {
+        title: 'User Subscriptions',
+        href: indexUserSubscriptions(),
+        icon: UserCheck,
+    },
+    {
+        title: 'Machines',
+        href: indexMachines(),
+        icon: HardDrive,
     },
     {
         title: 'Social Media',
