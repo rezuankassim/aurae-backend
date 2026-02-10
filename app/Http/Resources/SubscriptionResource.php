@@ -23,6 +23,7 @@ class SubscriptionResource extends JsonResource
             'price' => $this->price,
             'icon_url' => $this->icon ? asset('storage/'.$this->icon) : null,
             'is_active' => $this->is_active,
+            'has_recurring' => ! empty($this->senangpay_recurring_id),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

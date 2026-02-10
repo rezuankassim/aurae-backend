@@ -153,6 +153,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         // Subscription routes
         Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('api.subscriptions.index');
         Route::get('/user/subscription', [SubscriptionController::class, 'userSubscription'])->name('api.user.subscription');
+        Route::get('/subscription/active', [SubscriptionController::class, 'activeSubscription'])->name('api.subscription.active');
 
         // Subscription payment routes
         Route::post('/subscription/subscribe', [SubscriptionPaymentController::class, 'subscribe'])->name('api.subscription.subscribe');

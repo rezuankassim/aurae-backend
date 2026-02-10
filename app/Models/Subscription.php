@@ -17,6 +17,7 @@ class Subscription extends Model
         'description',
         'price',
         'is_active',
+        'senangpay_recurring_id',
     ];
 
     protected $casts = [

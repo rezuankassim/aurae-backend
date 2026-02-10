@@ -103,4 +103,34 @@ class SenangpaySignatureService
     {
         return $amount / 100;
     }
+
+    /**
+     * Generate hash for recurring payment.
+     * Format: hash('sha256', secret_key + order_id + recurring_id)
+     */
+    public function generateRecurringPaymentHash(
+        string $secretKey,
+        string $orderId,
+        string $recurringId
+    ): string {
+        $string = $secretKey.$orderId.$recurringId;
+
+        return hash('sha256', $string);
+    }
+
+    /**
+     * Generate hash for recurring return URL verification.
+     * Format: hash('sha256', secret_key + status_id + order_id + transaction_id + msg)
+     */
+    public function generateRecurringReturnHash(
+        string $secretKey,
+        string $statusId,
+        string $orderId,
+        string $transactionId,
+        string $msg
+    ): string {
+        $string = $secretKey.$statusId.$orderId.$transactionId.$msg;
+
+        return hash('sha256', $string);
+    }
 }

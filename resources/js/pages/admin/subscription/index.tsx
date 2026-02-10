@@ -17,6 +17,7 @@ export interface Subscription {
     description: string | null;
     price: string;
     is_active: boolean;
+    senangpay_recurring_id: string | null;
     created_at: string;
     updated_at: string;
 }

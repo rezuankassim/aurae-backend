@@ -20,12 +20,18 @@ class UserSubscription extends Model
         'payment_method',
         'payment_status',
         'paid_at',
+        'is_recurring',
+        'next_billing_at',
+        'cancelled_at',
     ];
 
     protected $casts = [
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
         'paid_at' => 'datetime',
+        'is_recurring' => 'boolean',
+        'next_billing_at' => 'datetime',
+        'cancelled_at' => 'datetime',
     ];
 
     /**

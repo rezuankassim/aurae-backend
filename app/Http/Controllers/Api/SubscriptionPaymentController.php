@@ -8,7 +8,6 @@ use App\Models\Subscription;
 use App\Models\UserSubscription;
 use App\Services\SenangpaySignatureService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Lunar\Models\Transaction;
 
@@ -19,7 +18,7 @@ class SubscriptionPaymentController extends Controller
     ) {}
 
     /**
-     * Initiate subscription payment.
+     * Initiate recurring subscription payment.
      */
     public function subscribe(Request $request)
     {
@@ -42,16 +41,45 @@ class SubscriptionPaymentController extends Controller
                 ->setStatusCode(400);
         }
 
+        // Check if subscription has recurring_id configured
+        if (! $subscription->senangpay_recurring_id) {
+            return BaseResource::make(null)
+                ->additional([
+                    'status' => 400,
+                    'message' => 'This subscription plan is not configured for recurring payments.',
+                ])
+                ->response()
+                ->setStatusCode(400);
+        }
+
+        // Check if user already has an active subscription
+        $existingSubscription = UserSubscription::where('user_id', $user->id)
+            ->where('status', 'active')
+            ->whereNull('cancelled_at')
+            ->first();
+
+        if ($existingSubscription) {
+            return BaseResource::make(null)
+                ->additional([
+                    'status' => 400,
+                    'message' => 'You already have an active subscription.',
+                ])
+                ->response()
+                ->setStatusCode(400);
+        }
+
         try {
             // Create pending user subscription
             $userSubscription = UserSubscription::create([
                 'user_id' => $user->id,
                 'subscription_id' => $subscription->id,
                 'starts_at' => now(),
-                'ends_at' => now()->addMonth(), // Default to 1 month
+                'ends_at' => now()->addMonth(),
                 'status' => 'pending',
                 'payment_method' => $validated['payment_method'],
                 'payment_status' => 'pending',
+                'is_recurring' => true,
+                'next_billing_at' => now()->addMonth(),
             ]);
 
             // Generate reference number
@@ -60,30 +88,23 @@ class SubscriptionPaymentController extends Controller
             // Get SenangPay config
             $merchantId = config('services.senangpay.merchant_id');
             $secretKey = config('services.senangpay.secret_key');
-            $baseUrl = config('services.senangpay.base_url', 'https://app.senangpay.my');
-
-            // Format amount to decimal
-            $amount = $this->signatureService->formatAmount($subscription->price * 100); // Convert to cents
+            $recurringBaseUrl = config('services.senangpay.recurring_base_url', 'https://api.senangpay.my');
 
             // Get customer details
             $customerName = $user->name ?? 'Customer';
             $customerEmail = $user->email ?? '';
             $customerPhone = $user->phone ?? '';
 
-            // Build detail description
-            $detail = 'Subscription_'.$subscription->title.'_'.$referenceNumber;
-
-            // Generate hash
-            $hash = $this->signatureService->generatePaymentHash(
+            // Generate hash for recurring payment: hash('sha256', secret_key + order_id + recurring_id)
+            $hash = $this->signatureService->generateRecurringPaymentHash(
                 $secretKey,
-                $detail,
-                $amount,
-                $referenceNumber
+                $referenceNumber,
+                $subscription->senangpay_recurring_id
             );
 
             // Create transaction record
             Transaction::create([
-                'order_id' => null, // No order for subscriptions
+                'order_id' => null,
                 'success' => true,
                 'type' => 'intent',
                 'driver' => 'senangpay',
@@ -92,16 +113,15 @@ class SubscriptionPaymentController extends Controller
                 'status' => 'pending',
                 'card_type' => '',
                 'last_four' => '',
-                'notes' => 'Subscription payment intent created',
+                'notes' => 'Recurring subscription payment intent created',
                 'meta' => [
                     'subscription_id' => $subscription->id,
                     'user_subscription_id' => $userSubscription->id,
                     'customer_name' => $customerName,
                     'customer_email' => $customerEmail,
                     'customer_phone' => $customerPhone,
-                    'amount' => $amount,
-                    'detail' => $detail,
-                    'type' => 'subscription',
+                    'recurring_id' => $subscription->senangpay_recurring_id,
+                    'type' => 'recurring_subscription',
                 ],
             ]);
 
@@ -110,22 +130,21 @@ class SubscriptionPaymentController extends Controller
                 'transaction_id' => $referenceNumber,
             ]);
 
-            // Build payment URL
-            $paymentUrl = $baseUrl.'/payment/'.$merchantId.'?'.http_build_query([
-                'detail' => $detail,
-                'amount' => $amount,
+            // Build recurring payment URL
+            $paymentUrl = $recurringBaseUrl.'/recurring/payment/'.$merchantId.'?'.http_build_query([
                 'order_id' => $referenceNumber,
+                'recurring_id' => $subscription->senangpay_recurring_id,
                 'hash' => $hash,
                 'name' => $customerName,
                 'email' => $customerEmail,
                 'phone' => $customerPhone,
             ]);
 
-            Log::info('Subscription payment initiated', [
+            Log::info('Recurring subscription payment initiated', [
                 'user_id' => $user->id,
                 'subscription_id' => $subscription->id,
                 'reference' => $referenceNumber,
-                'amount' => $amount,
+                'recurring_id' => $subscription->senangpay_recurring_id,
             ]);
 
             return BaseResource::make([
@@ -134,13 +153,14 @@ class SubscriptionPaymentController extends Controller
                 'subscription' => $subscription,
                 'amount' => 'RM '.number_format($subscription->price, 2),
                 'currency' => 'MYR',
+                'is_recurring' => true,
             ])
                 ->additional([
                     'status' => 200,
-                    'message' => 'Subscription payment initiated successfully.',
+                    'message' => 'Recurring subscription payment initiated successfully.',
                 ]);
         } catch (\Exception $e) {
-            Log::error('Subscription payment initiation failed', [
+            Log::error('Recurring subscription payment initiation failed', [
                 'user_id' => $user->id,
                 'subscription_id' => $subscription->id,
                 'error' => $e->getMessage(),

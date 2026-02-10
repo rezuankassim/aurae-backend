@@ -47,6 +47,7 @@ return [
         'merchant_id' => env('SENANGPAY_MERCHANT_ID'),
         'secret_key' => env('SENANGPAY_SECRET_KEY'),
         'base_url' => env('SENANGPAY_BASE_URL', 'https://app.senangpay.my'),
+        'recurring_base_url' => env('SENANGPAY_RECURRING_BASE_URL', 'https://api.senangpay.my'),
         'currency' => env('SENANGPAY_CURRENCY', 'MYR'),
     ],
 

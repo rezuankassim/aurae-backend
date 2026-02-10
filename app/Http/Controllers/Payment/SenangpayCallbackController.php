@@ -400,4 +400,299 @@ class SenangpayCallbackController extends Controller
             'reference' => $orderId,
         ]);
     }
+
+    /**
+     * Handle recurring payment return URL.
+     */
+    public function recurringReturnUrl(Request $request)
+    {
+        $statusId = $request->input('status_id');
+        $orderId = $request->input('order_id');
+        $transactionId = $request->input('transaction_id');
+        $msg = $request->input('msg');
+        $hash = $request->input('hash');
+
+        Log::info('SenangPay recurring return URL received', [
+            'status_id' => $statusId,
+            'order_id' => $orderId,
+            'transaction_id' => $transactionId,
+            'msg' => $msg,
+            'hash' => $hash,
+        ]);
+
+        // Find the transaction
+        $transaction = Transaction::where('reference', $orderId)
+            ->where('driver', 'senangpay')
+            ->where('type', 'intent')
+            ->whereJsonContains('meta->type', 'recurring_subscription')
+            ->first();
+
+        if (! $transaction) {
+            Log::error('SenangPay recurring return: Transaction not found', ['order_id' => $orderId]);
+
+            return response()->view('payment.error', [
+                'message' => 'Transaction not found',
+            ]);
+        }
+
+        // Verify hash using recurring hash method
+        $secretKey = config('services.senangpay.secret_key');
+        $expectedHash = $this->signatureService->generateRecurringReturnHash(
+            $secretKey,
+            $statusId,
+            $orderId,
+            $transactionId,
+            $msg
+        );
+
+        if (! $this->signatureService->verifySignature($expectedHash, $hash)) {
+            Log::error('SenangPay recurring return: Hash verification failed', [
+                'order_id' => $orderId,
+                'expected_hash' => $expectedHash,
+                'received_hash' => $hash,
+            ]);
+
+            return response()->view('payment.error', [
+                'message' => 'Payment verification failed',
+            ]);
+        }
+
+        // Get user subscription
+        $userSubscriptionId = $transaction->meta['user_subscription_id'] ?? null;
+        if (! $userSubscriptionId) {
+            Log::error('SenangPay recurring return: User subscription ID not found', ['order_id' => $orderId]);
+
+            return response()->view('payment.error', [
+                'message' => 'Subscription not found',
+            ]);
+        }
+
+        $userSubscription = UserSubscription::find($userSubscriptionId);
+        if (! $userSubscription) {
+            Log::error('SenangPay recurring return: User subscription not found', [
+                'order_id' => $orderId,
+                'user_subscription_id' => $userSubscriptionId,
+            ]);
+
+            return response()->view('payment.error', [
+                'message' => 'Subscription not found',
+            ]);
+        }
+
+        // Determine status
+        $status = $statusId === '1' ? 'success' : 'failed';
+
+        if ($status === 'success') {
+            // Check if already captured
+            if (! Transaction::where('parent_transaction_id', $transaction->id)
+                ->where('type', 'capture')
+                ->exists()) {
+                // Create capture transaction
+                Transaction::create([
+                    'parent_transaction_id' => $transaction->id,
+                    'order_id' => null,
+                    'success' => true,
+                    'type' => 'capture',
+                    'driver' => 'senangpay',
+                    'amount' => $transaction->amount,
+                    'reference' => $orderId,
+                    'status' => 'captured',
+                    'card_type' => '',
+                    'last_four' => '',
+                    'notes' => 'Recurring subscription payment captured',
+                    'captured_at' => now(),
+                    'meta' => [
+                        'transaction_id' => $transactionId,
+                        'type' => 'recurring_subscription',
+                        'subscription_id' => $transaction->meta['subscription_id'] ?? null,
+                        'user_subscription_id' => $userSubscriptionId,
+                    ],
+                ]);
+
+                // Update user subscription
+                $userSubscription->update([
+                    'status' => 'active',
+                    'payment_status' => 'completed',
+                    'paid_at' => now(),
+                    'starts_at' => now(),
+                    'ends_at' => now()->addMonth(),
+                    'next_billing_at' => now()->addMonth(),
+                ]);
+
+                Log::info('SenangPay recurring return: Payment captured', [
+                    'user_subscription_id' => $userSubscriptionId,
+                    'reference' => $orderId,
+                    'transaction_id' => $transactionId,
+                ]);
+            }
+        } else {
+            // Payment failed
+            $userSubscription->update([
+                'status' => 'cancelled',
+                'payment_status' => 'failed',
+            ]);
+
+            Log::warning('SenangPay recurring return: Payment failed', [
+                'user_subscription_id' => $userSubscriptionId,
+                'reference' => $orderId,
+            ]);
+        }
+
+        return response()->view('payment.processing', [
+            'status' => $status,
+            'reference' => $orderId,
+        ]);
+    }
+
+    /**
+     * Handle recurring payment callback (for subsequent charges).
+     */
+    public function recurringCallback(Request $request)
+    {
+        $statusId = $request->input('status_id');
+        $orderId = $request->input('order_id');
+        $transactionId = $request->input('transaction_id');
+        $msg = $request->input('msg');
+        $hash = $request->input('hash');
+
+        Log::info('SenangPay recurring callback received', [
+            'status_id' => $statusId,
+            'order_id' => $orderId,
+            'transaction_id' => $transactionId,
+            'msg' => $msg,
+            'all_params' => $request->all(),
+        ]);
+
+        // Verify hash
+        $secretKey = config('services.senangpay.secret_key');
+        $expectedHash = $this->signatureService->generateRecurringReturnHash(
+            $secretKey,
+            $statusId,
+            $orderId,
+            $transactionId,
+            $msg
+        );
+
+        if (! $this->signatureService->verifySignature($expectedHash, $hash)) {
+            Log::error('SenangPay recurring callback: Hash verification failed', [
+                'order_id' => $orderId,
+                'expected_hash' => $expectedHash,
+                'received_hash' => $hash,
+            ]);
+
+            return response()->json(['status' => 'error', 'message' => 'Hash verification failed'], 400);
+        }
+
+        // Find the original transaction by order_id pattern
+        $transaction = Transaction::where('reference', $orderId)
+            ->where('driver', 'senangpay')
+            ->where('type', 'intent')
+            ->whereJsonContains('meta->type', 'recurring_subscription')
+            ->first();
+
+        if (! $transaction) {
+            // This might be a subsequent recurring charge - find by user subscription
+            Log::info('SenangPay recurring callback: Original transaction not found, checking for renewal', [
+                'order_id' => $orderId,
+            ]);
+
+            // Try to find user subscription by reference pattern
+            $userSubscription = UserSubscription::where('transaction_id', 'LIKE', 'SUB-%')
+                ->where('is_recurring', true)
+                ->where('status', 'active')
+                ->whereNull('cancelled_at')
+                ->first();
+
+            if ($userSubscription && $statusId === '1') {
+                // This is a renewal payment
+                $this->handleRecurringRenewal($userSubscription, $transactionId, $orderId);
+
+                return response()->json(['status' => 'OK']);
+            }
+
+            Log::warning('SenangPay recurring callback: Could not find matching subscription', [
+                'order_id' => $orderId,
+            ]);
+
+            return response()->json(['status' => 'OK']);
+        }
+
+        // Get user subscription
+        $userSubscriptionId = $transaction->meta['user_subscription_id'] ?? null;
+        $userSubscription = UserSubscription::find($userSubscriptionId);
+
+        if (! $userSubscription) {
+            Log::error('SenangPay recurring callback: User subscription not found', [
+                'order_id' => $orderId,
+                'user_subscription_id' => $userSubscriptionId,
+            ]);
+
+            return response()->json(['status' => 'OK']);
+        }
+
+        $status = $statusId === '1' ? 'success' : 'failed';
+
+        if ($status === 'success') {
+            $this->handleRecurringRenewal($userSubscription, $transactionId, $orderId);
+        } else {
+            // Payment failed - mark subscription as expired or handle retry logic
+            Log::warning('SenangPay recurring callback: Renewal payment failed', [
+                'user_subscription_id' => $userSubscriptionId,
+                'order_id' => $orderId,
+            ]);
+
+            // Optionally mark as expired if payment fails
+            if ($userSubscription->ends_at && $userSubscription->ends_at->isPast()) {
+                $userSubscription->update([
+                    'status' => 'expired',
+                    'payment_status' => 'failed',
+                ]);
+            }
+        }
+
+        return response()->json(['status' => 'OK']);
+    }
+
+    /**
+     * Handle recurring subscription renewal.
+     */
+    protected function handleRecurringRenewal(UserSubscription $userSubscription, string $transactionId, string $orderId): void
+    {
+        // Create a new transaction record for this renewal
+        Transaction::create([
+            'order_id' => null,
+            'success' => true,
+            'type' => 'capture',
+            'driver' => 'senangpay',
+            'amount' => $userSubscription->subscription->price ?? 0,
+            'reference' => 'RENEWAL-'.$orderId.'-'.now()->format('YmdHis'),
+            'status' => 'captured',
+            'card_type' => '',
+            'last_four' => '',
+            'notes' => 'Recurring subscription renewal payment',
+            'captured_at' => now(),
+            'meta' => [
+                'transaction_id' => $transactionId,
+                'type' => 'recurring_renewal',
+                'subscription_id' => $userSubscription->subscription_id,
+                'user_subscription_id' => $userSubscription->id,
+                'original_order_id' => $orderId,
+            ],
+        ]);
+
+        // Extend subscription
+        $userSubscription->update([
+            'ends_at' => now()->addMonth(),
+            'next_billing_at' => now()->addMonth(),
+            'paid_at' => now(),
+            'status' => 'active',
+            'payment_status' => 'completed',
+        ]);
+
+        Log::info('SenangPay recurring callback: Subscription renewed', [
+            'user_subscription_id' => $userSubscription->id,
+            'new_ends_at' => $userSubscription->ends_at,
+            'transaction_id' => $transactionId,
+        ]);
+    }
 }

@@ -41,6 +41,7 @@ class SubscriptionController extends Controller
             'price' => 'required|numeric|min:0',
             'is_active' => 'boolean',
             'icon' => 'nullable|image|max:2048',
+            'senangpay_recurring_id' => 'nullable|string|max:255',
         ]);
 
         if ($request->hasFile('icon')) {
@@ -81,6 +82,7 @@ class SubscriptionController extends Controller
             'price' => 'required|numeric|min:0',
             'is_active' => 'boolean',
             'icon' => 'nullable|image|max:2048',
+            'senangpay_recurring_id' => 'nullable|string|max:255',
         ]);
 
         if ($request->hasFile('icon')) {

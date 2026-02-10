@@ -55,4 +55,38 @@ class SubscriptionController extends Controller
                 'message' => 'User subscriptions retrieved successfully.',
             ]);
     }
+
+    /**
+     * Get user's current active subscription (single).
+     */
+    public function activeSubscription(Request $request)
+    {
+        $user = $request->user();
+        $activeSubscription = $user->subscriptions()
+            ->where('status', 'active')
+            ->whereNull('cancelled_at')
+            ->where(function ($q) {
+                $q->whereNull('ends_at')
+                    ->orWhere('ends_at', '>', now());
+            })
+            ->with('subscription')
+            ->latest()
+            ->first();
+
+        if (! $activeSubscription) {
+            return BaseResource::make(null)
+                ->additional([
+                    'status' => 200,
+                    'message' => 'No active subscription found.',
+                    'has_subscription' => false,
+                ]);
+        }
+
+        return UserSubscriptionResource::make($activeSubscription)
+            ->additional([
+                'status' => 200,
+                'message' => 'Active subscription retrieved successfully.',
+                'has_subscription' => true,
+            ]);
+    }
 }

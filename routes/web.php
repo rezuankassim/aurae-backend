@@ -19,6 +19,8 @@ Route::redirect('/', '/login')->name('home');
 
 // SenangPay payment callbacks (no auth middleware)
 Route::get('/payment/senangpay/return', [SenangpayCallbackController::class, 'returnUrl'])->name('payment.senangpay.return');
+Route::get('/payment/senangpay/recurring/return', [SenangpayCallbackController::class, 'recurringReturnUrl'])->name('payment.senangpay.recurring.return');
+Route::post('/payment/senangpay/recurring/callback', [SenangpayCallbackController::class, 'recurringCallback'])->name('payment.senangpay.recurring.callback');
 
 // Public product routes
 Route::get('products', [ProductController::class, 'index'])->name('products.index');

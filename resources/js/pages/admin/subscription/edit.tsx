@@ -112,6 +112,23 @@ export default function EditSubscription({ subscription }: { subscription: Subsc
                                 <InputError message={errors.price} />
                             </div>
 
+                            <div className="grid gap-2">
+                                <Label htmlFor="senangpay_recurring_id">SenangPay Recurring ID</Label>
+
+                                <Input
+                                    id="senangpay_recurring_id"
+                                    name="senangpay_recurring_id"
+                                    placeholder="e.g. 172500523839"
+                                    defaultValue={subscription.senangpay_recurring_id || ''}
+                                />
+
+                                <p className="text-muted-foreground text-sm">
+                                    Get this ID from SenangPay dashboard after creating a recurring product
+                                </p>
+
+                                <InputError message={errors.senangpay_recurring_id} />
+                            </div>
+
                             <div className="flex items-center space-x-2">
                                 <Checkbox
                                     id="is_active"
