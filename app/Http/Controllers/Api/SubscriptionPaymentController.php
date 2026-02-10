@@ -133,16 +133,15 @@ class SubscriptionPaymentController extends Controller
                 'transaction_id' => $referenceNumber,
             ]);
 
-            // Build recurring payment form data (POST required by SenangPay)
-            $paymentUrl = $recurringBaseUrl.'/recurring/payment/'.$merchantId;
-            $formData = [
+            // Build recurring payment URL
+            $paymentUrl = $recurringBaseUrl.'/recurring/payment/'.$merchantId.'?'.http_build_query([
                 'order_id' => $referenceNumber,
                 'recurring_id' => $subscription->senangpay_recurring_id,
                 'hash' => $hash,
                 'name' => $customerName,
                 'email' => $customerEmail,
                 'phone' => $customerPhone,
-            ];
+            ]);
 
             Log::info('Recurring subscription payment initiated', [
                 'user_id' => $user->id,
@@ -154,8 +153,6 @@ class SubscriptionPaymentController extends Controller
 
             return BaseResource::make([
                 'payment_url' => $paymentUrl,
-                'payment_method' => 'POST',
-                'form_data' => $formData,
                 'reference_number' => $referenceNumber,
                 'subscription' => $subscription,
                 'amount' => 'RM '.number_format($subscription->price, 2),
