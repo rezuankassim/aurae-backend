@@ -131,33 +131,12 @@ class MachineSerialService
 
     /**
      * Generate regex pattern for validation.
+     * Accepts format: A10120260001 1 (with space) or A101202600011 (without space)
      */
     protected function getValidationPattern(): string
     {
-        $settings = GeneralSetting::first();
-        $format = $settings->machine_serial_format ?? self::DEFAULT_FORMAT;
-        $prefix = $settings->machine_serial_prefix ?? self::DEFAULT_PREFIX;
-
-        // Replace placeholders with regex patterns
-        $pattern = preg_quote($format, '/');
-        $pattern = str_replace('\{MMMM\}', '[A-Z0-9]{4}', $pattern); // Allow any 4-char model code
-        $pattern = str_replace('\{PREFIX\}', preg_quote($prefix, '/'), $pattern);
-        $pattern = str_replace('\{YYYY\}', '\d{4}', $pattern);
-        $pattern = str_replace('\{MM\}', '\d{2}', $pattern);
-        $pattern = str_replace('\{SSSS\}', '\d{4}', $pattern);
-        $pattern = str_replace('\{SSSSS\}', '\d{5}', $pattern);
-        $pattern = str_replace('\{SSS\}', '\d{3}', $pattern);
-        $pattern = str_replace('\{SS\}', '\d{2}', $pattern);
-        $pattern = str_replace('\{V\}', '\d{1}', $pattern);
-        // Legacy support
-        $pattern = str_replace('\{NNNN\}', '\d{4}', $pattern);
-        $pattern = str_replace('\{NNNNN\}', '\d{5}', $pattern);
-        $pattern = str_replace('\{NNN\}', '\d{3}', $pattern);
-        $pattern = str_replace('\{NN\}', '\d{2}', $pattern);
-        // Handle escaped space (from preg_quote)
-        $pattern = str_replace('\ ', ' ', $pattern);
-
-        return '/^'.$pattern.'$/';
+        // Pattern: 4 alphanumeric (model) + 4 digits (year) + 4 digits (product code) + optional space + 1 digit (variation)
+        return '/^[A-Z0-9]{4}\d{4}\d{4} ?\d{1}$/';
     }
 
     /**
