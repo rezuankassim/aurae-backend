@@ -88,7 +88,13 @@ class SubscriptionPaymentController extends Controller
             // Get SenangPay config
             $merchantId = config('services.senangpay.merchant_id');
             $secretKey = config('services.senangpay.secret_key');
-            $recurringBaseUrl = config('services.senangpay.recurring_base_url', 'https://api.senangpay.my');
+            $baseUrl = config('services.senangpay.base_url', 'https://app.senangpay.my');
+
+            // Determine recurring base URL based on sandbox/production
+            $isSandbox = str_contains($baseUrl, 'sandbox');
+            $recurringBaseUrl = $isSandbox
+                ? 'https://api.sandbox.senangpay.my'
+                : 'https://api.senangpay.my';
 
             // Get customer details
             $customerName = $user->name ?? 'Customer';
@@ -127,25 +133,29 @@ class SubscriptionPaymentController extends Controller
                 'transaction_id' => $referenceNumber,
             ]);
 
-            // Build recurring payment URL
-            $paymentUrl = $recurringBaseUrl.'/recurring/payment/'.$merchantId.'?'.http_build_query([
+            // Build recurring payment form data (POST required by SenangPay)
+            $paymentUrl = $recurringBaseUrl.'/recurring/payment/'.$merchantId;
+            $formData = [
                 'order_id' => $referenceNumber,
                 'recurring_id' => $subscription->senangpay_recurring_id,
                 'hash' => $hash,
                 'name' => $customerName,
                 'email' => $customerEmail,
                 'phone' => $customerPhone,
-            ]);
+            ];
 
             Log::info('Recurring subscription payment initiated', [
                 'user_id' => $user->id,
                 'subscription_id' => $subscription->id,
                 'reference' => $referenceNumber,
                 'recurring_id' => $subscription->senangpay_recurring_id,
+                'payment_url' => $paymentUrl,
             ]);
 
             return BaseResource::make([
                 'payment_url' => $paymentUrl,
+                'payment_method' => 'POST',
+                'form_data' => $formData,
                 'reference_number' => $referenceNumber,
                 'subscription' => $subscription,
                 'amount' => 'RM '.number_format($subscription->price, 2),

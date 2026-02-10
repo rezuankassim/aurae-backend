@@ -407,11 +407,11 @@ class SenangpayCallbackController extends Controller
      */
     public function recurringReturnUrl(Request $request)
     {
-        $statusId = $request->input('status_id');
-        $orderId = $request->input('order_id');
-        $transactionId = $request->input('transaction_id');
-        $msg = $request->input('msg');
-        $hash = $request->input('hash');
+        $statusId = $request->input('status_id', '');
+        $orderId = $request->input('order_id', '');
+        $transactionId = $request->input('transaction_id', '');
+        $msg = $request->input('msg', '');
+        $hash = $request->input('hash', '');
 
         Log::info('SenangPay recurring return URL received', [
             'status_id' => $statusId,
@@ -520,7 +520,7 @@ class SenangpayCallbackController extends Controller
             ]);
 
             Log::warning('SenangPay recurring return: Payment failed', [
-                'user_subscription_id' => $userSubscriptionId,
+                'user_subscription_id' => $transaction->user_subscription_id,
                 'reference' => $orderId,
             ]);
         }
