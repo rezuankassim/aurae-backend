@@ -15,7 +15,6 @@ export interface Subscription {
     title: string;
     pricing_title: string;
     description: string | null;
-    max_devices: number;
     price: string;
     is_active: boolean;
     created_at: string;

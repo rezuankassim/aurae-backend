@@ -26,10 +26,6 @@ export const columns: ColumnDef<Subscription>[] = [
         header: 'Pricing',
     },
     {
-        accessorKey: 'max_devices',
-        header: 'Max Devices',
-    },
-    {
         accessorKey: 'price',
         header: 'Price',
         cell: ({ row }) => {
