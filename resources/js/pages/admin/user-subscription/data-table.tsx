@@ -6,8 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { index } from '@/routes/admin/user-subscriptions';
 import { router } from '@inertiajs/react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { useState } from 'react';
-import { useDebouncedCallback } from 'use-debounce';
+import { useCallback, useRef, useState } from 'react';
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -21,6 +20,7 @@ interface DataTableProps<TData, TValue> {
 
 export function DataTable<TData, TValue>({ columns, data, filters }: DataTableProps<TData, TValue>) {
     const [search, setSearch] = useState(filters?.search || '');
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const table = useReactTable({
         data,
@@ -28,13 +28,18 @@ export function DataTable<TData, TValue>({ columns, data, filters }: DataTablePr
         getCoreRowModel: getCoreRowModel(),
     });
 
-    const handleSearch = useDebouncedCallback((value: string) => {
-        router.get(
-            index().url,
-            { search: value, status: filters?.status, payment_status: filters?.payment_status },
-            { preserveState: true, replace: true },
-        );
-    }, 300);
+    const handleSearch = useCallback((value: string) => {
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+        }
+        debounceRef.current = setTimeout(() => {
+            router.get(
+                index().url,
+                { search: value, status: filters?.status, payment_status: filters?.payment_status },
+                { preserveState: true, replace: true },
+            );
+        }, 300);
+    }, [filters?.status, filters?.payment_status]);
 
     const handleStatusChange = (value: string) => {
         router.get(index().url, { search: filters?.search, status: value === 'all' ? '' : value, payment_status: filters?.payment_status }, { preserveState: true, replace: true });
