@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Music extends Model
 {
@@ -33,11 +34,29 @@ class Music extends Model
     }
 
     /**
+     * Get the storage disk based on environment.
+     */
+    protected function storageDisk(): string
+    {
+        return app()->environment('production') ? 's3' : 'public';
+    }
+
+    /**
      * Get the music URL
      */
-    public function getUrlAttribute(): string
+    public function getUrlAttribute(): ?string
     {
-        return asset('storage/'.$this->path);
+        if (! $this->path) {
+            return null;
+        }
+
+        $disk = $this->storageDisk();
+
+        if ($disk === 'public') {
+            return asset('storage/'.$this->path);
+        }
+
+        return Storage::disk('s3')->url($this->path);
     }
 
     /**
@@ -45,6 +64,16 @@ class Music extends Model
      */
     public function getThumbnailUrlAttribute(): ?string
     {
-        return $this->thumbnail ? asset('storage/'.$this->thumbnail) : null;
+        if (! $this->thumbnail) {
+            return null;
+        }
+
+        $disk = $this->storageDisk();
+
+        if ($disk === 'public') {
+            return asset('storage/'.$this->thumbnail);
+        }
+
+        return Storage::disk('s3')->url($this->thumbnail);
     }
 }

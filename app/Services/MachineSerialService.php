@@ -8,13 +8,84 @@ use App\Models\Machine;
 class MachineSerialService
 {
     /**
+     * Default format: {MMMM}{YYYY}{SSSS}{V}
+     * Example: A101202600011
+     * - MMMM: Machine serial prefix (4 chars, e.g., A101)
+     * - YYYY: Year (4 digits)
+     * - SSSS: Product serial (4 digits, zero-padded)
+     * - V: Validation digit (1 digit)
+     */
+    protected const DEFAULT_FORMAT = '{MMMM}{YYYY}{SSSS}{V}';
+
+    protected const DEFAULT_PREFIX = 'A101';
+
+    /**
      * Validate serial number format against configured pattern.
      */
     public function validateFormat(string $serialNumber): bool
     {
         $pattern = $this->getValidationPattern();
 
-        return preg_match($pattern, $serialNumber) === 1;
+        if (preg_match($pattern, $serialNumber) !== 1) {
+            return false;
+        }
+
+        // Also validate the check digit if format includes {V}
+        $settings = GeneralSetting::first();
+        $format = $settings->machine_serial_format ?? self::DEFAULT_FORMAT;
+
+        if (str_contains($format, '{V}')) {
+            return $this->validateCheckDigit($serialNumber);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate the check digit of a serial number.
+     */
+    public function validateCheckDigit(string $serialNumber): bool
+    {
+        if (strlen($serialNumber) < 2) {
+            return false;
+        }
+
+        $baseSerial = substr($serialNumber, 0, -1);
+        $providedCheckDigit = (int) substr($serialNumber, -1);
+        $calculatedCheckDigit = $this->calculateCheckDigit($baseSerial);
+
+        return $providedCheckDigit === $calculatedCheckDigit;
+    }
+
+    /**
+     * Calculate check digit using Luhn algorithm variant.
+     * This ensures serial number validity can be verified.
+     */
+    protected function calculateCheckDigit(string $baseSerial): int
+    {
+        $sum = 0;
+        $length = strlen($baseSerial);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $baseSerial[$i];
+
+            // Convert letters to numbers (A=10, B=11, etc.)
+            if (ctype_alpha($char)) {
+                $value = ord(strtoupper($char)) - ord('A') + 10;
+            } else {
+                $value = (int) $char;
+            }
+
+            // Apply weight based on position (alternating 1, 2)
+            $weight = ($i % 2 === 0) ? 1 : 2;
+            $weighted = $value * $weight;
+
+            // Sum the digits if weighted value > 9
+            $sum += ($weighted > 9) ? $weighted - 9 : $weighted;
+        }
+
+        // Return check digit (0-9)
+        return (10 - ($sum % 10)) % 10;
     }
 
     /**
@@ -23,21 +94,42 @@ class MachineSerialService
     public function generateNextSerialNumber(): string
     {
         $settings = GeneralSetting::first();
-        $format = $settings->machine_serial_format ?? 'AUR-{NNNN}';
+        $format = $settings->machine_serial_format ?? self::DEFAULT_FORMAT;
+        $year = date('Y');
 
-        // Get the last machine to determine next number
-        $lastMachine = Machine::orderBy('created_at', 'desc')->first();
+        // Get the last machine for the current year to determine next number
+        $lastMachine = Machine::where('serial_number', 'like', '%'.$year.'%')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
         $nextNumber = 1;
 
         if ($lastMachine) {
-            // Extract number from last serial
-            preg_match('/\d+/', $lastMachine->serial_number, $matches);
-            if (! empty($matches)) {
-                $nextNumber = (int) $matches[0] + 1;
+            // Extract the product serial (4 digits after year)
+            $productSerial = $this->extractProductSerial($lastMachine->serial_number);
+            if ($productSerial !== null) {
+                $nextNumber = $productSerial + 1;
             }
         }
 
         return $this->formatSerialNumber($format, $nextNumber, $settings);
+    }
+
+    /**
+     * Extract product serial number from a full serial.
+     */
+    protected function extractProductSerial(string $serialNumber): ?int
+    {
+        // Format: A101YYYYSSSSV - extract SSSS (positions 8-11, 0-indexed)
+        // The serial is: PREFIX(4) + YEAR(4) + SERIAL(4) + CHECK(1) = 13 chars
+        if (strlen($serialNumber) >= 12) {
+            $serialPart = substr($serialNumber, 8, 4);
+            if (is_numeric($serialPart)) {
+                return (int) $serialPart;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -46,13 +138,21 @@ class MachineSerialService
     protected function getValidationPattern(): string
     {
         $settings = GeneralSetting::first();
-        $format = $settings->machine_serial_format ?? 'AUR-{NNNN}';
+        $format = $settings->machine_serial_format ?? self::DEFAULT_FORMAT;
+        $prefix = $settings->machine_serial_prefix ?? self::DEFAULT_PREFIX;
 
         // Replace placeholders with regex patterns
         $pattern = preg_quote($format, '/');
-        $pattern = str_replace('\{PREFIX\}', $settings->machine_serial_prefix ?? 'AUR', $pattern);
+        $pattern = str_replace('\{MMMM\}', preg_quote($prefix, '/'), $pattern);
+        $pattern = str_replace('\{PREFIX\}', preg_quote($prefix, '/'), $pattern);
         $pattern = str_replace('\{YYYY\}', '\d{4}', $pattern);
         $pattern = str_replace('\{MM\}', '\d{2}', $pattern);
+        $pattern = str_replace('\{SSSS\}', '\d{4}', $pattern);
+        $pattern = str_replace('\{SSSSS\}', '\d{5}', $pattern);
+        $pattern = str_replace('\{SSS\}', '\d{3}', $pattern);
+        $pattern = str_replace('\{SS\}', '\d{2}', $pattern);
+        $pattern = str_replace('\{V\}', '\d{1}', $pattern);
+        // Legacy support
         $pattern = str_replace('\{NNNN\}', '\d{4}', $pattern);
         $pattern = str_replace('\{NNNNN\}', '\d{5}', $pattern);
         $pattern = str_replace('\{NNN\}', '\d{3}', $pattern);
@@ -67,16 +167,28 @@ class MachineSerialService
     protected function formatSerialNumber(string $format, int $number, ?GeneralSetting $settings): string
     {
         $formatted = $format;
+        $prefix = $settings->machine_serial_prefix ?? self::DEFAULT_PREFIX;
 
-        // Replace placeholders
-        if ($settings && $settings->machine_serial_prefix) {
-            $formatted = str_replace('{PREFIX}', $settings->machine_serial_prefix, $formatted);
-        }
+        // Replace machine serial prefix
+        $formatted = str_replace('{MMMM}', $prefix, $formatted);
+        $formatted = str_replace('{PREFIX}', $prefix, $formatted);
 
+        // Replace date placeholders
         $formatted = str_replace('{YYYY}', date('Y'), $formatted);
         $formatted = str_replace('{MM}', date('m'), $formatted);
 
-        // Replace number placeholders with appropriate padding
+        // Replace product serial placeholders with appropriate padding
+        if (str_contains($formatted, '{SSSSS}')) {
+            $formatted = str_replace('{SSSSS}', str_pad($number, 5, '0', STR_PAD_LEFT), $formatted);
+        } elseif (str_contains($formatted, '{SSSS}')) {
+            $formatted = str_replace('{SSSS}', str_pad($number, 4, '0', STR_PAD_LEFT), $formatted);
+        } elseif (str_contains($formatted, '{SSS}')) {
+            $formatted = str_replace('{SSS}', str_pad($number, 3, '0', STR_PAD_LEFT), $formatted);
+        } elseif (str_contains($formatted, '{SS}')) {
+            $formatted = str_replace('{SS}', str_pad($number, 2, '0', STR_PAD_LEFT), $formatted);
+        }
+
+        // Legacy support for {NNNN} format
         if (str_contains($formatted, '{NNNNN}')) {
             $formatted = str_replace('{NNNNN}', str_pad($number, 5, '0', STR_PAD_LEFT), $formatted);
         } elseif (str_contains($formatted, '{NNNN}')) {
@@ -85,6 +197,13 @@ class MachineSerialService
             $formatted = str_replace('{NNN}', str_pad($number, 3, '0', STR_PAD_LEFT), $formatted);
         } elseif (str_contains($formatted, '{NN}')) {
             $formatted = str_replace('{NN}', str_pad($number, 2, '0', STR_PAD_LEFT), $formatted);
+        }
+
+        // Calculate and append validation digit if format includes {V}
+        if (str_contains($formatted, '{V}')) {
+            $baseSerial = str_replace('{V}', '', $formatted);
+            $checkDigit = $this->calculateCheckDigit($baseSerial);
+            $formatted = str_replace('{V}', (string) $checkDigit, $formatted);
         }
 
         return $formatted;
@@ -96,7 +215,7 @@ class MachineSerialService
     public function getFormatExample(): string
     {
         $settings = GeneralSetting::first();
-        $format = $settings->machine_serial_format ?? 'AUR-{NNNN}';
+        $format = $settings->machine_serial_format ?? self::DEFAULT_FORMAT;
 
         return $this->formatSerialNumber($format, 1, $settings);
     }
@@ -108,16 +227,20 @@ class MachineSerialService
     {
         $machines = [];
         $settings = GeneralSetting::first();
-        $format = $settings->machine_serial_format ?? 'AUR-{NNNN}';
+        $format = $settings->machine_serial_format ?? self::DEFAULT_FORMAT;
+        $year = date('Y');
 
-        // Get starting number
-        $lastMachine = Machine::orderBy('created_at', 'desc')->first();
+        // Get starting number for current year
+        $lastMachine = Machine::where('serial_number', 'like', '%'.$year.'%')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
         $startNumber = 1;
 
         if ($lastMachine) {
-            preg_match('/\d+/', $lastMachine->serial_number, $matches);
-            if (! empty($matches)) {
-                $startNumber = (int) $matches[0] + 1;
+            $productSerial = $this->extractProductSerial($lastMachine->serial_number);
+            if ($productSerial !== null) {
+                $startNumber = $productSerial + 1;
             }
         }
 
@@ -140,32 +263,64 @@ class MachineSerialService
     public function parseFormat(string $format): array
     {
         return [
-            'has_prefix' => str_contains($format, '{PREFIX}'),
+            'has_prefix' => str_contains($format, '{MMMM}') || str_contains($format, '{PREFIX}'),
             'has_year' => str_contains($format, '{YYYY}'),
             'has_month' => str_contains($format, '{MM}'),
-            'number_length' => $this->getNumberLength($format),
+            'has_validation' => str_contains($format, '{V}'),
+            'serial_length' => $this->getSerialLength($format),
             'pattern' => $this->getValidationPattern(),
         ];
     }
 
     /**
-     * Get number length from format.
+     * Get serial number length from format.
      */
-    protected function getNumberLength(string $format): int
+    protected function getSerialLength(string $format): int
     {
-        if (str_contains($format, '{NNNNN}')) {
+        if (str_contains($format, '{SSSSS}') || str_contains($format, '{NNNNN}')) {
             return 5;
         }
-        if (str_contains($format, '{NNNN}')) {
+        if (str_contains($format, '{SSSS}') || str_contains($format, '{NNNN}')) {
             return 4;
         }
-        if (str_contains($format, '{NNN}')) {
+        if (str_contains($format, '{SSS}') || str_contains($format, '{NNN}')) {
             return 3;
         }
-        if (str_contains($format, '{NN}')) {
+        if (str_contains($format, '{SS}') || str_contains($format, '{NN}')) {
             return 2;
         }
 
         return 4; // default
+    }
+
+    /**
+     * Parse a serial number into its components.
+     */
+    public function parseSerialNumber(string $serialNumber): array
+    {
+        // Expected format: A101202600011 (13 chars)
+        // MMMM(4) + YYYY(4) + SSSS(4) + V(1)
+        if (strlen($serialNumber) !== 13) {
+            return [
+                'valid' => false,
+                'error' => 'Invalid serial number length',
+            ];
+        }
+
+        $prefix = substr($serialNumber, 0, 4);
+        $year = substr($serialNumber, 4, 4);
+        $productSerial = substr($serialNumber, 8, 4);
+        $validation = substr($serialNumber, 12, 1);
+
+        $isValid = $this->validateCheckDigit($serialNumber);
+
+        return [
+            'valid' => $isValid,
+            'prefix' => $prefix,
+            'year' => $year,
+            'product_serial' => $productSerial,
+            'validation_digit' => $validation,
+            'full_serial' => $serialNumber,
+        ];
     }
 }

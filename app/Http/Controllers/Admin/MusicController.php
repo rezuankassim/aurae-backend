@@ -11,6 +11,13 @@ use Inertia\Inertia;
 class MusicController extends Controller
 {
     /**
+     * Get the storage disk based on environment.
+     */
+    protected function storageDisk(): string
+    {
+        return app()->environment('production') ? 's3' : 'public';
+    }
+    /**
      * Display a listing of the resource.
      */
     public function index()
@@ -42,11 +49,12 @@ class MusicController extends Controller
             'is_active' => ['boolean'],
         ]);
 
-        $path = $request->file('music')->store('music', 'public');
+        $disk = $this->storageDisk();
+        $path = $request->file('music')->store('music', $disk);
         $thumbnail = null;
 
         if ($request->hasFile('thumbnail')) {
-            $thumbnail = $request->file('thumbnail')->store('music/thumbnails', 'public');
+            $thumbnail = $request->file('thumbnail')->store('music/thumbnails', $disk);
         }
 
         Music::create([
@@ -90,20 +98,22 @@ class MusicController extends Controller
             'is_active' => $request->input('is_active', true),
         ];
 
+        $disk = $this->storageDisk();
+
         if ($request->hasFile('thumbnail')) {
             // Delete old thumbnail
-            if ($music->thumbnail && Storage::disk('public')->exists($music->thumbnail)) {
-                Storage::disk('public')->delete($music->thumbnail);
+            if ($music->thumbnail && Storage::disk($disk)->exists($music->thumbnail)) {
+                Storage::disk($disk)->delete($music->thumbnail);
             }
-            $data['thumbnail'] = $request->file('thumbnail')->store('music/thumbnails', 'public');
+            $data['thumbnail'] = $request->file('thumbnail')->store('music/thumbnails', $disk);
         }
 
         if ($request->hasFile('music')) {
             // Delete old file
-            if ($music->path && Storage::disk('public')->exists($music->path)) {
-                Storage::disk('public')->delete($music->path);
+            if ($music->path && Storage::disk($disk)->exists($music->path)) {
+                Storage::disk($disk)->delete($music->path);
             }
-            $data['path'] = $request->file('music')->store('music', 'public');
+            $data['path'] = $request->file('music')->store('music', $disk);
         }
 
         $music->update($data);
@@ -116,12 +126,14 @@ class MusicController extends Controller
      */
     public function destroy(Music $music)
     {
-        if ($music->thumbnail && Storage::disk('public')->exists($music->thumbnail)) {
-            Storage::disk('public')->delete($music->thumbnail);
+        $disk = $this->storageDisk();
+
+        if ($music->thumbnail && Storage::disk($disk)->exists($music->thumbnail)) {
+            Storage::disk($disk)->delete($music->thumbnail);
         }
 
-        if ($music->path && Storage::disk('public')->exists($music->path)) {
-            Storage::disk('public')->delete($music->path);
+        if ($music->path && Storage::disk($disk)->exists($music->path)) {
+            Storage::disk($disk)->delete($music->path);
         }
 
         $music->delete();

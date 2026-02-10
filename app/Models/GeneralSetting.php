@@ -25,5 +25,8 @@ class GeneralSetting extends Model
         'terms_and_conditions_html',
         'privacy_policy_content',
         'privacy_policy_html',
+        'machine_serial_format',
+        'machine_serial_prefix',
+        'machine_serial_length',
     ];
 }

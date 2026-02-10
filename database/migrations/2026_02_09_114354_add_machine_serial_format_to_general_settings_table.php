@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('general_settings', function (Blueprint $table) {
-            $table->string('machine_serial_format')->default('AUR-{NNNN}')->after('id');
-            $table->string('machine_serial_prefix')->nullable()->after('machine_serial_format');
-            $table->integer('machine_serial_length')->default(8)->after('machine_serial_prefix');
+            $table->string('machine_serial_format')->default('{MMMM}{YYYY}{SSSS}{V}')->after('id');
+            $table->string('machine_serial_prefix')->default('A101')->after('machine_serial_format');
+            $table->integer('machine_serial_length')->default(13)->after('machine_serial_prefix');
         });
     }
 
