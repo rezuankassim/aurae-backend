@@ -70,10 +70,14 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
         if (!confirm('Are you sure you want to cancel this subscription?')) return;
 
         setIsCancelling(true);
-        router.post(cancel(userSubscription.id).url, {}, {
-            preserveScroll: true,
-            onFinish: () => setIsCancelling(false),
-        });
+        router.post(
+            cancel(userSubscription.id).url,
+            {},
+            {
+                preserveScroll: true,
+                onFinish: () => setIsCancelling(false),
+            },
+        );
     };
 
     return (
@@ -124,7 +128,7 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
 
                 {/* Recurring Warning */}
                 {userSubscription.is_recurring && userSubscription.status === 'active' && (
-                    <Alert className="border-blue-200 bg-blue-50 text-blue-900">
+                    <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
                         <RefreshCcw className="h-4 w-4" />
                         <AlertTitle>Recurring Subscription</AlertTitle>
                         <AlertDescription>
@@ -185,7 +189,7 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
                                     </div>
                                     <div>
                                         <Label className="text-muted-foreground">Transaction ID</Label>
-                                        <p className="mt-1 font-medium font-mono text-sm">{userSubscription.transaction_id || '-'}</p>
+                                        <p className="mt-1 font-mono text-sm font-medium">{userSubscription.transaction_id || '-'}</p>
                                     </div>
                                 </div>
                             </CardContent>
@@ -224,7 +228,7 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
                                         {userSubscription.user.machines.map((machine) => (
                                             <div key={machine.id} className="flex items-center justify-between rounded-lg border p-3">
                                                 <div>
-                                                    <p className="font-medium font-mono">{machine.serial_number}</p>
+                                                    <p className="font-mono font-medium">{machine.serial_number}</p>
                                                     {machine.model && <p className="text-sm text-muted-foreground">{machine.model}</p>}
                                                 </div>
                                             </div>
@@ -238,9 +242,9 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
                     {/* Actions */}
                     <div className="space-y-6">
                         {userSubscription.status !== 'cancelled' && (
-                            <Card className="border-red-200">
+                            <Card className="border-red-200 dark:border-red-900">
                                 <CardHeader>
-                                    <CardTitle className="text-red-600">Cancel Subscription</CardTitle>
+                                    <CardTitle className="text-red-600 dark:text-red-50">Cancel Subscription</CardTitle>
                                     <CardDescription>
                                         Cancel this subscription immediately.
                                         {userSubscription.is_recurring && (

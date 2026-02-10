@@ -54,13 +54,17 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Machines({ machines, filters }: { machines: PaginatedMachines; filters: Filters }) {
     const [search, setSearch] = useState(filters.search || '');
-    const [status, setStatus] = useState(filters.status || '');
-    const [bound, setBound] = useState(filters.bound || '');
+    const [status, setStatus] = useState(filters.status || 'all');
+    const [bound, setBound] = useState(filters.bound || 'all');
 
     const handleFilter = () => {
         router.get(
             index().url,
-            { search, status, bound },
+            {
+                search,
+                status: status === 'all' ? '' : status,
+                bound: bound === 'all' ? '' : bound,
+            },
             {
                 preserveState: true,
                 preserveScroll: true,
@@ -70,8 +74,8 @@ export default function Machines({ machines, filters }: { machines: PaginatedMac
 
     const handleReset = () => {
         setSearch('');
-        setStatus('');
-        setBound('');
+        setStatus('all');
+        setBound('all');
         router.get(index().url);
     };
 
@@ -100,7 +104,7 @@ export default function Machines({ machines, filters }: { machines: PaginatedMac
                             <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">All Status</SelectItem>
+                            <SelectItem value="all">All Status</SelectItem>
                             <SelectItem value="1">Active</SelectItem>
                             <SelectItem value="0">Inactive</SelectItem>
                         </SelectContent>
@@ -111,7 +115,7 @@ export default function Machines({ machines, filters }: { machines: PaginatedMac
                             <SelectValue placeholder="Binding" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">All</SelectItem>
+                            <SelectItem value="all">All</SelectItem>
                             <SelectItem value="1">Bound</SelectItem>
                             <SelectItem value="0">Unbound</SelectItem>
                         </SelectContent>
