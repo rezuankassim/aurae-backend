@@ -3,11 +3,11 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { show } from '@/routes/admin/user-subscriptions';
+import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { Eye, RefreshCcw } from 'lucide-react';
 import type { UserSubscription } from './index';
-import { Link } from '@inertiajs/react';
 
 export const columns: ColumnDef<UserSubscription>[] = [
     {

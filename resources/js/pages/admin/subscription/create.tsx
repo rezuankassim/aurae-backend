@@ -90,13 +90,9 @@ export default function CreateSubscription() {
                             <div className="grid gap-2">
                                 <Label htmlFor="senangpay_recurring_id">SenangPay Recurring ID</Label>
 
-                                <Input
-                                    id="senangpay_recurring_id"
-                                    name="senangpay_recurring_id"
-                                    placeholder="e.g. 172500523839"
-                                />
+                                <Input id="senangpay_recurring_id" name="senangpay_recurring_id" placeholder="e.g. 172500523839" />
 
-                                <p className="text-muted-foreground text-sm">
+                                <p className="text-sm text-muted-foreground">
                                     Get this ID from SenangPay dashboard after creating a recurring product
                                 </p>
 

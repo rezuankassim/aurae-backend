@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Machine;
 use App\Services\MachineSerialService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class MachineController extends Controller
@@ -78,10 +79,23 @@ class MachineController extends Controller
             'year' => ['nullable', 'string', 'size:4'],
             'start_product_code' => ['nullable', 'integer', 'min:1', 'max:9999'],
             'variation_code' => ['nullable', 'string', 'size:1'],
+            'thumbnail' => ['nullable', 'image', 'max:5120'], // 5MB max
+            'detail_image' => ['nullable', 'image', 'max:5120'], // 5MB max
         ]);
 
         // Bulk generation
         if ($request->has('quantity') && $request->quantity > 1) {
+            // Handle images for bulk generation (same images for all machines)
+            $thumbnailPath = null;
+            $detailImagePath = null;
+
+            if ($request->hasFile('thumbnail')) {
+                $thumbnailPath = $request->file('thumbnail')->store('machines/thumbnails', 's3');
+            }
+            if ($request->hasFile('detail_image')) {
+                $detailImagePath = $request->file('detail_image')->store('machines/details', 's3');
+            }
+
             $this->serialService->bulkGenerate(
                 quantity: (int) $request->quantity,
                 baseName: $validated['name'],
@@ -89,7 +103,9 @@ class MachineController extends Controller
                 year: $validated['year'] ?? date('Y'),
                 startProductCode: (int) ($validated['start_product_code'] ?? 1),
                 variationCode: $validated['variation_code'] ?? '1',
-                status: (int) $validated['status']
+                status: (int) $validated['status'],
+                thumbnail: $thumbnailPath,
+                detailImage: $detailImagePath
             );
 
             return to_route('admin.machines.index')
@@ -99,11 +115,20 @@ class MachineController extends Controller
         // Single machine creation
         $serialNumber = $validated['serial_number'] ?? $this->serialService->generateNextSerialNumber();
 
-        Machine::create([
+        $machineData = [
             'serial_number' => $serialNumber,
             'name' => $validated['name'],
             'status' => $validated['status'],
-        ]);
+        ];
+
+        if ($request->hasFile('thumbnail')) {
+            $machineData['thumbnail'] = $request->file('thumbnail')->store('machines/thumbnails', 's3');
+        }
+        if ($request->hasFile('detail_image')) {
+            $machineData['detail_image'] = $request->file('detail_image')->store('machines/details', 's3');
+        }
+
+        Machine::create($machineData);
 
         return to_route('admin.machines.index')
             ->with('success', 'Machine created successfully.');
@@ -140,9 +165,33 @@ class MachineController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'serial_number' => ['required', 'string', 'unique:machines,serial_number,'.$machine->id],
             'status' => ['required', 'integer', 'in:0,1'],
+            'thumbnail' => ['nullable', 'image', 'max:5120'], // 5MB max
+            'detail_image' => ['nullable', 'image', 'max:5120'], // 5MB max
         ]);
 
-        $machine->update($validated);
+        $updateData = [
+            'name' => $validated['name'],
+            'serial_number' => $validated['serial_number'],
+            'status' => $validated['status'],
+        ];
+
+        if ($request->hasFile('thumbnail')) {
+            // Delete old thumbnail if exists
+            if ($machine->thumbnail) {
+                Storage::disk('s3')->delete($machine->thumbnail);
+            }
+            $updateData['thumbnail'] = $request->file('thumbnail')->store('machines/thumbnails', 's3');
+        }
+
+        if ($request->hasFile('detail_image')) {
+            // Delete old detail image if exists
+            if ($machine->detail_image) {
+                Storage::disk('s3')->delete($machine->detail_image);
+            }
+            $updateData['detail_image'] = $request->file('detail_image')->store('machines/details', 's3');
+        }
+
+        $machine->update($updateData);
 
         return to_route('admin.machines.index')
             ->with('success', 'Machine updated successfully.');

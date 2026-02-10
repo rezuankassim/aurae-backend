@@ -6,10 +6,10 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { index, create } from '@/routes/admin/machines';
+import { create, index } from '@/routes/admin/machines';
+import { useState } from 'react';
 import { columns } from './columns';
 import { DataTable } from './data-table';
-import { useState } from 'react';
 
 export interface Machine {
     id: string;

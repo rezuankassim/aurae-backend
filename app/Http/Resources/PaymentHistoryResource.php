@@ -20,10 +20,9 @@ class PaymentHistoryResource extends BaseResource
             return $this->formatMarketplaceOrder($data);
         }
 
-        // Add other payment types here when implemented
-        // if ($type === 'subscription') {
-        //     return $this->formatSubscriptionFee($data);
-        // }
+        if ($type === 'subscription') {
+            return $this->formatSubscriptionPayment($data);
+        }
 
         return [];
     }
@@ -63,30 +62,43 @@ class PaymentHistoryResource extends BaseResource
     }
 
     /**
-     * Format subscription fee for payment history.
-     * To be implemented when subscription module is ready.
+     * Format subscription payment for payment history.
      *
-     * @param  mixed  $subscription
-     * @return array
+     * @param  \App\Models\SubscriptionTransaction  $transaction
      */
-    // protected function formatSubscriptionFee($subscription): array
-    // {
-    //     $amount = $subscription->amount ?? 0;
-    //     $currencyCode = 'MYR';
-    //     $formattedAmount = $this->formatAmount($amount, $currencyCode);
-    //
-    //     return [
-    //         'id' => $subscription->id,
-    //         'type' => 'subscription',
-    //         'title' => 'subscription fee',
-    //         'amount' => "-{$formattedAmount}",
-    //         'amount_value' => -abs($amount),
-    //         'currency' => $currencyCode,
-    //         'status' => $subscription->status,
-    //         'date' => $subscription->created_at->toIso8601String(),
-    //         'reference' => $subscription->reference ?? $subscription->id,
-    //     ];
-    // }
+    protected function formatSubscriptionPayment($transaction): array
+    {
+        $amount = (float) ($transaction->amount ?? 0);
+        $currencyCode = 'MYR';
+        $formattedAmount = $this->formatAmount($amount, $currencyCode);
+
+        // Determine the title based on transaction type
+        $subscriptionName = $transaction->userSubscription?->subscription?->title ?? 'Subscription';
+        $isRenewal = str_contains($transaction->notes ?? '', 'renewal') ||
+                     ($transaction->meta['type'] ?? '') === 'recurring_renewal';
+
+        $title = $isRenewal
+            ? "subscription renewal - {$subscriptionName}"
+            : "subscription - {$subscriptionName}";
+
+        return [
+            'id' => $transaction->id,
+            'type' => 'subscription',
+            'title' => $title,
+            'amount' => "-{$formattedAmount}",
+            'amount_value' => -abs($amount),
+            'currency' => $currencyCode,
+            'status' => $transaction->status,
+            'date' => $transaction->captured_at instanceof \Carbon\Carbon
+                ? $transaction->captured_at->toIso8601String()
+                : ($transaction->created_at instanceof \Carbon\Carbon
+                    ? $transaction->created_at->toIso8601String()
+                    : $transaction->created_at),
+            'reference' => $transaction->reference ?? $transaction->id,
+            'subscription_name' => $subscriptionName,
+            'is_renewal' => $isRenewal,
+        ];
+    }
 
     /**
      * Format amount with currency symbol.

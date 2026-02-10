@@ -122,7 +122,7 @@ export default function EditSubscription({ subscription }: { subscription: Subsc
                                     defaultValue={subscription.senangpay_recurring_id || ''}
                                 />
 
-                                <p className="text-muted-foreground text-sm">
+                                <p className="text-sm text-muted-foreground">
                                     Get this ID from SenangPay dashboard after creating a recurring product
                                 </p>
 

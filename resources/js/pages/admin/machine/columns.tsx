@@ -1,9 +1,5 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { Machine } from './index';
-import { Button } from '@/components/ui/button';
-import { router } from '@inertiajs/react';
-import { show, edit, unbind, activate, deactivate, destroy } from '@/routes/admin/machines';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -12,7 +8,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { activate, deactivate, destroy, edit, show, unbind } from '@/routes/admin/machines';
+import { router } from '@inertiajs/react';
+import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
+import { Machine } from './index';
 
 export const columns: ColumnDef<Machine>[] = [
     {
@@ -28,11 +28,7 @@ export const columns: ColumnDef<Machine>[] = [
         header: 'Status',
         cell: ({ row }) => {
             const status = row.original.status;
-            return (
-                <Badge variant={status === 1 ? 'default' : 'secondary'}>
-                    {status === 1 ? 'Active' : 'Inactive'}
-                </Badge>
-            );
+            return <Badge variant={status === 1 ? 'default' : 'secondary'}>{status === 1 ? 'Active' : 'Inactive'}</Badge>;
         },
     },
     {
@@ -96,9 +92,7 @@ export const columns: ColumnDef<Machine>[] = [
                         <DropdownMenuItem onClick={() => router.get(show(machine).url)}>View Details</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => router.get(edit(machine).url)}>Edit</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        {machine.user && (
-                            <DropdownMenuItem onClick={handleUnbind}>Unbind from User</DropdownMenuItem>
-                        )}
+                        {machine.user && <DropdownMenuItem onClick={handleUnbind}>Unbind from User</DropdownMenuItem>}
                         {machine.status === 1 ? (
                             <DropdownMenuItem onClick={handleDeactivate}>Deactivate</DropdownMenuItem>
                         ) : (

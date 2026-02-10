@@ -4,12 +4,12 @@ import { Head, useForm } from '@inertiajs/react';
 
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { index, store, create } from '@/routes/admin/machines';
-import { useEffect } from 'react';
+import { create, index, store } from '@/routes/admin/machines';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -27,7 +27,19 @@ interface Props {
 }
 
 export default function CreateMachine({ next_serial }: Props) {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm<{
+        name: string;
+        serial_number: string;
+        model: string;
+        year: string;
+        product_code: string;
+        variation_code: string;
+        status: string;
+        quantity: string;
+        start_product_code: string;
+        thumbnail: File | null;
+        detail_image: File | null;
+    }>({
         name: '',
         serial_number: '',
         model: 'A101',
@@ -37,7 +49,32 @@ export default function CreateMachine({ next_serial }: Props) {
         status: '1',
         quantity: '',
         start_product_code: '1',
+        thumbnail: null,
+        detail_image: null,
     });
+
+    const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+    const [detailImagePreview, setDetailImagePreview] = useState<string | null>(null);
+
+    const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        setData('thumbnail', file);
+        if (file) {
+            setThumbnailPreview(URL.createObjectURL(file));
+        } else {
+            setThumbnailPreview(null);
+        }
+    };
+
+    const handleDetailImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        setData('detail_image', file);
+        if (file) {
+            setDetailImagePreview(URL.createObjectURL(file));
+        } else {
+            setDetailImagePreview(null);
+        }
+    };
 
     // Build serial number from components
     useEffect(() => {
@@ -52,7 +89,9 @@ export default function CreateMachine({ next_serial }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(store().url);
+        post(store().url, {
+            forceFormData: true,
+        });
     };
 
     const isBulk = data.quantity && parseInt(data.quantity) > 1;
@@ -119,9 +158,7 @@ export default function CreateMachine({ next_serial }: Props) {
                         <Card>
                             <CardHeader>
                                 <CardTitle>Serial Number</CardTitle>
-                                <CardDescription>
-                                    Format: [Model][Year][Product Code] [Variation] — Example: A10120260001 1
-                                </CardDescription>
+                                <CardDescription>Format: [Model][Year][Product Code] [Variation] — Example: A10120260001 1</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid grid-cols-4 gap-4">
@@ -173,9 +210,7 @@ export default function CreateMachine({ next_serial }: Props) {
 
                                 <div className="rounded-lg bg-muted p-4">
                                     <Label className="text-muted-foreground">Generated Serial Number</Label>
-                                    <p className="mt-1 font-mono text-lg font-semibold">
-                                        {data.serial_number || 'Enter product code to generate'}
-                                    </p>
+                                    <p className="mt-1 font-mono text-lg font-semibold">{data.serial_number || 'Enter product code to generate'}</p>
                                 </div>
 
                                 {errors.serial_number && <p className="text-sm text-red-600">{errors.serial_number}</p>}
@@ -243,15 +278,17 @@ export default function CreateMachine({ next_serial }: Props) {
                                     </div>
                                 </div>
 
-                                <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
+                                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
                                     <Label className="text-blue-900">Preview (first 3 serial numbers)</Label>
-                                    <div className="mt-2 font-mono text-sm text-blue-800 space-y-1">
+                                    <div className="mt-2 space-y-1 font-mono text-sm text-blue-800">
                                         {Array.from({ length: Math.min(3, parseInt(data.quantity) || 0) }, (_, i) => {
                                             const startCode = parseInt(data.start_product_code) || 1;
                                             const productCode = String(startCode + i).padStart(4, '0');
                                             return (
                                                 <div key={i}>
-                                                    {data.model}{data.year}{productCode} {data.variation_code}
+                                                    {data.model}
+                                                    {data.year}
+                                                    {productCode} {data.variation_code}
                                                 </div>
                                             );
                                         })}
@@ -266,6 +303,43 @@ export default function CreateMachine({ next_serial }: Props) {
                             </CardContent>
                         </Card>
                     )}
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Machine Images</CardTitle>
+                            <CardDescription>Upload thumbnail and detail images (stored in S3)</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <Label htmlFor="thumbnail">Thumbnail Image</Label>
+                                    <Input id="thumbnail" type="file" accept="image/*" onChange={handleThumbnailChange} />
+                                    {thumbnailPreview && (
+                                        <div className="mt-2">
+                                            <img src={thumbnailPreview} alt="Thumbnail preview" className="h-32 w-32 rounded-lg object-cover" />
+                                        </div>
+                                    )}
+                                    {errors.thumbnail && <p className="text-sm text-red-600">{errors.thumbnail}</p>}
+                                    <p className="text-xs text-muted-foreground">Max 5MB. Recommended: 200x200px</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="detail_image">Detail Image</Label>
+                                    <Input id="detail_image" type="file" accept="image/*" onChange={handleDetailImageChange} />
+                                    {detailImagePreview && (
+                                        <div className="mt-2">
+                                            <img
+                                                src={detailImagePreview}
+                                                alt="Detail image preview"
+                                                className="h-32 w-auto rounded-lg object-cover"
+                                            />
+                                        </div>
+                                    )}
+                                    {errors.detail_image && <p className="text-sm text-red-600">{errors.detail_image}</p>}
+                                    <p className="text-xs text-muted-foreground">Max 5MB. Recommended: 800x600px</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
 
                     <div className="flex gap-2">
                         <Button type="submit" disabled={processing}>

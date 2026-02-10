@@ -28,25 +28,36 @@ export function DataTable<TData, TValue>({ columns, data, filters }: DataTablePr
         getCoreRowModel: getCoreRowModel(),
     });
 
-    const handleSearch = useCallback((value: string) => {
-        if (debounceRef.current) {
-            clearTimeout(debounceRef.current);
-        }
-        debounceRef.current = setTimeout(() => {
-            router.get(
-                index().url,
-                { search: value, status: filters?.status, payment_status: filters?.payment_status },
-                { preserveState: true, replace: true },
-            );
-        }, 300);
-    }, [filters?.status, filters?.payment_status]);
+    const handleSearch = useCallback(
+        (value: string) => {
+            if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+            }
+            debounceRef.current = setTimeout(() => {
+                router.get(
+                    index().url,
+                    { search: value, status: filters?.status, payment_status: filters?.payment_status },
+                    { preserveState: true, replace: true },
+                );
+            }, 300);
+        },
+        [filters?.status, filters?.payment_status],
+    );
 
     const handleStatusChange = (value: string) => {
-        router.get(index().url, { search: filters?.search, status: value === 'all' ? '' : value, payment_status: filters?.payment_status }, { preserveState: true, replace: true });
+        router.get(
+            index().url,
+            { search: filters?.search, status: value === 'all' ? '' : value, payment_status: filters?.payment_status },
+            { preserveState: true, replace: true },
+        );
     };
 
     const handlePaymentStatusChange = (value: string) => {
-        router.get(index().url, { search: filters?.search, status: filters?.status, payment_status: value === 'all' ? '' : value }, { preserveState: true, replace: true });
+        router.get(
+            index().url,
+            { search: filters?.search, status: filters?.status, payment_status: value === 'all' ? '' : value },
+            { preserveState: true, replace: true },
+        );
     };
 
     return (

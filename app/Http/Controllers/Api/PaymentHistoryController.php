@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PaymentHistoryResource;
+use App\Models\SubscriptionTransaction;
+use App\Models\UserSubscription;
 use Illuminate\Http\Request;
 use Lunar\Models\Order;
 
@@ -14,7 +16,7 @@ class PaymentHistoryController extends Controller
      *
      * This includes:
      * - Marketplace orders (from Lunar)
-     * - Subscription fees (to be implemented)
+     * - Subscription payments (from SubscriptionTransaction)
      */
     public function index(Request $request)
     {
@@ -34,18 +36,28 @@ class PaymentHistoryController extends Controller
             ];
         });
 
-        // TODO: Add subscription fee transactions here when subscription module is implemented
-        // Example structure:
-        // $subscriptions = UserSubscriptionTransaction::where('user_id', $user->id)
-        //     ->latest()
-        //     ->get();
-        // $subscriptionHistory = $subscriptions->map(function ($subscription) {
-        //     return [
-        //         'type' => 'subscription',
-        //         'data' => $subscription,
-        //     ];
-        // });
-        // $paymentHistory = $paymentHistory->merge($subscriptionHistory);
+        // Get user's subscription IDs
+        $userSubscriptionIds = UserSubscription::where('user_id', $user->id)
+            ->pluck('id');
+
+        // Get subscription transactions (only captured/successful payments)
+        $subscriptionTransactions = SubscriptionTransaction::whereIn('user_subscription_id', $userSubscriptionIds)
+            ->where('type', 'capture')
+            ->where('success', true)
+            ->with(['userSubscription.subscription'])
+            ->latest('captured_at')
+            ->get();
+
+        // Transform subscription transactions into payment history items
+        $subscriptionHistory = $subscriptionTransactions->map(function ($transaction) {
+            return [
+                'type' => 'subscription',
+                'data' => $transaction,
+            ];
+        });
+
+        // Merge all payment history
+        $paymentHistory = $paymentHistory->merge($subscriptionHistory);
 
         // Sort by date (newest first)
         $paymentHistory = $paymentHistory->sortByDesc(function ($item) {
@@ -53,7 +65,10 @@ class PaymentHistoryController extends Controller
                 return $item['data']->placed_at ?? $item['data']->created_at;
             }
 
-            // Add sorting for subscription when implemented
+            if ($item['type'] === 'subscription') {
+                return $item['data']->captured_at ?? $item['data']->created_at;
+            }
+
             return null;
         })->values();
 

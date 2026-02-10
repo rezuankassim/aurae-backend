@@ -208,6 +208,8 @@ class MachineSerialService
      * @param  int  $startProductCode  Starting product code (will increment)
      * @param  string  $variationCode  1-digit variation code
      * @param  int  $status  Machine status (0 or 1)
+     * @param  string|null  $thumbnail  S3 path for thumbnail image
+     * @param  string|null  $detailImage  S3 path for detail image
      */
     public function bulkGenerate(
         int $quantity,
@@ -216,7 +218,9 @@ class MachineSerialService
         ?string $year = null,
         int $startProductCode = 1,
         string $variationCode = '1',
-        int $status = 1
+        int $status = 1,
+        ?string $thumbnail = null,
+        ?string $detailImage = null
     ): array {
         $machines = [];
         $year = $year ?? date('Y');
@@ -229,6 +233,8 @@ class MachineSerialService
                 'serial_number' => $serialNumber,
                 'name' => $baseName.' #'.($i + 1),
                 'status' => $status,
+                'thumbnail' => $thumbnail,
+                'detail_image' => $detailImage,
             ]);
         }
 
