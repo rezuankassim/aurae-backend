@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Models\Subscription;
+use App\Models\SubscriptionTransaction;
 use App\Models\UserSubscription;
 use App\Services\SenangpaySignatureService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Lunar\Models\Transaction;
 
 class SubscriptionPaymentController extends Controller
 {
@@ -103,20 +103,17 @@ class SubscriptionPaymentController extends Controller
             );
 
             // Create transaction record
-            Transaction::create([
-                'order_id' => null,
+            SubscriptionTransaction::create([
+                'user_subscription_id' => $userSubscription->id,
                 'success' => true,
                 'type' => 'intent',
                 'driver' => 'senangpay',
                 'amount' => $subscription->price,
                 'reference' => $referenceNumber,
                 'status' => 'pending',
-                'card_type' => '',
-                'last_four' => '',
                 'notes' => 'Recurring subscription payment intent created',
                 'meta' => [
                     'subscription_id' => $subscription->id,
-                    'user_subscription_id' => $userSubscription->id,
                     'customer_name' => $customerName,
                     'customer_email' => $customerEmail,
                     'customer_phone' => $customerPhone,
@@ -182,9 +179,9 @@ class SubscriptionPaymentController extends Controller
     public function checkPaymentStatus(Request $request, string $reference)
     {
         // Find transaction
-        $transaction = Transaction::where('reference', $reference)
+        $transaction = SubscriptionTransaction::where('reference', $reference)
             ->where('driver', 'senangpay')
-            ->whereJsonContains('meta->type', 'subscription')
+            ->where('type', 'intent')
             ->latest()
             ->first();
 
@@ -198,9 +195,9 @@ class SubscriptionPaymentController extends Controller
                 ->setStatusCode(404);
         }
 
-        // Get user subscription
-        $userSubscriptionId = $transaction->meta['user_subscription_id'] ?? null;
-        if (! $userSubscriptionId) {
+        $userSubscription = UserSubscription::with('subscription')->find($transaction->user_subscription_id);
+
+        if (! $userSubscription) {
             return BaseResource::make(null)
                 ->additional([
                     'status' => 404,
@@ -210,11 +207,9 @@ class SubscriptionPaymentController extends Controller
                 ->setStatusCode(404);
         }
 
-        $userSubscription = UserSubscription::with('subscription')->find($userSubscriptionId);
-
         // Determine payment status
         $paymentStatus = 'pending';
-        $captureTransaction = Transaction::where('reference', $reference)
+        $captureTransaction = SubscriptionTransaction::where('reference', $reference)
             ->where('type', 'capture')
             ->where('driver', 'senangpay')
             ->first();

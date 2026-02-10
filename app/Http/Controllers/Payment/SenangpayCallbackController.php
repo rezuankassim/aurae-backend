@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Payment;
 
 use App\Events\PaymentCompleted;
 use App\Http\Controllers\Controller;
+use App\Models\SubscriptionTransaction;
 use App\Models\UserSubscription;
 use App\Services\SenangpaySignatureService;
 use Illuminate\Http\Request;
@@ -421,10 +422,9 @@ class SenangpayCallbackController extends Controller
         ]);
 
         // Find the transaction
-        $transaction = Transaction::where('reference', $orderId)
+        $transaction = SubscriptionTransaction::where('reference', $orderId)
             ->where('driver', 'senangpay')
             ->where('type', 'intent')
-            ->whereJsonContains('meta->type', 'recurring_subscription')
             ->first();
 
         if (! $transaction) {
@@ -457,21 +457,11 @@ class SenangpayCallbackController extends Controller
             ]);
         }
 
-        // Get user subscription
-        $userSubscriptionId = $transaction->meta['user_subscription_id'] ?? null;
-        if (! $userSubscriptionId) {
-            Log::error('SenangPay recurring return: User subscription ID not found', ['order_id' => $orderId]);
-
-            return response()->view('payment.error', [
-                'message' => 'Subscription not found',
-            ]);
-        }
-
-        $userSubscription = UserSubscription::find($userSubscriptionId);
+        $userSubscription = UserSubscription::find($transaction->user_subscription_id);
         if (! $userSubscription) {
             Log::error('SenangPay recurring return: User subscription not found', [
                 'order_id' => $orderId,
-                'user_subscription_id' => $userSubscriptionId,
+                'user_subscription_id' => $transaction->user_subscription_id,
             ]);
 
             return response()->view('payment.error', [
@@ -484,28 +474,25 @@ class SenangpayCallbackController extends Controller
 
         if ($status === 'success') {
             // Check if already captured
-            if (! Transaction::where('parent_transaction_id', $transaction->id)
+            if (! SubscriptionTransaction::where('parent_transaction_id', $transaction->id)
                 ->where('type', 'capture')
                 ->exists()) {
                 // Create capture transaction
-                Transaction::create([
+                SubscriptionTransaction::create([
                     'parent_transaction_id' => $transaction->id,
-                    'order_id' => null,
+                    'user_subscription_id' => $transaction->user_subscription_id,
                     'success' => true,
                     'type' => 'capture',
                     'driver' => 'senangpay',
                     'amount' => $transaction->amount,
                     'reference' => $orderId,
                     'status' => 'captured',
-                    'card_type' => '',
-                    'last_four' => '',
                     'notes' => 'Recurring subscription payment captured',
                     'captured_at' => now(),
                     'meta' => [
                         'transaction_id' => $transactionId,
                         'type' => 'recurring_subscription',
                         'subscription_id' => $transaction->meta['subscription_id'] ?? null,
-                        'user_subscription_id' => $userSubscriptionId,
                     ],
                 ]);
 
@@ -520,7 +507,7 @@ class SenangpayCallbackController extends Controller
                 ]);
 
                 Log::info('SenangPay recurring return: Payment captured', [
-                    'user_subscription_id' => $userSubscriptionId,
+                    'user_subscription_id' => $transaction->user_subscription_id,
                     'reference' => $orderId,
                     'transaction_id' => $transactionId,
                 ]);
@@ -584,10 +571,9 @@ class SenangpayCallbackController extends Controller
         }
 
         // Find the original transaction by order_id pattern
-        $transaction = Transaction::where('reference', $orderId)
+        $transaction = SubscriptionTransaction::where('reference', $orderId)
             ->where('driver', 'senangpay')
             ->where('type', 'intent')
-            ->whereJsonContains('meta->type', 'recurring_subscription')
             ->first();
 
         if (! $transaction) {
@@ -618,13 +604,12 @@ class SenangpayCallbackController extends Controller
         }
 
         // Get user subscription
-        $userSubscriptionId = $transaction->meta['user_subscription_id'] ?? null;
-        $userSubscription = UserSubscription::find($userSubscriptionId);
+        $userSubscription = UserSubscription::find($transaction->user_subscription_id);
 
         if (! $userSubscription) {
             Log::error('SenangPay recurring callback: User subscription not found', [
                 'order_id' => $orderId,
-                'user_subscription_id' => $userSubscriptionId,
+                'user_subscription_id' => $transaction->user_subscription_id,
             ]);
 
             return response()->json(['status' => 'OK']);
@@ -637,7 +622,7 @@ class SenangpayCallbackController extends Controller
         } else {
             // Payment failed - mark subscription as expired or handle retry logic
             Log::warning('SenangPay recurring callback: Renewal payment failed', [
-                'user_subscription_id' => $userSubscriptionId,
+                'user_subscription_id' => $transaction->user_subscription_id,
                 'order_id' => $orderId,
             ]);
 
@@ -659,23 +644,20 @@ class SenangpayCallbackController extends Controller
     protected function handleRecurringRenewal(UserSubscription $userSubscription, string $transactionId, string $orderId): void
     {
         // Create a new transaction record for this renewal
-        Transaction::create([
-            'order_id' => null,
+        SubscriptionTransaction::create([
+            'user_subscription_id' => $userSubscription->id,
             'success' => true,
             'type' => 'capture',
             'driver' => 'senangpay',
             'amount' => $userSubscription->subscription->price ?? 0,
             'reference' => 'RENEWAL-'.$orderId.'-'.now()->format('YmdHis'),
             'status' => 'captured',
-            'card_type' => '',
-            'last_four' => '',
             'notes' => 'Recurring subscription renewal payment',
             'captured_at' => now(),
             'meta' => [
                 'transaction_id' => $transactionId,
                 'type' => 'recurring_renewal',
                 'subscription_id' => $userSubscription->subscription_id,
-                'user_subscription_id' => $userSubscription->id,
                 'original_order_id' => $orderId,
             ],
         ]);
