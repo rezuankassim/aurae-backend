@@ -36,6 +36,7 @@ export default function CreateMachine({ next_serial }: Props) {
         variation_code: '1',
         status: '1',
         quantity: '',
+        start_product_code: '1',
     });
 
     // Build serial number from components
@@ -187,12 +188,81 @@ export default function CreateMachine({ next_serial }: Props) {
                     )}
 
                     {isBulk && (
-                        <Card className="border-blue-200 bg-blue-50">
-                            <CardContent className="pt-6">
-                                <p className="text-sm text-blue-900">
-                                    <strong>Bulk Generation:</strong> {data.quantity} machines will be created with sequential
-                                    serial numbers starting from <span className="font-mono">{next_serial}</span>
-                                </p>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Bulk Serial Number Format</CardTitle>
+                                <CardDescription>
+                                    Format: [Model][Year][Product Code] [Variation] — Product code will increment for each machine
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="grid grid-cols-4 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="bulk_model">Model (4 chars)</Label>
+                                        <Input
+                                            id="bulk_model"
+                                            value={data.model}
+                                            onChange={(e) => setData('model', e.target.value.toUpperCase().slice(0, 4))}
+                                            placeholder="A101"
+                                            maxLength={4}
+                                        />
+                                        <p className="text-xs text-muted-foreground">e.g., A101</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="bulk_year">Year (4 digits)</Label>
+                                        <Input
+                                            id="bulk_year"
+                                            value={data.year}
+                                            onChange={(e) => setData('year', e.target.value.replace(/\D/g, '').slice(0, 4))}
+                                            placeholder="2026"
+                                            maxLength={4}
+                                        />
+                                        <p className="text-xs text-muted-foreground">e.g., 2026</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="start_product_code">Starting Product Code</Label>
+                                        <Input
+                                            id="start_product_code"
+                                            value={data.start_product_code}
+                                            onChange={(e) => setData('start_product_code', e.target.value.replace(/\D/g, '').slice(0, 4))}
+                                            placeholder="1"
+                                            maxLength={4}
+                                        />
+                                        <p className="text-xs text-muted-foreground">Will increment</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="bulk_variation">Variation</Label>
+                                        <Input
+                                            id="bulk_variation"
+                                            value={data.variation_code}
+                                            onChange={(e) => setData('variation_code', e.target.value.replace(/\D/g, '').slice(0, 1))}
+                                            placeholder="1"
+                                            maxLength={1}
+                                        />
+                                        <p className="text-xs text-muted-foreground">1 digit</p>
+                                    </div>
+                                </div>
+
+                                <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
+                                    <Label className="text-blue-900">Preview (first 3 serial numbers)</Label>
+                                    <div className="mt-2 font-mono text-sm text-blue-800 space-y-1">
+                                        {Array.from({ length: Math.min(3, parseInt(data.quantity) || 0) }, (_, i) => {
+                                            const startCode = parseInt(data.start_product_code) || 1;
+                                            const productCode = String(startCode + i).padStart(4, '0');
+                                            return (
+                                                <div key={i}>
+                                                    {data.model}{data.year}{productCode} {data.variation_code}
+                                                </div>
+                                            );
+                                        })}
+                                        {parseInt(data.quantity) > 3 && <div>...</div>}
+                                    </div>
+                                </div>
+
+                                {errors.model && <p className="text-sm text-red-600">{errors.model}</p>}
+                                {errors.year && <p className="text-sm text-red-600">{errors.year}</p>}
+                                {errors.start_product_code && <p className="text-sm text-red-600">{errors.start_product_code}</p>}
+                                {errors.variation_code && <p className="text-sm text-red-600">{errors.variation_code}</p>}
                             </CardContent>
                         </Card>
                     )}

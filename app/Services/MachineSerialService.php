@@ -221,35 +221,35 @@ class MachineSerialService
 
     /**
      * Bulk generate machines with auto-serial numbers.
+     *
+     * @param  int  $quantity  Number of machines to generate
+     * @param  string  $baseName  Base name for machines
+     * @param  string  $model  4-character model code (e.g., A101)
+     * @param  string  $year  4-digit year
+     * @param  int  $startProductCode  Starting product code (will increment)
+     * @param  string  $variationCode  1-digit variation code
+     * @param  int  $status  Machine status (0 or 1)
      */
-    public function bulkGenerate(int $quantity, string $baseName): array
-    {
+    public function bulkGenerate(
+        int $quantity,
+        string $baseName,
+        string $model = 'A101',
+        ?string $year = null,
+        int $startProductCode = 1,
+        string $variationCode = '1',
+        int $status = 1
+    ): array {
         $machines = [];
-        $settings = GeneralSetting::first();
-        $format = $settings->machine_serial_format ?? self::DEFAULT_FORMAT;
-        $year = date('Y');
-
-        // Get starting number for current year
-        $lastMachine = Machine::where('serial_number', 'like', '%'.$year.'%')
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        $startNumber = 1;
-
-        if ($lastMachine) {
-            $productSerial = $this->extractProductSerial($lastMachine->serial_number);
-            if ($productSerial !== null) {
-                $startNumber = $productSerial + 1;
-            }
-        }
+        $year = $year ?? date('Y');
 
         for ($i = 0; $i < $quantity; $i++) {
-            $serialNumber = $this->formatSerialNumber($format, $startNumber + $i, $settings);
+            $productCode = str_pad($startProductCode + $i, 4, '0', STR_PAD_LEFT);
+            $serialNumber = "{$model}{$year}{$productCode} {$variationCode}";
 
             $machines[] = Machine::create([
                 'serial_number' => $serialNumber,
                 'name' => $baseName.' #'.($i + 1),
-                'status' => 1,
+                'status' => $status,
             ]);
         }
 

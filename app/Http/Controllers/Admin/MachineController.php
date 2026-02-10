@@ -74,13 +74,22 @@ class MachineController extends Controller
             'serial_number' => ['nullable', 'string', 'unique:machines,serial_number'],
             'status' => ['required', 'integer', 'in:0,1'],
             'quantity' => ['nullable', 'integer', 'min:1', 'max:1000'],
+            'model' => ['nullable', 'string', 'size:4'],
+            'year' => ['nullable', 'string', 'size:4'],
+            'start_product_code' => ['nullable', 'integer', 'min:1', 'max:9999'],
+            'variation_code' => ['nullable', 'string', 'size:1'],
         ]);
 
         // Bulk generation
         if ($request->has('quantity') && $request->quantity > 1) {
-            $machines = $this->serialService->bulkGenerate(
-                $request->quantity,
-                $validated['name']
+            $this->serialService->bulkGenerate(
+                quantity: (int) $request->quantity,
+                baseName: $validated['name'],
+                model: $validated['model'] ?? 'A101',
+                year: $validated['year'] ?? date('Y'),
+                startProductCode: (int) ($validated['start_product_code'] ?? 1),
+                variationCode: $validated['variation_code'] ?? '1',
+                status: (int) $validated['status']
             );
 
             return to_route('admin.machines.index')
