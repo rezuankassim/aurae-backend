@@ -106,14 +106,14 @@ class SenangpaySignatureService
 
     /**
      * Generate hash for recurring payment.
-     * Format: hash('sha256', secret_key + order_id + recurring_id)
+     * Format: hash('sha256', secret_key + recurring_id + order_id)
      */
     public function generateRecurringPaymentHash(
         string $secretKey,
         string $orderId,
         string $recurringId
     ): string {
-        $string = $secretKey.$orderId.$recurringId;
+        $string = $secretKey.$recurringId.$orderId;
 
         return hash('sha256', $string);
     }
