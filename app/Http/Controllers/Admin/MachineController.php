@@ -58,11 +58,9 @@ class MachineController extends Controller
     public function create()
     {
         $nextSerial = $this->serialService->generateNextSerialNumber();
-        $formatExample = $this->serialService->getFormatExample();
 
         return Inertia::render('admin/machine/create', [
             'next_serial' => $nextSerial,
-            'format_example' => $formatExample,
         ]);
     }
 

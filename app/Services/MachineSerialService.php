@@ -8,14 +8,14 @@ use App\Models\Machine;
 class MachineSerialService
 {
     /**
-     * Default format: {MMMM}{YYYY}{SSSS}{V}
-     * Example: A101202600011
-     * - MMMM: Machine serial prefix (4 chars, e.g., A101)
+     * Default format: {MMMM}{YYYY}{SSSS} {V}
+     * Example: A10120260001 1
+     * - MMMM: Machine serial prefix/model (4 chars, e.g., A101)
      * - YYYY: Year (4 digits)
      * - SSSS: Product serial (4 digits, zero-padded)
-     * - V: Validation digit (1 digit)
+     * - V: Variation code (1 digit, separated by space)
      */
-    protected const DEFAULT_FORMAT = '{MMMM}{YYYY}{SSSS}{V}';
+    protected const DEFAULT_FORMAT = '{MMMM}{YYYY}{SSSS} {V}';
 
     protected const DEFAULT_PREFIX = 'A101';
 
@@ -30,13 +30,8 @@ class MachineSerialService
             return false;
         }
 
-        // Also validate the check digit if format includes {V}
-        $settings = GeneralSetting::first();
-        $format = $settings->machine_serial_format ?? self::DEFAULT_FORMAT;
-
-        if (str_contains($format, '{V}')) {
-            return $this->validateCheckDigit($serialNumber);
-        }
+        // Note: {V} is now treated as a user-provided variation code, not a calculated check digit
+        // No additional validation needed beyond the regex pattern match
 
         return true;
     }
@@ -120,10 +115,12 @@ class MachineSerialService
      */
     protected function extractProductSerial(string $serialNumber): ?int
     {
-        // Format: A101YYYYSSSSV - extract SSSS (positions 8-11, 0-indexed)
-        // The serial is: PREFIX(4) + YEAR(4) + SERIAL(4) + CHECK(1) = 13 chars
-        if (strlen($serialNumber) >= 12) {
-            $serialPart = substr($serialNumber, 8, 4);
+        // Format: A101YYYYSSSS V - extract SSSS (positions 8-11, 0-indexed)
+        // The serial is: PREFIX(4) + YEAR(4) + SERIAL(4) + SPACE(1) + VARIATION(1) = 14 chars
+        // Or without space: PREFIX(4) + YEAR(4) + SERIAL(4) + VARIATION(1) = 13 chars
+        $cleanSerial = str_replace(' ', '', $serialNumber);
+        if (strlen($cleanSerial) >= 12) {
+            $serialPart = substr($cleanSerial, 8, 4);
             if (is_numeric($serialPart)) {
                 return (int) $serialPart;
             }
@@ -143,7 +140,7 @@ class MachineSerialService
 
         // Replace placeholders with regex patterns
         $pattern = preg_quote($format, '/');
-        $pattern = str_replace('\{MMMM\}', preg_quote($prefix, '/'), $pattern);
+        $pattern = str_replace('\{MMMM\}', '[A-Z0-9]{4}', $pattern); // Allow any 4-char model code
         $pattern = str_replace('\{PREFIX\}', preg_quote($prefix, '/'), $pattern);
         $pattern = str_replace('\{YYYY\}', '\d{4}', $pattern);
         $pattern = str_replace('\{MM\}', '\d{2}', $pattern);
@@ -157,6 +154,8 @@ class MachineSerialService
         $pattern = str_replace('\{NNNNN\}', '\d{5}', $pattern);
         $pattern = str_replace('\{NNN\}', '\d{3}', $pattern);
         $pattern = str_replace('\{NN\}', '\d{2}', $pattern);
+        // Handle escaped space (from preg_quote)
+        $pattern = str_replace('\ ', ' ', $pattern);
 
         return '/^'.$pattern.'$/';
     }
@@ -298,28 +297,29 @@ class MachineSerialService
      */
     public function parseSerialNumber(string $serialNumber): array
     {
-        // Expected format: A101202600011 (13 chars)
-        // MMMM(4) + YYYY(4) + SSSS(4) + V(1)
-        if (strlen($serialNumber) !== 13) {
+        // Expected format: A10120260001 1 (14 chars with space) or A101202600011 (13 chars without space)
+        // MMMM(4) + YYYY(4) + SSSS(4) + SPACE?(1) + V(1)
+        $cleanSerial = str_replace(' ', '', $serialNumber);
+        if (strlen($cleanSerial) !== 13) {
             return [
                 'valid' => false,
                 'error' => 'Invalid serial number length',
             ];
         }
 
-        $prefix = substr($serialNumber, 0, 4);
-        $year = substr($serialNumber, 4, 4);
-        $productSerial = substr($serialNumber, 8, 4);
-        $validation = substr($serialNumber, 12, 1);
-
-        $isValid = $this->validateCheckDigit($serialNumber);
+        $prefix = substr($cleanSerial, 0, 4);
+        $year = substr($cleanSerial, 4, 4);
+        $productSerial = substr($cleanSerial, 8, 4);
+        $variation = substr($cleanSerial, 12, 1);
 
         return [
-            'valid' => $isValid,
+            'valid' => true,
             'prefix' => $prefix,
+            'model' => $prefix,
             'year' => $year,
             'product_serial' => $productSerial,
-            'validation_digit' => $validation,
+            'product_code' => $productSerial,
+            'variation_code' => $variation,
             'full_serial' => $serialNumber,
         ];
     }

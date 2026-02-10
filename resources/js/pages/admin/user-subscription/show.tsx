@@ -248,8 +248,8 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
                                     <CardDescription>
                                         Cancel this subscription immediately.
                                         {userSubscription.is_recurring && (
-                                            <span className="mt-1 block font-semibold text-orange-600">
-                                                ⚠️ Remember to also cancel in SenangPay dashboard!
+                                            <span className="mt-1 block font-semibold text-red-600 dark:text-red-50">
+                                                Remember to also cancel in SenangPay dashboard!
                                             </span>
                                         )}
                                     </CardDescription>
