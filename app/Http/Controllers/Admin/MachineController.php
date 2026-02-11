@@ -139,7 +139,7 @@ class MachineController extends Controller
      */
     public function show(Machine $machine)
     {
-        $machine->load(['user', 'device']);
+        $machine->load(['user', 'device', 'userSubscription.subscription']);
 
         return Inertia::render('admin/machine/show', [
             'machine' => $machine,
