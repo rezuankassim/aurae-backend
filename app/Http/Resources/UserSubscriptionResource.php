@@ -15,8 +15,6 @@ class UserSubscriptionResource extends JsonResource
     public function toArray(Request $request): array
     {
         $user = $this->relationLoaded('user') ? $this->user : $request->user();
-        $currentMachineCount = $user ? $user->machines()->count() : 0;
-        $maxMachines = $this->subscription?->max_machines ?? 1;
 
         $daysRemaining = null;
         if ($this->ends_at) {
@@ -41,9 +39,6 @@ class UserSubscriptionResource extends JsonResource
             'next_billing_at' => $this->next_billing_at,
             'cancelled_at' => $this->cancelled_at,
             'days_remaining' => $daysRemaining,
-            'current_machine_count' => $currentMachineCount,
-            'max_machines' => $maxMachines,
-            'machines_available' => max(0, $maxMachines - $currentMachineCount),
             'has_machine' => $machine !== null,
             'machine' => $machine ? [
                 'id' => $machine->id,
