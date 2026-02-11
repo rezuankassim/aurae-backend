@@ -52,22 +52,6 @@ class SubscriptionPaymentController extends Controller
                 ->setStatusCode(400);
         }
 
-        // Check if user already has an active subscription
-        $existingSubscription = UserSubscription::where('user_id', $user->id)
-            ->where('status', 'active')
-            ->whereNull('cancelled_at')
-            ->first();
-
-        if ($existingSubscription) {
-            return BaseResource::make(null)
-                ->additional([
-                    'status' => 400,
-                    'message' => 'You already have an active subscription.',
-                ])
-                ->response()
-                ->setStatusCode(400);
-        }
-
         try {
             // Create pending user subscription
             $userSubscription = UserSubscription::create([
