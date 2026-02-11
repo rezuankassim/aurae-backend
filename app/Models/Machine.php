@@ -38,6 +38,14 @@ class Machine extends Model
     }
 
     /**
+     * Get the user subscription this machine is bound to.
+     */
+    public function userSubscription(): BelongsTo
+    {
+        return $this->belongsTo(UserSubscription::class);
+    }
+
+    /**
      * Check if machine is bound to a user.
      */
     public function isBound(): bool

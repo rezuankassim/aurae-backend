@@ -51,6 +51,14 @@ class UserSubscription extends Model
     }
 
     /**
+     * Get the machine bound to this subscription.
+     */
+    public function machine(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Machine::class);
+    }
+
+    /**
      * Scope a query to only include active subscriptions.
      */
     public function scopeActive($query)

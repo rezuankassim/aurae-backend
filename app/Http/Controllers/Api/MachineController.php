@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Models\Device;
 use App\Models\Machine;
+use App\Models\UserSubscription;
 use App\Services\MachineSerialService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -25,6 +26,7 @@ class MachineController extends Controller
             'device_id' => ['required', 'string'],
             'device_uuid' => ['required', 'string'],
             'serial_number' => ['required', 'string'],
+            'subscription_id' => ['nullable', 'integer', 'exists:user_subscriptions,id'],
         ]);
 
         $user = $request->user();
@@ -65,24 +67,89 @@ class MachineController extends Controller
                 ->setStatusCode(422);
         }
 
-        // 3. Check user has active subscription
-        $activeSubscription = $user->activeSubscription()->with('subscription')->first();
-        if (! $activeSubscription) {
-            return BaseResource::make([])
-                ->additional([
-                    'status' => 403,
-                    'message' => 'Please subscribe to a plan to bind machines.',
-                ])
-                ->response()
-                ->setStatusCode(403);
+        // 3. Get the subscription to use
+        $selectedSubscription = null;
+
+        if (isset($validated['subscription_id'])) {
+            // Use the specified subscription
+            $selectedSubscription = UserSubscription::where('id', $validated['subscription_id'])
+                ->where('user_id', $user->id)
+                ->where('status', 'active')
+                ->where(function ($q) {
+                    $q->whereNull('ends_at')
+                        ->orWhere('ends_at', '>', now());
+                })
+                ->with('subscription')
+                ->first();
+
+            if (! $selectedSubscription) {
+                return BaseResource::make([])
+                    ->additional([
+                        'status' => 404,
+                        'message' => 'The specified subscription is not active or does not belong to you.',
+                    ])
+                    ->response()
+                    ->setStatusCode(404);
+            }
+
+            // Check if this subscription already has a machine bound
+            if ($selectedSubscription->machine()->exists()) {
+                return BaseResource::make([])
+                    ->additional([
+                        'status' => 403,
+                        'message' => 'This subscription already has a machine bound to it. Please choose a different subscription.',
+                    ])
+                    ->response()
+                    ->setStatusCode(403);
+            }
+        } else {
+            // Find first active subscription without a machine bound
+            $selectedSubscription = $user->subscriptions()
+                ->where('status', 'active')
+                ->where(function ($q) {
+                    $q->whereNull('ends_at')
+                        ->orWhere('ends_at', '>', now());
+                })
+                ->whereDoesntHave('machine')
+                ->with('subscription')
+                ->first();
+
+            if (! $selectedSubscription) {
+                // Check if user has any active subscriptions
+                $hasActiveSubscriptions = $user->subscriptions()
+                    ->where('status', 'active')
+                    ->where(function ($q) {
+                        $q->whereNull('ends_at')
+                            ->orWhere('ends_at', '>', now());
+                    })
+                    ->exists();
+
+                if (! $hasActiveSubscriptions) {
+                    return BaseResource::make([])
+                        ->additional([
+                            'status' => 403,
+                            'message' => 'Please subscribe to a plan to bind machines.',
+                        ])
+                        ->response()
+                        ->setStatusCode(403);
+                }
+
+                return BaseResource::make([])
+                    ->additional([
+                        'status' => 403,
+                        'message' => 'All your subscriptions already have machines bound. Please purchase a new subscription to bind more machines.',
+                    ])
+                    ->response()
+                    ->setStatusCode(403);
+            }
         }
 
-        // 4. Check machine limit
+        // 4. Check machine limit (total machines vs total active subscriptions)
         $maxMachines = $user->getMaxMachines();
         $currentMachineCount = Machine::where('user_id', $user->id)->count();
 
         if ($currentMachineCount >= $maxMachines) {
-            $planName = $activeSubscription->subscription->title;
+            $planName = $selectedSubscription->subscription->title;
 
             return BaseResource::make([])
                 ->additional([
@@ -138,6 +205,7 @@ class MachineController extends Controller
         $machine->update([
             'user_id' => $user->id,
             'device_id' => $device->id,
+            'user_subscription_id' => $selectedSubscription->id,
             'last_logged_in_at' => now(),
         ]);
 
@@ -145,12 +213,14 @@ class MachineController extends Controller
             'user_id' => $user->id,
             'machine_id' => $machine->id,
             'device_id' => $device->id,
+            'user_subscription_id' => $selectedSubscription->id,
             'serial_number' => $machine->serial_number,
         ]);
 
         return BaseResource::make([
-            'machine' => $machine->load(['user', 'device']),
-            'subscription' => $activeSubscription->subscription,
+            'machine' => $machine->load(['user', 'device', 'userSubscription.subscription']),
+            'subscription' => $selectedSubscription->subscription,
+            'user_subscription' => $selectedSubscription,
             'machines_count' => $currentMachineCount + 1,
             'max_machines' => $maxMachines,
         ])

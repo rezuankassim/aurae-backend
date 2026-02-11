@@ -29,4 +29,12 @@ class Device extends Model
     {
         return $this->hasMany(Guest::class);
     }
+
+    /**
+     * Get the machine linked to this device.
+     */
+    public function machine(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Machine::class);
+    }
 }

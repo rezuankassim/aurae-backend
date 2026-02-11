@@ -23,6 +23,9 @@ class UserSubscriptionResource extends JsonResource
             $daysRemaining = max(0, now()->diffInDays($this->ends_at, false));
         }
 
+        // Get machine bound to this subscription
+        $machine = $this->relationLoaded('machine') ? $this->machine : $this->machine()->first();
+
         return [
             'id' => $this->id,
             'subscription' => new SubscriptionResource($this->whenLoaded('subscription')),
@@ -41,6 +44,15 @@ class UserSubscriptionResource extends JsonResource
             'current_machine_count' => $currentMachineCount,
             'max_machines' => $maxMachines,
             'machines_available' => max(0, $maxMachines - $currentMachineCount),
+            'has_machine' => $machine !== null,
+            'machine' => $machine ? [
+                'id' => $machine->id,
+                'serial_number' => $machine->serial_number,
+                'name' => $machine->name,
+                'status' => $machine->status,
+                'thumbnail_url' => $machine->thumbnail_url,
+                'detail_image_url' => $machine->detail_image_url,
+            ] : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

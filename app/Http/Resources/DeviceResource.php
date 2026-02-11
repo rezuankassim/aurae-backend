@@ -14,6 +14,20 @@ class DeviceResource extends BaseResource
      */
     public function toArray(Request $request): array
     {
+        // Load machine with its subscription if not already loaded
+        $machine = $this->relationLoaded('machine') ? $this->machine : $this->machine()->with('userSubscription.subscription')->first();
+
+        // Get user's active subscriptions
+        $user = $request->user();
+        $subscriptions = $user ? $user->subscriptions()
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('ends_at')
+                    ->orWhere('ends_at', '>', now());
+            })
+            ->with(['subscription', 'machine'])
+            ->get() : collect();
+
         return [
             'id' => $this->id,
             'status' => $this->status,
@@ -30,6 +44,20 @@ class DeviceResource extends BaseResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'token' => $this->when(isset($this->token), $this->token),
+            'machine' => $machine ? [
+                'id' => $machine->id,
+                'serial_number' => $machine->serial_number,
+                'name' => $machine->name,
+                'status' => $machine->status,
+                'thumbnail_url' => $machine->thumbnail_url,
+                'detail_image_url' => $machine->detail_image_url,
+                'user_subscription_id' => $machine->user_subscription_id,
+                'subscription' => $machine->userSubscription?->subscription ? [
+                    'id' => $machine->userSubscription->subscription->id,
+                    'title' => $machine->userSubscription->subscription->title,
+                ] : null,
+            ] : null,
+            'subscriptions' => UserSubscriptionResource::collection($subscriptions),
         ];
     }
 }
