@@ -270,6 +270,7 @@ class MachineController extends Controller
         $machine->update([
             'user_id' => null,
             'device_id' => null,
+            'user_subscription_id' => null,
         ]);
 
         Log::info('Machine unbound from user', [
@@ -281,6 +282,96 @@ class MachineController extends Controller
             ->additional([
                 'status' => 200,
                 'message' => 'Machine unbound successfully.',
+            ]);
+    }
+
+    /**
+     * Change machine subscription plan.
+     */
+    public function changeSubscription(Request $request, Machine $machine)
+    {
+        $validated = $request->validate([
+            'subscription_id' => ['required', 'integer', 'exists:user_subscriptions,id'],
+        ]);
+
+        $user = $request->user();
+
+        // Verify machine belongs to current user
+        if ($machine->user_id !== $user->id) {
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 403,
+                    'message' => 'You do not own this machine.',
+                ])
+                ->response()
+                ->setStatusCode(403);
+        }
+
+        // Verify target subscription belongs to user and is active
+        $targetSubscription = UserSubscription::where('id', $validated['subscription_id'])
+            ->where('user_id', $user->id)
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('ends_at')
+                    ->orWhere('ends_at', '>', now());
+            })
+            ->with('subscription')
+            ->first();
+
+        if (! $targetSubscription) {
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 404,
+                    'message' => 'The specified subscription is not active or does not belong to you.',
+                ])
+                ->response()
+                ->setStatusCode(404);
+        }
+
+        // Check if trying to change to the same subscription
+        if ($machine->user_subscription_id === $targetSubscription->id) {
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 400,
+                    'message' => 'This machine is already bound to this subscription.',
+                ])
+                ->response()
+                ->setStatusCode(400);
+        }
+
+        // Check if target subscription already has a machine bound
+        if ($targetSubscription->machine()->exists()) {
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 403,
+                    'message' => 'The target subscription already has a machine bound to it. Please choose a different subscription.',
+                ])
+                ->response()
+                ->setStatusCode(403);
+        }
+
+        $previousSubscriptionId = $machine->user_subscription_id;
+
+        // Update machine's subscription
+        $machine->update([
+            'user_subscription_id' => $targetSubscription->id,
+        ]);
+
+        Log::info('Machine subscription changed', [
+            'user_id' => $user->id,
+            'machine_id' => $machine->id,
+            'previous_subscription_id' => $previousSubscriptionId,
+            'new_subscription_id' => $targetSubscription->id,
+        ]);
+
+        return BaseResource::make([
+            'machine' => $machine->load(['user', 'device', 'userSubscription.subscription']),
+            'subscription' => $targetSubscription->subscription,
+            'user_subscription' => $targetSubscription,
+        ])
+            ->additional([
+                'status' => 200,
+                'message' => 'Machine subscription changed successfully.',
             ]);
     }
 }

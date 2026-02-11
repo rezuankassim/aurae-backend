@@ -17,16 +17,8 @@ class DeviceResource extends BaseResource
         // Load machine with its subscription if not already loaded
         $machine = $this->relationLoaded('machine') ? $this->machine : $this->machine()->with('userSubscription.subscription')->first();
 
-        // Get user's active subscriptions
-        $user = $request->user();
-        $subscriptions = $user ? $user->subscriptions()
-            ->where('status', 'active')
-            ->where(function ($q) {
-                $q->whereNull('ends_at')
-                    ->orWhere('ends_at', '>', now());
-            })
-            ->with(['subscription', 'machine'])
-            ->get() : collect();
+        // Get the subscription linked to this device's machine
+        $subscription = $machine?->userSubscription;
 
         return [
             'id' => $this->id,
@@ -57,7 +49,7 @@ class DeviceResource extends BaseResource
                     'title' => $machine->userSubscription->subscription->title,
                 ] : null,
             ] : null,
-            'subscriptions' => UserSubscriptionResource::collection($subscriptions),
+            'subscription' => $subscription ? new UserSubscriptionResource($subscription) : null,
         ];
     }
 }
