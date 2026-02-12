@@ -7,6 +7,8 @@ use App\Listeners\LogConnectionPruned;
 use App\Listeners\LogFailedLogin;
 use App\Listeners\LogLogout;
 use App\Listeners\LogSuccessfulLogin;
+use App\Lunar\Extensions\ShippingMethodEditExtension;
+use App\Lunar\Extensions\ShippingMethodListExtension;
 use App\PaymentTypes\SenangpayPayment;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Panel;
@@ -18,6 +20,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\Events\ConnectionPruned;
 use Lunar\Admin\Support\Facades\LunarPanel;
+use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\EditShippingMethod;
+use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\ListShippingMethod;
 use Lunar\Shipping\ShippingPlugin;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,6 +32,10 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         LunarPanel::disableTwoFactorAuth()
+            ->extensions([
+                EditShippingMethod::class => ShippingMethodEditExtension::class,
+                ListShippingMethod::class => ShippingMethodListExtension::class,
+            ])
             ->panel(function (Panel $panel) {
                 return $panel
                     ->authGuard('web')
