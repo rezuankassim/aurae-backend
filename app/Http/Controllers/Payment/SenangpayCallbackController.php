@@ -568,7 +568,8 @@ class SenangpayCallbackController extends Controller
                 'received_hash' => $hash,
             ]);
 
-            return response()->json(['status' => 'error', 'message' => 'Hash verification failed'], 400);
+            // Still return OK to acknowledge receipt, but log the error
+            return response('OK', 200)->header('Content-Type', 'text/plain');
         }
 
         // Find the original transaction by order_id pattern
@@ -594,14 +595,14 @@ class SenangpayCallbackController extends Controller
                 // This is a renewal payment
                 $this->handleRecurringRenewal($userSubscription, $transactionId, $orderId);
 
-                return response()->json(['status' => 'OK']);
+                return response('OK', 200)->header('Content-Type', 'text/plain');
             }
 
             Log::warning('SenangPay recurring callback: Could not find matching subscription', [
                 'order_id' => $orderId,
             ]);
 
-            return response()->json(['status' => 'OK']);
+            return response('OK', 200)->header('Content-Type', 'text/plain');
         }
 
         // Get user subscription
@@ -613,7 +614,7 @@ class SenangpayCallbackController extends Controller
                 'user_subscription_id' => $transaction->user_subscription_id,
             ]);
 
-            return response()->json(['status' => 'OK']);
+            return response('OK', 200)->header('Content-Type', 'text/plain');
         }
 
         $status = $statusId === '1' ? 'success' : 'failed';
@@ -636,7 +637,7 @@ class SenangpayCallbackController extends Controller
             }
         }
 
-        return response()->json(['status' => 'OK']);
+        return response('OK', 200)->header('Content-Type', 'text/plain');
     }
 
     /**
