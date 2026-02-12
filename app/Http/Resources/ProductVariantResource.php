@@ -3,10 +3,9 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Lunar\Facades\Pricing;
 
-class ProductVariantResource extends JsonResource
+class ProductVariantResource extends BaseResource
 {
     /**
      * Transform the resource into an array.

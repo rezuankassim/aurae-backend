@@ -3,9 +3,8 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 
-class MusicResource extends JsonResource
+class MusicResource extends BaseResource
 {
     /**
      * Transform the resource into an array.
