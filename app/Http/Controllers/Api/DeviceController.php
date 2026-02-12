@@ -37,6 +37,7 @@ class DeviceController extends Controller
         return BaseResource::make([
             'qr' => 'data:image/png;base64,'.base64_encode($qr),
             'device_id' => $device->id,
+            'is_bound' => ! is_null($device->user_id),
         ])
             ->additional([
                 'status' => 200,
