@@ -44,6 +44,65 @@ class DeviceController extends Controller
             ]);
     }
 
+    /**
+     * Check device ownership status.
+     */
+    public function check(Request $request)
+    {
+        $request->validate([
+            'device_id' => ['required', 'string'],
+            'device_uuid' => ['required', 'string'],
+        ]);
+
+        $user = $request->user();
+
+        // Find device by ID and UUID
+        $device = Device::where('id', $request->device_id)
+            ->where('uuid', $request->device_uuid)
+            ->first();
+
+        if (! $device) {
+            return BaseResource::make([
+                'exists' => false,
+                'is_available' => false,
+                'belongs_to_user' => false,
+                'belongs_to_other' => false,
+            ])
+                ->additional([
+                    'status' => 404,
+                    'message' => 'Device not found. Please check the device credentials.',
+                ])
+                ->response()
+                ->setStatusCode(404);
+        }
+
+        // Check ownership status
+        $isAvailable = is_null($device->user_id);
+        $belongsToUser = $device->user_id === $user->id;
+        $belongsToOther = ! is_null($device->user_id) && $device->user_id !== $user->id;
+
+        return BaseResource::make([
+            'exists' => true,
+            'is_available' => $isAvailable,
+            'belongs_to_user' => $belongsToUser,
+            'belongs_to_other' => $belongsToOther,
+            'is_active' => $device->status === 1,
+            'device' => [
+                'id' => $device->id,
+                'name' => $device->name,
+                'uuid' => $device->uuid,
+            ],
+        ])
+            ->additional([
+                'status' => 200,
+                'message' => $isAvailable
+                    ? 'Device is available for binding.'
+                    : ($belongsToUser
+                        ? 'Device belongs to you.'
+                        : 'Device is already linked to another user.'),
+            ]);
+    }
+
     public function login(Request $request)
     {
         $request->validate([

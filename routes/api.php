@@ -114,6 +114,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
 
         Route::post('/device/fcm-token', [DeviceTokenController::class, 'update'])->name('api.device.fcm-token.update');
 
+        Route::post('/device/check', [DeviceController::class, 'check'])->name('api.device.check');
         Route::post('/device-login', [DeviceController::class, 'login'])->name('api.device.login');
 
         Route::get('/collections', [EcommerceController::class, 'collections'])->name('api.ecommerce.collections');
