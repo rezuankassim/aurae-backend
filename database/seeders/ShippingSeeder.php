@@ -37,7 +37,7 @@ class ShippingSeeder extends Seeder
         $customerGroup = CustomerGroup::getDefault();
 
         // Create Basic Delivery shipping method
-        $basicDelivery = ShippingMethod::firstOrCreate(
+        $basicDelivery = ShippingMethod::updateOrCreate(
             ['code' => 'BASDEL'],
             [
                 'name' => 'Basic Delivery',
@@ -77,7 +77,7 @@ class ShippingSeeder extends Seeder
         }
 
         // Create Pick Up shipping method
-        $pickup = ShippingMethod::firstOrCreate(
+        $pickup = ShippingMethod::updateOrCreate(
             ['code' => 'PICKUP'],
             [
                 'name' => 'Pick up in store',

@@ -42,6 +42,9 @@ class AppServiceProvider extends ServiceProvider
                             ->url('/dashboard')
                             ->icon('heroicon-o-arrow-left-circle'),
                     ])
+                    ->brandLogo(asset('logo.png'))
+                    ->darkModeBrandLogo(asset('logo.png'))
+                    ->favicon(asset('favicon.ico'))
                     ->plugin(new ShippingPlugin);
             })->register();
 

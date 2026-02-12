@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,7 +16,7 @@ use Lunar\Base\LunarUser as LunarUserInterface;
 use Lunar\Base\Traits\LunarUser;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser, LunarUserInterface
+class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUserInterface
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, HasRoles, LunarUser, Notifiable;
@@ -177,5 +178,14 @@ class User extends Authenticatable implements FilamentUser, LunarUserInterface
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->is_admin;
+    }
+
+    /**
+     * Get the avatar URL for Filament.
+     */
+    public function getFilamentAvatarUrl(): ?string
+    {
+        // Return system logo as default avatar
+        return asset('logo.png');
     }
 }
