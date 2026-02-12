@@ -63,7 +63,7 @@ class CheckoutController extends Controller
                     'value' => $option->getPrice()->value,
                     'formatted' => $option->getPrice()->formatted,
                 ],
-                'is_collection' => $option->isCollection(),
+                'is_collection' => $option->collect,
             ];
         }
 
