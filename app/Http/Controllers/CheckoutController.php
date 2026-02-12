@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Lunar\Facades\CartSession;
-use Lunar\Facades\ShippingManifest;
 use Lunar\Models\Country;
 use Lunar\Models\Order;
+use Lunar\Shipping\DataTransferObjects\ShippingOptionLookup;
+use Lunar\Shipping\Facades\Shipping;
 
 class CheckoutController extends Controller
 {
@@ -183,9 +184,19 @@ class CheckoutController extends Controller
         $cart->calculate();
 
         // Set default shipping option (BASDEL - Basic Delivery)
-        $shippingOption = ShippingManifest::getOption($cart, 'BASDEL');
-        if ($shippingOption) {
-            $cart->setShippingOption($shippingOption);
+        $shippingRates = Shipping::shippingRates($cart)->get();
+        $shippingOptions = Shipping::shippingOptions($cart)->get(
+            new ShippingOptionLookup(
+                shippingRates: $shippingRates
+            )
+        );
+
+        // Find BASDEL option
+        foreach ($shippingOptions as $optionResult) {
+            if ($optionResult->option->getIdentifier() === 'BASDEL') {
+                $cart->setShippingOption($optionResult->option);
+                break;
+            }
         }
 
         // Create the order

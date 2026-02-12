@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use Illuminate\Http\Request;
 use Lunar\Facades\Payments;
-use Lunar\Facades\ShippingManifest;
 use Lunar\Models\Cart;
 use Lunar\Models\Order;
 use Lunar\Models\Transaction;
@@ -51,13 +50,9 @@ class CheckoutController extends Controller
             )
         );
 
-        // Also get options from ShippingManifest (includes custom modifiers)
-        $manifestOptions = ShippingManifest::getOptions($cart);
-
-        // Combine and format options
+        // Format options from table rate shipping
         $options = [];
 
-        // Add table rate shipping options
         foreach ($shippingOptions as $shippingOption) {
             $option = $shippingOption->option;
             $options[] = [
@@ -70,24 +65,6 @@ class CheckoutController extends Controller
                 ],
                 'is_collection' => $option->isCollection(),
             ];
-        }
-
-        // Add manifest options (from CustomShippingModifier)
-        foreach ($manifestOptions as $option) {
-            // Avoid duplicates
-            $exists = collect($options)->contains('identifier', $option->getIdentifier());
-            if (! $exists) {
-                $options[] = [
-                    'identifier' => $option->getIdentifier(),
-                    'name' => $option->getName(),
-                    'description' => $option->getDescription(),
-                    'price' => [
-                        'value' => $option->getPrice()->value,
-                        'formatted' => $option->getPrice()->formatted,
-                    ],
-                    'is_collection' => $option->isCollection(),
-                ];
-            }
         }
 
         return response()->json([
@@ -130,8 +107,22 @@ class CheckoutController extends Controller
         // Calculate cart to populate shipping options
         $cart->calculate();
 
-        // Try to get the shipping option from manifest
-        $shippingOption = ShippingManifest::getOption($cart, $validated['shipping_option']);
+        // Get shipping rates and options from database
+        $shippingRates = Shipping::shippingRates($cart)->get();
+        $shippingOptions = Shipping::shippingOptions($cart)->get(
+            new ShippingOptionLookup(
+                shippingRates: $shippingRates
+            )
+        );
+
+        // Find the requested shipping option
+        $shippingOption = null;
+        foreach ($shippingOptions as $optionResult) {
+            if ($optionResult->option->getIdentifier() === $validated['shipping_option']) {
+                $shippingOption = $optionResult->option;
+                break;
+            }
+        }
 
         if (! $shippingOption) {
             return response()->json([
@@ -307,9 +298,19 @@ class CheckoutController extends Controller
 
         // Check if shipping option is set, if not use default (BASDEL - Basic Delivery)
         if (! $cart->shippingOptionOverride) {
-            $shippingOption = ShippingManifest::getOption($cart, 'BASDEL');
-            if ($shippingOption) {
-                $cart->setShippingOption($shippingOption);
+            $shippingRates = Shipping::shippingRates($cart)->get();
+            $shippingOptions = Shipping::shippingOptions($cart)->get(
+                new ShippingOptionLookup(
+                    shippingRates: $shippingRates
+                )
+            );
+
+            // Find BASDEL option
+            foreach ($shippingOptions as $optionResult) {
+                if ($optionResult->option->getIdentifier() === 'BASDEL') {
+                    $cart->setShippingOption($optionResult->option);
+                    break;
+                }
             }
         }
 

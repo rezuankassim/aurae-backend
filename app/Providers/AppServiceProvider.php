@@ -7,7 +7,6 @@ use App\Listeners\LogConnectionPruned;
 use App\Listeners\LogFailedLogin;
 use App\Listeners\LogLogout;
 use App\Listeners\LogSuccessfulLogin;
-use App\Modifiers\CustomShippingModifier;
 use App\PaymentTypes\SenangpayPayment;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Panel;
@@ -53,11 +52,9 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(\Lunar\Base\ShippingModifiers $shippingModifiers): void
+    public function boot(): void
     {
         \Lunar\Facades\Telemetry::optOut();
-
-        $shippingModifiers->add(CustomShippingModifier::class);
 
         Event::listen(Login::class, LogSuccessfulLogin::class);
         Event::listen(Logout::class, LogLogout::class);
