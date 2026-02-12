@@ -10,6 +10,7 @@ use App\Listeners\LogSuccessfulLogin;
 use App\Modifiers\CustomShippingModifier;
 use App\PaymentTypes\SenangpayPayment;
 use Filament\Http\Middleware\Authenticate;
+use Filament\Panel;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\Events\ConnectionPruned;
 use Lunar\Admin\Support\Facades\LunarPanel;
+use Lunar\Shipping\ShippingPlugin;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         LunarPanel::disableTwoFactorAuth()
-            ->panel(function ($panel) {
+            ->panel(function (Panel $panel) {
                 return $panel
                     ->authGuard('web')
                     ->authPasswordBroker('users')
@@ -40,7 +42,8 @@ class AppServiceProvider extends ServiceProvider
                             ->label('Back to Admin Panel')
                             ->url('/dashboard')
                             ->icon('heroicon-o-arrow-left-circle'),
-                    ]);
+                    ])
+                    ->plugin(new ShippingPlugin);
             })->register();
 
         // Register SenangPay payment driver

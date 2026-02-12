@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b8672323b34e8b2f3ace1a995b2cf0a0",
+    "content-hash": "03492292509ff6a529428a2abf6866ab",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -6108,6 +6108,74 @@
                 }
             ],
             "time": "2025-08-17T10:06:32+00:00"
+        },
+        {
+            "name": "lunarphp/table-rate-shipping",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lunarphp/table-rate-shipping.git",
+                "reference": "628cb5f21cb029b95a4c394f7887938f16d7c14f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lunarphp/table-rate-shipping/zipball/628cb5f21cb029b95a4c394f7887938f16d7c14f",
+                "reference": "628cb5f21cb029b95a4c394f7887938f16d7c14f",
+                "shasum": ""
+            },
+            "require": {
+                "lunarphp/lunar": "self.version",
+                "php": "^8.2"
+            },
+            "type": "library",
+            "extra": {
+                "lunar": {
+                    "name": "Table Rate Shipping"
+                },
+                "laravel": {
+                    "providers": [
+                        "Lunar\\Shipping\\ShippingServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lunar\\Shipping\\": "src",
+                    "Lunar\\Shipping\\Database\\Factories\\": "database/factories"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lunar",
+                    "homepage": "https://lunarphp.io/"
+                }
+            ],
+            "description": "Lunar Table Rate Shipping Addon",
+            "keywords": [
+                "cart",
+                "e-commerce",
+                "ecommerce",
+                "headless",
+                "laravel",
+                "lunar",
+                "shop",
+                "store"
+            ],
+            "support": {
+                "issues": "https://github.com/lunarphp/table-rate-shipping/issues",
+                "source": "https://github.com/lunarphp/table-rate-shipping/tree/1.0.2"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/lunar",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-08-15T10:04:08+00:00"
         },
         {
             "name": "maennchen/zipstream-php",

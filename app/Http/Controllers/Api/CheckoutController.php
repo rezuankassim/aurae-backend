@@ -10,9 +10,163 @@ use Lunar\Facades\ShippingManifest;
 use Lunar\Models\Cart;
 use Lunar\Models\Order;
 use Lunar\Models\Transaction;
+use Lunar\Shipping\DataTransferObjects\ShippingOptionLookup;
+use Lunar\Shipping\Facades\Shipping;
 
 class CheckoutController extends Controller
 {
+    /**
+     * Get available shipping options for cart.
+     */
+    public function getShippingOptions(Request $request)
+    {
+        $cart = Cart::where('user_id', $request->user()->id)->first();
+
+        if (! $cart) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Cart not found.',
+                'data' => null,
+            ], 404);
+        }
+
+        if (! $cart->shippingAddress) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Please set shipping address first.',
+                'data' => null,
+            ], 400);
+        }
+
+        // Calculate cart to get shipping options
+        $cart->calculate();
+
+        // Get shipping rates from table rate shipping
+        $shippingRates = Shipping::shippingRates($cart)->get();
+
+        // Get shipping options
+        $shippingOptions = Shipping::shippingOptions($cart)->get(
+            new ShippingOptionLookup(
+                shippingRates: $shippingRates
+            )
+        );
+
+        // Also get options from ShippingManifest (includes custom modifiers)
+        $manifestOptions = ShippingManifest::getOptions($cart);
+
+        // Combine and format options
+        $options = [];
+
+        // Add table rate shipping options
+        foreach ($shippingOptions as $shippingOption) {
+            $option = $shippingOption->option;
+            $options[] = [
+                'identifier' => $option->getIdentifier(),
+                'name' => $option->getName(),
+                'description' => $option->getDescription(),
+                'price' => [
+                    'value' => $option->getPrice()->value,
+                    'formatted' => $option->getPrice()->formatted,
+                ],
+                'is_collection' => $option->isCollection(),
+            ];
+        }
+
+        // Add manifest options (from CustomShippingModifier)
+        foreach ($manifestOptions as $option) {
+            // Avoid duplicates
+            $exists = collect($options)->contains('identifier', $option->getIdentifier());
+            if (! $exists) {
+                $options[] = [
+                    'identifier' => $option->getIdentifier(),
+                    'name' => $option->getName(),
+                    'description' => $option->getDescription(),
+                    'price' => [
+                        'value' => $option->getPrice()->value,
+                        'formatted' => $option->getPrice()->formatted,
+                    ],
+                    'is_collection' => $option->isCollection(),
+                ];
+            }
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Shipping options retrieved successfully.',
+            'data' => [
+                'options' => $options,
+                'selected_option' => $cart->shippingOptionOverride?->getIdentifier(),
+            ],
+        ]);
+    }
+
+    /**
+     * Set shipping option for cart.
+     */
+    public function setShippingOption(Request $request)
+    {
+        $validated = $request->validate([
+            'shipping_option' => ['required', 'string'],
+        ]);
+
+        $cart = Cart::where('user_id', $request->user()->id)->first();
+
+        if (! $cart) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Cart not found.',
+                'data' => null,
+            ], 404);
+        }
+
+        if (! $cart->shippingAddress) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Please set shipping address first.',
+                'data' => null,
+            ], 400);
+        }
+
+        // Calculate cart to populate shipping options
+        $cart->calculate();
+
+        // Try to get the shipping option from manifest
+        $shippingOption = ShippingManifest::getOption($cart, $validated['shipping_option']);
+
+        if (! $shippingOption) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid shipping option.',
+                'data' => null,
+            ], 400);
+        }
+
+        // Set the shipping option on the cart
+        $cart->setShippingOption($shippingOption);
+
+        // Recalculate cart with shipping
+        $cart->calculate();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Shipping option set successfully.',
+            'data' => [
+                'cart_id' => $cart->id,
+                'shipping_option' => [
+                    'identifier' => $shippingOption->getIdentifier(),
+                    'name' => $shippingOption->getName(),
+                    'description' => $shippingOption->getDescription(),
+                    'price' => [
+                        'value' => $shippingOption->getPrice()->value,
+                        'formatted' => $shippingOption->getPrice()->formatted,
+                    ],
+                ],
+                'cart_total' => $cart->total->formatted,
+                'shipping_total' => $cart->shippingTotal?->formatted,
+            ],
+        ]);
+    }
+
     /**
      * Set shipping and billing addresses for cart.
      */
@@ -148,13 +302,15 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Calculate cart and set default shipping option
+        // Calculate cart
         $cart->calculate();
 
-        // Set default shipping option (BASDEL - Basic Delivery)
-        $shippingOption = ShippingManifest::getOption($cart, 'BASDEL');
-        if ($shippingOption) {
-            $cart->setShippingOption($shippingOption);
+        // Check if shipping option is set, if not use default (BASDEL - Basic Delivery)
+        if (! $cart->shippingOptionOverride) {
+            $shippingOption = ShippingManifest::getOption($cart, 'BASDEL');
+            if ($shippingOption) {
+                $cart->setShippingOption($shippingOption);
+            }
         }
 
         // Initiate payment based on method

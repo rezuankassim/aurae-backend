@@ -13,24 +13,25 @@ use App\Http\Controllers\Api\EcommerceController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\GeneralSettingController;
-use App\Http\Controllers\Api\LegalController;
 use App\Http\Controllers\Api\HealthReportController;
 use App\Http\Controllers\Api\KnowledgeController;
+use App\Http\Controllers\Api\LegalController;
+use App\Http\Controllers\Api\MachineController;
 use App\Http\Controllers\Api\MaintenanceBannerController;
 use App\Http\Controllers\Api\MarketplaceBannerController;
 use App\Http\Controllers\Api\MusicController;
-use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\NewsController;
-use App\Http\Controllers\Api\PaymentHistoryController;
-use App\Http\Controllers\Api\UserSettingController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PaymentHistoryController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\SubscriptionPaymentController;
-use App\Http\Controllers\Api\MachineController;
 use App\Http\Controllers\Api\TherapyController;
 use App\Http\Controllers\Api\UsageHistoryController;
+use App\Http\Controllers\Api\UserSettingController;
 use App\Http\Controllers\Api\VideoStreamController;
 use App\Http\Controllers\Api\WebSocketController;
+use App\Http\Middleware\EnsureActiveSubscription;
 use App\Http\Middleware\EnsureDevice;
 use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
@@ -50,7 +51,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
     Route::get('/countries', [AddressController::class, 'countries'])->name('api.countries.index');
     Route::get('/states', [AddressController::class, 'states'])->name('api.states.index');
 
-    Route::get('/faqs', [FaqController::class, 'index'])->name('api.faqs.index');
+    Route::get('/faqs', [FaqController::class, 'index'])->middleware(EnsureActiveSubscription::class)->name('api.faqs.index');
     Route::get('/faqs/{faq}', [FaqController::class, 'show'])->name('api.faqs.show');
 
     Route::get('/terms-and-conditions', [LegalController::class, 'termsAndConditions'])->name('api.legal.terms');
@@ -66,16 +67,16 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
     Route::post('/verify-reset-otp', [AuthenticationController::class, 'verifyResetOtp'])->name('api.verify_reset_otp');
     Route::post('/reset-password', [AuthenticationController::class, 'resetPassword'])->name('api.reset_password');
 
-    Route::post('/device-retrieve', [DeviceController::class, 'retrieve'])->name('api.device.retrieve');
+    Route::post('/device-retrieve', [DeviceController::class, 'retrieve'])->middleware(EnsureActiveSubscription::class)->name('api.device.retrieve');
 
     // WebSocket ping-pong
-    Route::post('/ws/ping', [WebSocketController::class, 'ping'])->name('api.ws.ping');
+    Route::post('/ws/ping', [WebSocketController::class, 'ping'])->middleware(EnsureActiveSubscription::class)->name('api.ws.ping');
 
     // Guest management routes
-    Route::get('/device-guests', [DeviceGuestController::class, 'index'])->name('api.device.guests.index');
-    Route::post('/device-guest-create', [DeviceGuestController::class, 'store'])->name('api.device.guests.store');
-    Route::post('/device-guest-login', [DeviceGuestController::class, 'login'])->name('api.device.guests.login');
-    Route::delete('/device-guests/{guestId}', [DeviceGuestController::class, 'destroy'])->name('api.device.guests.destroy');
+    Route::get('/device-guests', [DeviceGuestController::class, 'index'])->middleware(EnsureActiveSubscription::class)->name('api.device.guests.index');
+    Route::post('/device-guest-create', [DeviceGuestController::class, 'store'])->middleware(EnsureActiveSubscription::class)->name('api.device.guests.store');
+    Route::post('/device-guest-login', [DeviceGuestController::class, 'login'])->middleware(EnsureActiveSubscription::class)->name('api.device.guests.login');
+    Route::delete('/device-guests/{guestId}', [DeviceGuestController::class, 'destroy'])->middleware(EnsureActiveSubscription::class)->name('api.device.guests.destroy');
 
     Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/user', function (Request $request) {
@@ -90,32 +91,32 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
                 ]);
         });
 
-        Route::post('/logout', [AuthenticationController::class, 'logout'])->name('api.logout');
+        Route::post('/logout', [AuthenticationController::class, 'logout'])->middleware(EnsureActiveSubscription::class)->name('api.logout');
 
-        Route::get('/knowledge', [KnowledgeController::class, 'index'])->name('api.knowledge.index');
+        Route::get('/knowledge', [KnowledgeController::class, 'index'])->middleware(EnsureActiveSubscription::class)->name('api.knowledge.index');
         Route::get('/knowledge/{knowledge}', [KnowledgeController::class, 'show'])->name('api.knowledge.show');
         Route::get('/knowledge/{knowledge}/video', [VideoStreamController::class, 'streamKnowledgeVideo'])->name('api.knowledge.video.stream');
 
         Route::get('/news', [NewsController::class, 'index'])->name('api.news.index');
         Route::get('/news/{news}', [NewsController::class, 'show'])->name('api.news.show');
 
-        Route::get('/therapies', [TherapyController::class, 'index'])->name('api.therapies.index');
+        Route::get('/therapies', [TherapyController::class, 'index'])->middleware(EnsureActiveSubscription::class)->name('api.therapies.index');
 
-        Route::get('/music', [MusicController::class, 'index'])->name('api.music.index');
+        Route::get('/music', [MusicController::class, 'index'])->middleware(EnsureActiveSubscription::class)->name('api.music.index');
 
-        Route::get('/custom-therapies', [CustomTherapyController::class, 'index'])->name('api.custom-therapies.index');
-        Route::post('/custom-therapies', [CustomTherapyController::class, 'store'])->name('api.custom-therapies.store');
-        Route::delete('/custom-therapies/{customTherapy}', [CustomTherapyController::class, 'destroy'])->name('api.custom-therapies.destroy');
+        Route::get('/custom-therapies', [CustomTherapyController::class, 'index'])->middleware(EnsureActiveSubscription::class)->name('api.custom-therapies.index');
+        Route::post('/custom-therapies', [CustomTherapyController::class, 'store'])->middleware(EnsureActiveSubscription::class)->name('api.custom-therapies.store');
+        Route::delete('/custom-therapies/{customTherapy}', [CustomTherapyController::class, 'destroy'])->middleware(EnsureActiveSubscription::class)->name('api.custom-therapies.destroy');
 
         Route::post('/usage-histories', [UsageHistoryController::class, 'store'])->name('api.usage-histories.store');
         Route::get('/usage-histories/chart', [UsageHistoryController::class, 'chart'])->name('api.usage-histories.chart');
 
         Route::get('/notifications', [NotificationController::class, 'index'])->name('api.notifications.index');
 
-        Route::post('/device/fcm-token', [DeviceTokenController::class, 'update'])->name('api.device.fcm-token.update');
+        Route::post('/device/fcm-token', [DeviceTokenController::class, 'update'])->middleware(EnsureActiveSubscription::class)->name('api.device.fcm-token.update');
 
         Route::post('/device/check', [DeviceController::class, 'check'])->name('api.device.check');
-        Route::post('/device-login', [DeviceController::class, 'login'])->name('api.device.login');
+        Route::post('/device-login', [DeviceController::class, 'login'])->middleware(EnsureActiveSubscription::class)->name('api.device.login');
 
         Route::get('/collections', [EcommerceController::class, 'collections'])->name('api.ecommerce.collections');
         Route::get('/cart', [EcommerceController::class, 'cart'])->name('api.ecommerce.cart');
@@ -124,6 +125,8 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
 
         // Checkout and payment routes
         Route::post('/checkout/set-addresses', [CheckoutController::class, 'setAddresses'])->name('api.checkout.set-addresses');
+        Route::get('/checkout/shipping-options', [CheckoutController::class, 'getShippingOptions'])->name('api.checkout.shipping-options');
+        Route::post('/checkout/set-shipping', [CheckoutController::class, 'setShippingOption'])->name('api.checkout.set-shipping');
         Route::post('/checkout/initiate-payment', [CheckoutController::class, 'initiatePayment'])->name('api.checkout.initiate-payment');
         Route::get('/checkout/payment-status/{reference}', [CheckoutController::class, 'checkPaymentStatus'])->name('api.checkout.payment-status');
         Route::get('/orders', [CheckoutController::class, 'orderHistory'])->name('api.orders.index');
