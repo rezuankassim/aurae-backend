@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Models\User;
 use App\Models\Verification;
-use App\Services\TwilioService;
+use App\Services\ExabytesService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -171,9 +171,15 @@ class AuthenticationController extends Controller
             ['code' => $code]
         );
 
-        // Send OTP via Twilio SMS
-        $twilioService = app(TwilioService::class);
-        $twilioService->sendOtp($request->phone, (string) $code);
+        // Send OTP via Exabytes SMS
+        $exabytesService = app(ExabytesService::class);
+        $result = $exabytesService->sendOtp($request->phone, (string) $code);
+
+        if (! $result['success']) {
+            throw ValidationException::withMessages([
+                'phone' => ['Failed to send OTP: '.$result['error']],
+            ]);
+        }
 
         return BaseResource::make(null)
             ->additional([

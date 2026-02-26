@@ -321,6 +321,50 @@ LimitRequestBody 681574400
 - Music files: Maximum 1GB (configured in `MusicController.php`)
 - Ensure server PHP limits are higher than Laravel validation limits to provide clear error messages
 
+### SMS Integration (Exabytes)
+
+The application uses **Exabytes Bulk SMS Marketing Solutions** for sending OTP verification codes.
+
+#### Configuration
+```bash
+# Add to .env
+EXABYTES_USERNAME=your_username
+EXABYTES_PASSWORD=your_password
+EXABYTES_BRAND_NAME=AURAE
+```
+
+#### Features
+- OTP verification for authentication and password reset
+- Malaysian standard format: `RM0.00 [AURAE]: Your verification code is 123456.`
+- Automatic phone number normalization (Malaysian formats)
+- Comprehensive error handling and logging
+- Support for ASCII and Unicode messages
+
+#### Usage
+```php
+use App\Services\ExabytesService;
+
+$exabytesService = app(ExabytesService::class);
+$result = $exabytesService->sendOtp($phoneNumber, $code);
+
+if (!$result['success']) {
+    // Handle error: $result['error']
+}
+```
+
+#### Integration Points
+- `AuthenticationController@forgotPassword` - Send OTP for password reset
+- `ProfileController@update` - Send OTP when phone number changes
+- `ProfileController@resendPhoneVerificationOtp` - Resend OTP
+
+#### Important Notes
+- Including `RM0.00` and brand name prevents international SMS charges (RM0.30/SMS in Malaysia)
+- Brand name must be 3-8 ASCII characters and approved by Exabytes
+- Phone numbers are auto-normalized: `0123456789` → `60123456789`
+- Free 50 SMS credits on signup at https://www.exabytes.my/online-marketing/bulk-sms-marketing
+
+**Documentation:** See `docs/EXABYTES_SMS_INTEGRATION.md` for detailed guide
+
 ## Additional Notes
 
 - **Server-Side Rendering (SSR)**: Supported via Inertia SSR - use `composer dev:ssr`

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Models\User;
 use App\Models\Verification;
-use App\Services\TwilioService;
+use App\Services\ExabytesService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -90,9 +90,15 @@ class ProfileController extends Controller
 
             $user->save();
 
-            // Send OTP via Twilio SMS to the new phone number
-            $twilioService = app(TwilioService::class);
-            $twilioService->sendOtp($validated['phone'], (string) $code);
+            // Send OTP via Exabytes SMS to the new phone number
+            $exabytesService = app(ExabytesService::class);
+            $result = $exabytesService->sendOtp($validated['phone'], (string) $code);
+
+            if (! $result['success']) {
+                throw ValidationException::withMessages([
+                    'phone' => ['Failed to send OTP: '.$result['error']],
+                ]);
+            }
 
             return BaseResource::make([
                 'user' => $user,
@@ -191,9 +197,15 @@ class ProfileController extends Controller
             'verified_at' => null,
         ]);
 
-        // Send OTP via Twilio SMS
-        $twilioService = app(TwilioService::class);
-        $twilioService->sendOtp($request->phone, (string) $code);
+        // Send OTP via Exabytes SMS
+        $exabytesService = app(ExabytesService::class);
+        $result = $exabytesService->sendOtp($request->phone, (string) $code);
+
+        if (! $result['success']) {
+            throw ValidationException::withMessages([
+                'phone' => ['Failed to send OTP: '.$result['error']],
+            ]);
+        }
 
         return BaseResource::make(null)
             ->additional([

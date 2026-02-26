@@ -57,4 +57,10 @@ return [
         'from' => env('TWILIO_FROM'),
     ],
 
+    'exabytes' => [
+        'username' => env('EXABYTES_USERNAME'),
+        'password' => env('EXABYTES_PASSWORD'),
+        'brand_name' => env('EXABYTES_BRAND_NAME', 'AURAE'),
+    ],
+
 ];
