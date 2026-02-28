@@ -131,6 +131,19 @@ class NewsController extends Controller
     }
 
     /**
+     * Unpublish the specified news entry.
+     */
+    public function unpublish(News $news)
+    {
+        $news->update([
+            'is_published' => false,
+            'published_at' => null,
+        ]);
+
+        return back()->with('success', 'News unpublished successfully.');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)

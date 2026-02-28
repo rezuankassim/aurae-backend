@@ -46,6 +46,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/news/{news}', [NewsController::class, 'show'])->name('news.show');
     Route::get('/news/{news}/edit', [NewsController::class, 'edit'])->name('news.edit');
     Route::put('/news/{news}', [NewsController::class, 'update'])->name('news.update');
+    Route::post('/news/{news}/unpublish', [NewsController::class, 'unpublish'])->name('news.unpublish');
     Route::delete('/news/{news}', [NewsController::class, 'destroy'])->name('news.destroy');
 
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');

@@ -5,8 +5,8 @@ import { News } from '@/types';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 
-import { edit, show } from '@/routes/admin/news';
-import { Link } from '@inertiajs/react';
+import { edit, show, unpublish } from '@/routes/admin/news';
+import { Link, router } from '@inertiajs/react';
 import dayjs from 'dayjs';
 
 export const columns: ColumnDef<News>[] = [
@@ -52,6 +52,12 @@ export const columns: ColumnDef<News>[] = [
     {
         id: 'actions',
         cell: ({ row }) => {
+            const handleUnpublish = () => {
+                if (confirm('Are you sure you want to unpublish this news entry?')) {
+                    router.post(unpublish(row.original.id).url);
+                }
+            };
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -72,6 +78,11 @@ export const columns: ColumnDef<News>[] = [
                                 Edit
                             </Link>
                         </DropdownMenuItem>
+                        {row.original.is_published && (
+                            <DropdownMenuItem className="text-destructive hover:cursor-pointer focus:text-destructive" onClick={handleUnpublish}>
+                                Unpublish
+                            </DropdownMenuItem>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             );
