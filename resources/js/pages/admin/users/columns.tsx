@@ -1,9 +1,16 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { show } from '@/routes/admin/users';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { destroy, edit, show } from '@/routes/admin/users';
 import { User } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
 import { MoreHorizontal } from 'lucide-react';
@@ -48,6 +55,12 @@ export const columns: ColumnDef<User>[] = [
     {
         id: 'actions',
         cell: ({ row }) => {
+            const handleDelete = () => {
+                if (confirm('Are you sure you want to delete this user?')) {
+                    router.delete(destroy(row.original.id).url);
+                }
+            };
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -62,6 +75,15 @@ export const columns: ColumnDef<User>[] = [
                             <Link className="hover:cursor-pointer" href={show(row.original.id).url}>
                                 View
                             </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link className="hover:cursor-pointer" href={edit(row.original.id).url}>
+                                Edit
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-destructive hover:cursor-pointer focus:text-destructive" onClick={handleDelete}>
+                            Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

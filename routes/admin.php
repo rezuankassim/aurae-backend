@@ -10,11 +10,11 @@ use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\FirebaseTestController;
 use App\Http\Controllers\Admin\HealthReportController;
 use App\Http\Controllers\Admin\KnowledgeController;
+use App\Http\Controllers\Admin\MachineController;
 use App\Http\Controllers\Admin\MaintenanceBannerController;
 use App\Http\Controllers\Admin\MarketplaceBannerController;
 use App\Http\Controllers\Admin\MusicController;
 use App\Http\Controllers\Admin\NewsController;
-use App\Http\Controllers\Admin\S3UploadController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductCollectionController;
 use App\Http\Controllers\Admin\ProductController;
@@ -23,12 +23,12 @@ use App\Http\Controllers\Admin\ProductInventoryController;
 use App\Http\Controllers\Admin\ProductMediaController;
 use App\Http\Controllers\Admin\ProductPricingController;
 use App\Http\Controllers\Admin\ProductVariantController;
+use App\Http\Controllers\Admin\S3UploadController;
 use App\Http\Controllers\Admin\SubscriptionController;
-use App\Http\Controllers\Admin\MachineController;
-use App\Http\Controllers\Admin\UserSubscriptionController;
 use App\Http\Controllers\Admin\TherapyController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserLoginActivityController;
+use App\Http\Controllers\Admin\UserSubscriptionController;
 use App\Http\Controllers\Admin\WebSocketTestController;
 use App\Http\Middleware\EnsureIsAdmin;
 use Illuminate\Support\Facades\Route;
@@ -87,6 +87,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
     Route::get('/users/{user}/login-activities', [UserLoginActivityController::class, 'index'])->name('users.login-activities.index');
 
