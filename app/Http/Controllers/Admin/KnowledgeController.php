@@ -157,6 +157,19 @@ class KnowledgeController extends Controller
     }
 
     /**
+     * Unpublish the specified knowledge entry.
+     */
+    public function unpublish(Knowledge $knowledge)
+    {
+        $knowledge->update([
+            'is_published' => false,
+            'published_at' => null,
+        ]);
+
+        return back()->with('success', 'Knowledge entry unpublished successfully.');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Knowledge $knowledge)

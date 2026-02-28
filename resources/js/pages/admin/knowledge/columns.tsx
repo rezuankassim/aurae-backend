@@ -12,7 +12,7 @@ import { Knowledge } from '@/types';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 
-import { destroy, edit, show } from '@/routes/admin/knowledge';
+import { destroy, edit, show, unpublish } from '@/routes/admin/knowledge';
 import { Link, router } from '@inertiajs/react';
 import dayjs from 'dayjs';
 
@@ -52,6 +52,12 @@ export const columns: ColumnDef<Knowledge>[] = [
                 }
             };
 
+            const handleUnpublish = () => {
+                if (confirm('Are you sure you want to unpublish this knowledge entry?')) {
+                    router.post(unpublish(row.original.id).url);
+                }
+            };
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -72,6 +78,14 @@ export const columns: ColumnDef<Knowledge>[] = [
                                 Edit
                             </Link>
                         </DropdownMenuItem>
+                        {row.original.is_published && (
+                            <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive hover:cursor-pointer focus:text-destructive" onClick={handleUnpublish}>
+                                    Unpublish
+                                </DropdownMenuItem>
+                            </>
+                        )}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive hover:cursor-pointer focus:text-destructive" onClick={handleDelete}>
                             Delete

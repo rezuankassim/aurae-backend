@@ -18,3 +18,8 @@ Schedule::command('uploads:cleanup --hours=24')
 // Runs every minute to check for news that should be published
 Schedule::command('news:publish-scheduled')
     ->everyMinute();
+
+// Schedule automatic publishing of knowledge entries based on published_at timestamp
+// Runs every minute to check for knowledge entries that should be published
+Schedule::command('knowledge:publish-scheduled')
+    ->everyMinute();

@@ -114,6 +114,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/knowledge/{knowledge}', [KnowledgeController::class, 'show'])->name('knowledge.show');
     Route::get('/knowledge/{knowledge}/edit', [KnowledgeController::class, 'edit'])->name('knowledge.edit');
     Route::put('/knowledge/{knowledge}', [KnowledgeController::class, 'update'])->name('knowledge.update');
+    Route::post('/knowledge/{knowledge}/unpublish', [KnowledgeController::class, 'unpublish'])->name('knowledge.unpublish');
     Route::delete('/knowledge/{knowledge}', [KnowledgeController::class, 'destroy'])->name('knowledge.destroy');
 
     Route::get('/therapies', [TherapyController::class, 'index'])->name('therapies.index');
