@@ -112,6 +112,8 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::get('/usage-histories/chart', [UsageHistoryController::class, 'chart'])->name('api.usage-histories.chart');
 
         Route::get('/notifications', [NotificationController::class, 'index'])->name('api.notifications.index');
+        Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('api.notifications.read');
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('api.notifications.read-all');
 
         Route::post('/device/fcm-token', [DeviceTokenController::class, 'update'])->middleware(EnsureActiveSubscription::class)->name('api.device.fcm-token.update');
 

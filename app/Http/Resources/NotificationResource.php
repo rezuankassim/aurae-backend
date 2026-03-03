@@ -21,6 +21,8 @@ class NotificationResource extends BaseResource
             'type' => $this->type,
             'sent_at' => $this->sent_at,
             'is_sent' => $this->is_sent,
+            'read_at' => $this->read_at,
+            'is_read' => $this->read_at !== null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

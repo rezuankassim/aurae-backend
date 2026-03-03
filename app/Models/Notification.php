@@ -20,6 +20,7 @@ class Notification extends Model
         'sent_at',
         'is_sent',
         'error_message',
+        'read_at',
     ];
 
     /**
@@ -33,6 +34,7 @@ class Notification extends Model
             'data' => 'array',
             'sent_at' => 'datetime',
             'is_sent' => 'boolean',
+            'read_at' => 'datetime',
         ];
     }
 

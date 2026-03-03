@@ -212,13 +212,7 @@ class AddressController extends Controller
 
     public function countries()
     {
-        $priorityCountries = ['Malaysia', 'Singapore', 'Brunei', 'Thailand'];
-
-        $countries = Country::query()->get()->sortBy(function ($country) use ($priorityCountries) {
-            $index = array_search($country->name, $priorityCountries);
-
-            return $index !== false ? $index : count($priorityCountries) + array_search($country->name, Country::query()->pluck('name')->toArray());
-        })->values();
+        $countries = Country::query()->where('name', 'Malaysia')->get();
 
         return BaseResource::collection($countries)
             ->additional([
