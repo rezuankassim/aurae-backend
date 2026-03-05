@@ -551,6 +551,20 @@ export interface Country {
     [key: string]: unknown;
 }
 
+export interface ProgramLog {
+    id: number;
+    user_id: number;
+    therapy_id: number;
+    program_duration: string;
+    action: 'start' | 'stop';
+    program_started_at: string | null;
+    program_ended_at: string | null;
+    created_at: string;
+    updated_at: string;
+    therapy?: Therapy;
+    [key: string]: unknown;
+}
+
 export interface Music {
     id: number;
     title: string;

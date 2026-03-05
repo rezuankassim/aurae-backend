@@ -4,6 +4,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { show } from '@/routes/admin/users';
 import { index } from '@/routes/admin/users/login-activities';
+import { index as programLogsIndex } from '@/routes/admin/users/program-logs';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
@@ -28,6 +29,11 @@ export default function UsersLayout({
         {
             title: 'Login Activities',
             href: index(id_record),
+            icon: null,
+        },
+        {
+            title: 'Program Logs',
+            href: programLogsIndex(id_record),
             icon: null,
         },
     ];

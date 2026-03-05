@@ -73,4 +73,12 @@ class Therapy extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get the program logs for the therapy.
+     */
+    public function programLogs()
+    {
+        return $this->hasMany(ProgramLog::class);
+    }
 }

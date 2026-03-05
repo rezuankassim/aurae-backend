@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\TherapyController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserLoginActivityController;
+use App\Http\Controllers\Admin\UserProgramLogController;
 use App\Http\Controllers\Admin\UserSubscriptionController;
 use App\Http\Controllers\Admin\WebSocketTestController;
 use App\Http\Middleware\EnsureIsAdmin;
@@ -90,6 +91,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
     Route::get('/users/{user}/login-activities', [UserLoginActivityController::class, 'index'])->name('users.login-activities.index');
+    Route::get('/users/{user}/program-logs', [UserProgramLogController::class, 'index'])->name('users.program-logs.index');
 
     Route::get('/collection-groups', [CollectionGroupController::class, 'index'])->name('collection-groups.index');
     Route::post('/collection-groups', [CollectionGroupController::class, 'store'])->name('collection-groups.store');

@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PaymentHistoryController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\ProgramController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\SubscriptionPaymentController;
 use App\Http\Controllers\Api\TherapyController;
@@ -180,5 +181,9 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         // User settings routes
         Route::get('/settings', [UserSettingController::class, 'show'])->name('api.settings.show');
         Route::post('/settings', [UserSettingController::class, 'update'])->name('api.settings.update');
+
+        // Program routes
+        Route::post('/program/start', [ProgramController::class, 'start'])->name('api.program.start');
+        Route::post('/program/stop', [ProgramController::class, 'stop'])->name('api.program.stop');
     });
 });
