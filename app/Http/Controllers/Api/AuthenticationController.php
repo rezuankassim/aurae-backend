@@ -102,18 +102,27 @@ class AuthenticationController extends Controller
             'phone' => ['required', 'string', 'max:20'],
         ]);
 
+        $code = rand(100000, 999999);
+
         Verification::updateOrCreate(
             ['phone' => $request->phone],
-            ['code' => rand(100000, 999999)]
+            ['code' => $code]
         );
 
-        // Verify the phone number (e.g., send a verification code) here.
-        return BaseResource::make([
-            'code' => Verification::where('phone', $request->phone)->first()->code,
-        ])
+        // Send OTP via Exabytes SMS
+        $exabytesService = app(ExabytesService::class);
+        $result = $exabytesService->sendOtp($request->phone, (string) $code);
+
+        if (! $result['success']) {
+            throw ValidationException::withMessages([
+                'phone' => ['Failed to send OTP: '.$result['error']],
+            ]);
+        }
+
+        return BaseResource::make(null)
             ->additional([
                 'status' => 200,
-                'message' => 'Phone verification initiated.',
+                'message' => 'OTP sent to your phone number successfully.',
             ]);
     }
 
