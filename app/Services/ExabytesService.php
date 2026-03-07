@@ -13,7 +13,7 @@ class ExabytesService
 
     protected ?string $brandName = null;
 
-    protected string $baseUrl = 'https://smsportal.exabytes.my/sms_api.php';
+    protected string $baseUrl = 'https://smsportal.exabytes.my/isms_send.php';
 
     public function __construct()
     {
