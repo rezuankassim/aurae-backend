@@ -77,6 +77,8 @@ class ExabytesService
                 'agreedterm' => 'YES',
             ]);
 
+            dd($response);
+
             // Check if request was successful
             if ($response->successful()) {
                 $responseBody = $response->body();
