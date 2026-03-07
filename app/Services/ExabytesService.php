@@ -43,7 +43,7 @@ class ExabytesService
         }
 
         // Format message according to Malaysian standard
-        $message = "RM0.00 [{$this->brandName}]: Your verification code is {$code}. This code expires in 5 minutes.";
+        $message = "Your verification code is {$code}. This code expires in 5 minutes.";
 
         return $this->sendSms($phone, $message);
     }
