@@ -306,11 +306,22 @@ class CheckoutController extends Controller
             );
 
             // Find BASDEL option
+            $shippingOptionSet = false;
+
             foreach ($shippingOptions as $optionResult) {
                 if ($optionResult->option->getIdentifier() === 'BASDEL') {
                     $cart->setShippingOption($optionResult->option);
+                    $shippingOptionSet = true;
                     break;
                 }
+            }
+
+            if (! $shippingOptionSet) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Please ensure you have entered a valid shipping address. We are unable to find a shipping option for the provided address.',
+                    'data' => null,
+                ], 400);
             }
         }
 
@@ -340,37 +351,61 @@ class CheckoutController extends Controller
 
                 return response()->json([
                     'status' => 500,
-                    'message' => 'Failed to initiate payment.',
+                    'message' => 'Failed to initiate payment. Please try again later.',
                     'data' => null,
                 ], 500);
             } catch (\Exception $e) {
+                report($e);
+
+                $message = match (true) {
+                    str_contains($e->getMessage(), 'missing shipping option'),
+                    str_contains($e->getMessage(), 'shipping') => 'Please ensure you have entered a valid shipping address and try again.',
+                    default => 'Something went wrong while processing your payment. Please try again later.',
+                };
+
                 return response()->json([
                     'status' => 500,
-                    'message' => 'Payment initiation error: '.$e->getMessage(),
+                    'message' => $message,
                     'data' => null,
                 ], 500);
             }
         } else {
             // Cash in hand - create order directly
-            $order = $cart->createOrder();
+            try {
+                $order = $cart->createOrder();
 
-            if ($order) {
+                if ($order) {
+                    return response()->json([
+                        'status' => 200,
+                        'message' => 'Order created successfully.',
+                        'data' => [
+                            'order_id' => $order->id,
+                            'reference' => $order->reference,
+                            'payment_method' => 'cash-in-hand',
+                        ],
+                    ]);
+                }
+
                 return response()->json([
-                    'status' => 200,
-                    'message' => 'Order created successfully.',
-                    'data' => [
-                        'order_id' => $order->id,
-                        'reference' => $order->reference,
-                        'payment_method' => 'cash-in-hand',
-                    ],
-                ]);
-            }
+                    'status' => 500,
+                    'message' => 'Failed to create order. Please try again later.',
+                    'data' => null,
+                ], 500);
+            } catch (\Exception $e) {
+                report($e);
 
-            return response()->json([
-                'status' => 500,
-                'message' => 'Failed to create order.',
-                'data' => null,
-            ], 500);
+                $message = match (true) {
+                    str_contains($e->getMessage(), 'missing shipping option'),
+                    str_contains($e->getMessage(), 'shipping') => 'Please ensure you have entered a valid shipping address and try again.',
+                    default => 'Something went wrong while creating your order. Please try again later.',
+                };
+
+                return response()->json([
+                    'status' => 500,
+                    'message' => $message,
+                    'data' => null,
+                ], 500);
+            }
         }
     }
 
