@@ -1,10 +1,11 @@
 import Heading from '@/components/heading';
+import { TopDevicesChart } from '@/components/top-devices-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/admin/dashboard';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { Users } from 'lucide-react';
+import { TabletSmartphone, Users, Wifi } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,7 +14,19 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function AdminDashboard({ totalUsers }: { totalUsers: number }) {
+type ChartDataItem = { date: string; new: number; active: number };
+
+export default function AdminDashboard({
+    totalUsers,
+    totalDevices,
+    onlineDevices,
+    subscriptionChartData,
+}: {
+    totalUsers: number;
+    totalDevices: number;
+    onlineDevices: number;
+    subscriptionChartData: ChartDataItem[];
+}) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin Dashboard" />
@@ -31,7 +44,33 @@ export default function AdminDashboard({ totalUsers }: { totalUsers: number }) {
                             <p className="text-muted-foreground text-xs">Registered users</p>
                         </CardContent>
                     </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Devices</CardTitle>
+                            <TabletSmartphone className="text-muted-foreground h-4 w-4" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{totalDevices.toLocaleString()}</div>
+                            <p className="text-muted-foreground text-xs">All registered devices</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Online Devices</CardTitle>
+                            <Wifi className="text-muted-foreground h-4 w-4" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{onlineDevices.toLocaleString()}</div>
+                            <p className="text-muted-foreground text-xs">Active devices</p>
+                        </CardContent>
+                    </Card>
                 </div>
+
+                <Card className="@container/card">
+                    <TopDevicesChart data={subscriptionChartData} />
+                </Card>
             </div>
         </AppLayout>
     );
