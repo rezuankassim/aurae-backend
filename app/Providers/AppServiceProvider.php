@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Filament\Widgets\DashboardDateFilterWidget;
 use App\Http\Middleware\EnsureIsAdmin;
 use App\Listeners\LogConnectionPruned;
 use App\Listeners\LogFailedLogin;
@@ -53,7 +54,10 @@ class AppServiceProvider extends ServiceProvider
                     ->brandLogo(asset('logo.png'))
                     ->darkModeBrandLogo(asset('logo.png'))
                     ->favicon(asset('favicon.ico'))
-                    ->plugin(new ShippingPlugin);
+                    ->plugin(new ShippingPlugin)
+                    ->widgets([
+                        DashboardDateFilterWidget::class,
+                    ]);
             })->register();
 
         // Register SenangPay payment driver
