@@ -29,8 +29,6 @@ class DashboardDateFilterWidget extends Widget implements HasForms
 
     public string $revenue = '0.00';
 
-    public int $activeCustomers = 0;
-
     public function mount(): void
     {
         $this->form->fill([
@@ -91,11 +89,6 @@ class DashboardDateFilterWidget extends Widget implements HasForms
 
         $rawRevenue = (clone $base)->sum('sub_total');
         $this->revenue = number_format($rawRevenue / 100, 2);
-
-        $this->activeCustomers = (clone $base)
-            ->whereNotNull('user_id')
-            ->distinct('user_id')
-            ->count('user_id');
     }
 
     private function resolveDateRange(): array
