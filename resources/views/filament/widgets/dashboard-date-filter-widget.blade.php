@@ -2,6 +2,18 @@
     <x-filament::section>
         <x-slot name="heading">Order Statistics</x-slot>
         <x-slot name="description">{{ $this->getLabel() }}</x-slot>
+        <x-slot name="headerEnd">
+            <x-filament::button
+                wire:click="exportCsv"
+                wire:loading.attr="disabled"
+                color="gray"
+                icon="heroicon-m-arrow-down-tray"
+                size="sm"
+            >
+                <span wire:loading.remove wire:target="exportCsv">Export CSV</span>
+                <span wire:loading wire:target="exportCsv">Exporting...</span>
+            </x-filament::button>
+        </x-slot>
 
         <form wire:submit.prevent>
             {{ $this->form }}

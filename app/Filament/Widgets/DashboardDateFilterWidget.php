@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Widgets\Widget;
 use Lunar\Models\Order;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DashboardDateFilterWidget extends Widget implements HasForms
 {
@@ -114,6 +115,54 @@ class DashboardDateFilterWidget extends Widget implements HasForms
             Carbon::now()->subDays($days)->startOfDay(),
             Carbon::now()->endOfDay(),
         ];
+    }
+
+    public function exportCsv(): StreamedResponse
+    {
+        [$from, $to] = $this->resolveDateRange();
+
+        $orders = Order::whereNotNull('placed_at')
+            ->whereBetween('placed_at', [$from, $to])
+            ->with(['user', 'billingAddress'])
+            ->orderBy('placed_at', 'desc')
+            ->get();
+
+        $filename = 'order-stats-' . now()->format('Y-m-d') . '.csv';
+
+        return response()->streamDownload(function () use ($orders) {
+            $handle = fopen('php://output', 'w');
+
+            // UTF-8 BOM for Excel compatibility
+            fwrite($handle, "\xEF\xBB\xBF");
+
+            fputcsv($handle, [
+                'Order ID',
+                'Reference',
+                'Customer Name',
+                'Customer Email',
+                'Status',
+                'Sub Total (RM)',
+                'Currency',
+                'Placed At',
+            ]);
+
+            foreach ($orders as $order) {
+                fputcsv($handle, [
+                    $order->id,
+                    $order->reference ?? $order->id,
+                    $order->user?->name ?? 'Guest',
+                    $order->user?->email ?? $order->billingAddress?->contact_email ?? '-',
+                    $order->status,
+                    number_format($order->sub_total / 100, 2),
+                    $order->currency_code,
+                    $order->placed_at?->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 
     public function getLabel(): string
