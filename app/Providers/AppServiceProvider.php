@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Filament\Widgets\DashboardDateFilterWidget;
+use App\Filament\Pages\LunarDashboard;
 use App\Http\Middleware\EnsureIsAdmin;
 use App\Listeners\LogConnectionPruned;
 use App\Listeners\LogFailedLogin;
@@ -32,6 +32,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Replace Lunar's hardcoded Dashboard with our custom one that includes the date filter widget
+        $pagesRef = new \ReflectionProperty(\Lunar\Admin\LunarPanelManager::class, 'pages');
+        $pagesRef->setAccessible(true);
+        $pagesRef->setValue(null, array_map(
+            fn ($page) => $page === \Lunar\Admin\Filament\Pages\Dashboard::class
+                ? LunarDashboard::class
+                : $page,
+            $pagesRef->getValue()
+        ));
+
         LunarPanel::disableTwoFactorAuth()
             ->extensions([
                 EditShippingMethod::class => ShippingMethodEditExtension::class,
@@ -54,10 +64,7 @@ class AppServiceProvider extends ServiceProvider
                     ->brandLogo(asset('logo.png'))
                     ->darkModeBrandLogo(asset('logo.png'))
                     ->favicon(asset('favicon.ico'))
-                    ->plugin(new ShippingPlugin)
-                    ->widgets([
-                        DashboardDateFilterWidget::class,
-                    ]);
+                    ->plugin(new ShippingPlugin);
             })->register();
 
         // Register SenangPay payment driver
