@@ -1,140 +1,150 @@
 import * as React from 'react';
-import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from 'recharts';
+import { format } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
+import { CalendarIcon } from 'lucide-react';
+import { router } from '@inertiajs/react';
 
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import { CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
+import { index } from '@/routes/admin/dashboard';
 
 const chartConfig = {
-    new: {
-        label: 'New',
+    count: {
+        label: 'Subscriptions',
         color: 'var(--primary)',
-    },
-    active: {
-        label: 'Active',
-        color: 'var(--chart-2, oklch(0.6 0.118 184.704))',
     },
 } satisfies ChartConfig;
 
-type ChartDataItem = {
-    date: string;
-    new: number;
-    active: number;
+type TopSubscriptionItem = { name: string; count: number };
+
+type ChartFilter = {
+    range: string;
+    dateFrom?: string | null;
+    dateTo?: string | null;
 };
 
-export function TopDevicesChart({ data }: { data: ChartDataItem[] }) {
-    const isMobile = useIsMobile();
-    const [timeRange, setTimeRange] = React.useState('90d');
+export function TopDevicesChart({ data, filter }: { data: TopSubscriptionItem[]; filter: ChartFilter }) {
+    const [selectValue, setSelectValue] = React.useState(filter.range);
+    const [dateRange, setDateRange] = React.useState<DateRange | undefined>(
+        filter.dateFrom && filter.dateTo
+            ? { from: new Date(filter.dateFrom), to: new Date(filter.dateTo) }
+            : undefined,
+    );
+    const [popoverOpen, setPopoverOpen] = React.useState(false);
 
-    React.useEffect(() => {
-        if (isMobile) {
-            setTimeRange('7d');
+    const handleRangeChange = (value: string) => {
+        setSelectValue(value);
+        if (value !== 'custom') {
+            router.get(index().url, { range: value }, { preserveState: true, preserveScroll: true });
+        } else {
+            setPopoverOpen(true);
         }
-    }, [isMobile]);
+    };
 
-    const filteredData = data.filter((item) => {
-        const date = new Date(item.date);
-        const referenceDate = new Date();
-        let daysToSubtract = 90;
-        if (timeRange === '30d') {
-            daysToSubtract = 30;
-        } else if (timeRange === '7d') {
-            daysToSubtract = 7;
-        }
-        const startDate = new Date(referenceDate);
-        startDate.setDate(startDate.getDate() - daysToSubtract);
-        return date >= startDate;
-    });
+    const handleApply = () => {
+        if (!dateRange?.from || !dateRange?.to) return;
+        router.get(
+            index().url,
+            {
+                date_from: format(dateRange.from, 'yyyy-MM-dd'),
+                date_to: format(dateRange.to, 'yyyy-MM-dd'),
+            },
+            { preserveState: true, preserveScroll: true },
+        );
+        setPopoverOpen(false);
+    };
+
+    const description =
+        filter.range === 'custom' && filter.dateFrom && filter.dateTo
+            ? `${format(new Date(filter.dateFrom), 'MMM d, yyyy')} – ${format(new Date(filter.dateTo), 'MMM d, yyyy')}`
+            : { '7d': 'Last 7 days', '30d': 'Last 30 days', '90d': 'Last 3 months' }[filter.range] ?? 'Last 3 months';
 
     return (
         <>
             <CardHeader>
                 <CardTitle>Top Devices</CardTitle>
-                <CardDescription>
-                    <span className="hidden @[540px]/card:block">Subscription activity for the last 3 months</span>
-                    <span className="@[540px]/card:hidden">Last 3 months</span>
-                </CardDescription>
+                <CardDescription>Top 10 subscription plans — {description}</CardDescription>
                 <CardAction>
-                    <ToggleGroup
-                        type="single"
-                        value={timeRange}
-                        onValueChange={setTimeRange}
-                        variant="outline"
-                        className="hidden *:data-[slot=toggle-group-item]:px-4! @[767px]/card:flex"
-                    >
-                        <ToggleGroupItem value="90d">Last 3 months</ToggleGroupItem>
-                        <ToggleGroupItem value="30d">Last 30 days</ToggleGroupItem>
-                        <ToggleGroupItem value="7d">Last 7 days</ToggleGroupItem>
-                    </ToggleGroup>
-                    <Select value={timeRange} onValueChange={setTimeRange}>
-                        <SelectTrigger
-                            className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
-                            size="sm"
-                            aria-label="Select a value"
-                        >
-                            <SelectValue placeholder="Last 3 months" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl">
-                            <SelectItem value="90d" className="rounded-lg">
-                                Last 3 months
-                            </SelectItem>
-                            <SelectItem value="30d" className="rounded-lg">
-                                Last 30 days
-                            </SelectItem>
-                            <SelectItem value="7d" className="rounded-lg">
-                                Last 7 days
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                        <Select value={selectValue} onValueChange={handleRangeChange}>
+                            <SelectTrigger className="w-44" size="sm">
+                                <SelectValue placeholder="Last 3 months" />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl">
+                                <SelectItem value="90d" className="rounded-lg">Last 3 months</SelectItem>
+                                <SelectItem value="30d" className="rounded-lg">Last 30 days</SelectItem>
+                                <SelectItem value="7d" className="rounded-lg">Last 7 days</SelectItem>
+                                <SelectItem value="custom" className="rounded-lg">Custom date range</SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        {selectValue === 'custom' && (
+                            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className={cn('w-56 justify-start text-left font-normal', !dateRange && 'text-muted-foreground')}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {dateRange?.from ? (
+                                            dateRange.to ? (
+                                                <>{format(dateRange.from, 'MMM d, yyyy')} – {format(dateRange.to, 'MMM d, yyyy')}</>
+                                            ) : (
+                                                format(dateRange.from, 'MMM d, yyyy')
+                                            )
+                                        ) : (
+                                            'Pick a date range'
+                                        )}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="end">
+                                    <Calendar
+                                        mode="range"
+                                        selected={dateRange}
+                                        onSelect={setDateRange}
+                                        numberOfMonths={2}
+                                        disabled={{ after: new Date() }}
+                                    />
+                                    <div className="flex justify-end gap-2 border-t px-4 py-3">
+                                        <Button variant="ghost" size="sm" onClick={() => setPopoverOpen(false)}>
+                                            Cancel
+                                        </Button>
+                                        <Button size="sm" onClick={handleApply} disabled={!dateRange?.from || !dateRange?.to}>
+                                            Apply
+                                        </Button>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                        )}
+                    </div>
                 </CardAction>
             </CardHeader>
-            <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-                <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-                    <AreaChart data={filteredData}>
-                        <defs>
-                            <linearGradient id="fillNew" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="var(--color-new)" stopOpacity={1.0} />
-                                <stop offset="95%" stopColor="var(--color-new)" stopOpacity={0.1} />
-                            </linearGradient>
-                            <linearGradient id="fillActive" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="var(--color-active)" stopOpacity={0.8} />
-                                <stop offset="95%" stopColor="var(--color-active)" stopOpacity={0.1} />
-                            </linearGradient>
-                        </defs>
-                        <CartesianGrid vertical={false} />
-                        <XAxis
-                            dataKey="date"
+            <CardContent className="px-2 pb-4 sm:px-6">
+                <ChartContainer config={chartConfig} className="aspect-auto h-[300px] w-full">
+                    <BarChart data={data} layout="vertical" margin={{ left: 0, right: 32 }}>
+                        <CartesianGrid horizontal={false} />
+                        <YAxis
+                            dataKey="name"
+                            type="category"
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
-                            minTickGap={32}
-                            tickFormatter={(value) => {
-                                const date = new Date(value);
-                                return date.toLocaleDateString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                });
-                            }}
+                            width={120}
+                            tick={{ fontSize: 12 }}
                         />
-                        <ChartTooltip
-                            cursor={false}
-                            content={
-                                <ChartTooltipContent
-                                    labelFormatter={(value) => {
-                                        return new Date(value).toLocaleDateString('en-US', {
-                                            month: 'short',
-                                            day: 'numeric',
-                                        });
-                                    }}
-                                    indicator="dot"
-                                />
-                            }
-                        />
-                        <Area dataKey="active" type="natural" fill="url(#fillActive)" stroke="var(--color-active)" stackId="a" />
-                        <Area dataKey="new" type="natural" fill="url(#fillNew)" stroke="var(--color-new)" stackId="a" />
-                    </AreaChart>
+                        <XAxis type="number" hide />
+                        <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                        <Bar dataKey="count" fill="var(--color-count)" radius={[0, 4, 4, 0]}>
+                            <LabelList dataKey="count" position="right" className="fill-foreground" fontSize={12} />
+                        </Bar>
+                    </BarChart>
                 </ChartContainer>
             </CardContent>
         </>

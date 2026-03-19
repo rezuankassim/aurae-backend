@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Device;
+use App\Models\Subscription;
 use App\Models\User;
-use App\Models\UserSubscription;
 use Carbon\Carbon;
 use Inertia\Inertia;
 
@@ -16,42 +16,53 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $subscriptionChartData = $this->getSubscriptionChartData();
-
         return Inertia::render('admin/dashboard/index', [
             'totalUsers' => User::where('is_admin', false)->count(),
             'totalDevices' => Device::count(),
             'onlineDevices' => Device::where('status', 1)->count(),
-            'subscriptionChartData' => $subscriptionChartData,
+            'topSubscriptions' => $this->getTopSubscriptions(),
+            'chartFilter' => $this->getChartFilter(),
         ]);
     }
 
-    private function getSubscriptionChartData(): array
+    private function getChartFilter(): array
     {
-        $endDate = Carbon::today();
-        $startDate = Carbon::today()->subDays(89);
+        $dateFrom = request()->query('date_from');
+        $dateTo = request()->query('date_to');
 
-        $newPerDay = UserSubscription::selectRaw('DATE(starts_at) as date, COUNT(*) as count')
-            ->whereBetween('starts_at', [$startDate, $endDate->copy()->endOfDay()])
-            ->groupBy('date')
-            ->pluck('count', 'date');
+        return [
+            'range' => ($dateFrom && $dateTo) ? 'custom' : request()->query('range', '90d'),
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+        ];
+    }
 
-        $activePerDay = UserSubscription::selectRaw('DATE(starts_at) as date, COUNT(*) as count')
-            ->where('status', 'active')
-            ->whereBetween('starts_at', [$startDate, $endDate->copy()->endOfDay()])
-            ->groupBy('date')
-            ->pluck('count', 'date');
+    private function getTopSubscriptions(): array
+    {
+        $filter = $this->getChartFilter();
 
-        $data = [];
-        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-            $key = $date->toDateString();
-            $data[] = [
-                'date' => $key,
-                'new' => $newPerDay[$key] ?? 0,
-                'active' => $activePerDay[$key] ?? 0,
-            ];
-        }
-
-        return $data;
+        return Subscription::withCount(['userSubscriptions' => function ($q) use ($filter) {
+            if ($filter['range'] === 'custom' && $filter['dateFrom'] && $filter['dateTo']) {
+                $q->whereBetween('starts_at', [
+                    Carbon::parse($filter['dateFrom'])->startOfDay(),
+                    Carbon::parse($filter['dateTo'])->endOfDay(),
+                ]);
+            } else {
+                $days = match ($filter['range']) {
+                    '30d' => 30,
+                    '7d' => 7,
+                    default => 90,
+                };
+                $q->where('starts_at', '>=', Carbon::today()->subDays($days));
+            }
+        }])
+            ->orderBy('user_subscriptions_count', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(fn ($s) => [
+                'name' => $s->title,
+                'count' => $s->user_subscriptions_count,
+            ])
+            ->toArray();
     }
 }

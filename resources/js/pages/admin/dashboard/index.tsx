@@ -14,18 +14,21 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-type ChartDataItem = { date: string; new: number; active: number };
+type TopSubscriptionItem = { name: string; count: number };
+type ChartFilter = { range: string; dateFrom?: string | null; dateTo?: string | null };
 
 export default function AdminDashboard({
     totalUsers,
     totalDevices,
     onlineDevices,
-    subscriptionChartData,
+    topSubscriptions,
+    chartFilter,
 }: {
     totalUsers: number;
     totalDevices: number;
     onlineDevices: number;
-    subscriptionChartData: ChartDataItem[];
+    topSubscriptions: TopSubscriptionItem[];
+    chartFilter: ChartFilter;
 }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -69,7 +72,7 @@ export default function AdminDashboard({
                 </div>
 
                 <Card className="@container/card">
-                    <TopDevicesChart data={subscriptionChartData} />
+                    <TopDevicesChart data={topSubscriptions} filter={chartFilter} />
                 </Card>
             </div>
         </AppLayout>
