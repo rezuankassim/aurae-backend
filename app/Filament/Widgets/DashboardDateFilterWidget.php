@@ -153,7 +153,7 @@ class DashboardDateFilterWidget extends Widget implements HasForms
                     $order->user?->name ?? 'Guest',
                     $order->user?->email ?? $order->billingAddress?->contact_email ?? '-',
                     $order->status,
-                    number_format($order->sub_total / 100, 2),
+                    number_format($order->sub_total->decimal, 2),
                     $order->currency_code,
                     $order->placed_at?->format('Y-m-d H:i:s'),
                 ]);
