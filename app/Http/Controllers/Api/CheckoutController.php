@@ -339,12 +339,16 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Calculate cart scoped to selected lines
+        // Scope to selected lines and do an initial calculate to populate shipping rates lookup
         $this->scopeCartToSelected($cart);
         $cart->calculate();
 
-        // Check if shipping option is set, if not use default (BASDEL - Basic Delivery)
-        if (! $cart->shippingOptionOverride) {
+        // Ensure a shipping option is set. shippingOptionOverride is an in-memory-only
+        // property (always null after a fresh DB load), so we check the shipping address
+        // DB record via ShippingManifest instead.
+        $existingShippingOption = \Lunar\Facades\ShippingManifest::getShippingOption($cart);
+
+        if (! $existingShippingOption) {
             $shippingRates = Shipping::shippingRates($cart)->get();
             $shippingOptions = Shipping::shippingOptions($cart)->get(
                 new ShippingOptionLookup(
@@ -352,7 +356,7 @@ class CheckoutController extends Controller
                 )
             );
 
-            // Find BASDEL option
+            // Fall back to BASDEL (Basic Delivery)
             $shippingOptionSet = false;
 
             foreach ($shippingOptions as $optionResult) {
@@ -371,6 +375,13 @@ class CheckoutController extends Controller
                 ], 400);
             }
         }
+
+        // Force-recalculate after shipping is confirmed so $cart->total correctly
+        // reflects selected lines + shipping. This covers both the case where
+        // setShippingOption() was just called (which only updates the DB, not the
+        // in-memory cart) and where shipping was already set in a prior request.
+        $this->scopeCartToSelected($cart);
+        $cart->recalculate();
 
         // Initiate payment based on method
         if ($validated['payment_method'] === 'senangpay') {
