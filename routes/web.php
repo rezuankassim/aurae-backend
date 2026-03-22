@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomTherapyController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\Payment\SenangpayCallbackController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UsageHistoryController;
+use App\Models\Device;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -31,9 +33,7 @@ Route::get('terms-and-conditions', [LegalController::class, 'termsAndConditions'
 Route::get('privacy-policy', [LegalController::class, 'privacyPolicy'])->name('legal.privacy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('devices', [DeviceController::class, 'index'])->name('devices.index');
     Route::get('devices/{device}', [DeviceController::class, 'show'])->name('devices.show');

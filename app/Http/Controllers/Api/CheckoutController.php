@@ -15,6 +15,24 @@ use Lunar\Shipping\Facades\Shipping;
 class CheckoutController extends Controller
 {
     /**
+     * Scope a cart's lines relation to selected lines only, then calculate.
+     * This ensures shipping and tax are computed against the items being checked out.
+     */
+    private function scopeCartToSelected(Cart $cart): Cart
+    {
+        $selectedLines = $cart->lines()->where('selected', true)->with([
+            'purchasable.taxClass',
+            'purchasable.prices.currency',
+            'purchasable.prices.priceable',
+            'purchasable.product',
+        ])->get();
+
+        $cart->setRelation('lines', $selectedLines);
+
+        return $cart;
+    }
+
+    /**
      * Get available shipping options for cart.
      */
     public function getShippingOptions(Request $request)
@@ -37,7 +55,16 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Calculate cart to get shipping options
+        if (! $cart->lines()->where('selected', true)->exists()) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'No items selected for checkout.',
+                'data' => null,
+            ], 400);
+        }
+
+        // Calculate cart scoped to selected lines
+        $this->scopeCartToSelected($cart);
         $cart->calculate();
 
         // Get shipping rates from table rate shipping
@@ -104,7 +131,16 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Calculate cart to populate shipping options
+        if (! $cart->lines()->where('selected', true)->exists()) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'No items selected for checkout.',
+                'data' => null,
+            ], 400);
+        }
+
+        // Calculate cart scoped to selected lines
+        $this->scopeCartToSelected($cart);
         $cart->calculate();
 
         // Get shipping rates and options from database
@@ -135,8 +171,10 @@ class CheckoutController extends Controller
         // Set the shipping option on the cart
         $cart->setShippingOption($shippingOption);
 
-        // Recalculate cart with shipping
-        $cart->calculate();
+        // Re-scope to selected lines and force-recalculate so totals include shipping
+        // against only the items being checked out (not the full cart)
+        $this->scopeCartToSelected($cart);
+        $cart->recalculate();
 
         return response()->json([
             'status' => 200,
@@ -284,6 +322,14 @@ class CheckoutController extends Controller
             ], 400);
         }
 
+        if (! $cart->lines()->where('selected', true)->exists()) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'No items selected for checkout. Please select at least one item.',
+                'data' => null,
+            ], 400);
+        }
+
         // Check if addresses are set
         if (! $cart->shippingAddress || ! $cart->billingAddress) {
             return response()->json([
@@ -293,7 +339,8 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Calculate cart
+        // Calculate cart scoped to selected lines
+        $this->scopeCartToSelected($cart);
         $cart->calculate();
 
         // Check if shipping option is set, if not use default (BASDEL - Basic Delivery)

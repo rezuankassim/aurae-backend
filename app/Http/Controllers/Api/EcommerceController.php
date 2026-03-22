@@ -99,4 +99,55 @@ class EcommerceController extends Controller
                 'message' => 'Cart line removed successfully.',
             ]);
     }
+
+    /**
+     * Set which cart lines are selected for checkout.
+     *
+     * The provided line_ids become selected=true; all other lines in the cart
+     * become selected=false. Passing an empty array deselects everything.
+     */
+    public function selectLines(Request $request)
+    {
+        $request->validate([
+            'line_ids' => ['required', 'array'],
+            'line_ids.*' => ['integer'],
+        ]);
+
+        $cart = Cart::where('user_id', $request->user()->id)->first();
+
+        if (! $cart) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Cart not found.',
+                'data' => null,
+            ], 404);
+        }
+
+        $lineIds = collect($request->line_ids);
+
+        // Verify all provided IDs belong to this cart
+        $validCount = $cart->lines()->whereIn('id', $lineIds)->count();
+        if ($lineIds->isNotEmpty() && $validCount !== $lineIds->count()) {
+            return response()->json([
+                'status' => 422,
+                'message' => 'One or more line IDs do not belong to your cart.',
+                'data' => null,
+            ], 422);
+        }
+
+        // Deselect all lines, then select only the requested ones
+        $cart->lines()->update(['selected' => false]);
+
+        if ($lineIds->isNotEmpty()) {
+            $cart->lines()->whereIn('id', $lineIds)->update(['selected' => true]);
+        }
+
+        $cart = $cart->recalculate();
+
+        return CartResource::make($cart)
+            ->additional([
+                'status' => 200,
+                'message' => 'Cart selection updated successfully.',
+            ]);
+    }
 }

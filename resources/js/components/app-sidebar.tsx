@@ -1,9 +1,17 @@
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+} from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { index as indexAdminDashboard } from '@/routes/admin/dashboard';
 import { index as indexDeviceLocations } from '@/routes/admin/device-locations';
 import { index as indexAdminDeviceMaintenances } from '@/routes/admin/device-maintenances';
 import { index as indexFAQs } from '@/routes/admin/faqs';
@@ -60,11 +68,6 @@ import { NavManagement } from './nav-management';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
         title: 'Personal Health',
         icon: FileBox,
         children: [
@@ -101,11 +104,6 @@ const mainNavItems: NavItem[] = [
 ];
 
 const managementNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: indexAdminDashboard(),
-        icon: LayoutGrid,
-    },
     {
         title: 'Ecommerce Platform',
         href: '/lunar',
@@ -234,6 +232,19 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
+                <SidebarGroup className="px-2 py-0">
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={usePage().url === dashboard().url} tooltip={{ children: 'Dashboard' }}>
+                                <Link href={dashboard()} prefetch>
+                                    <LayoutGrid />
+                                    <span>Dashboard</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarGroup>
+
                 <NavMain items={mainNavItems} />
                 {auth.user.is_admin ? <NavManagement items={managementNavItems} /> : null}
             </SidebarContent>

@@ -21,6 +21,7 @@ class CartLineResource extends BaseResource
             'subTotal' => $this->subTotal,
             'total' => $this->total,
             'quantity' => $this->quantity,
+            'selected' => (bool) $this->selected,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'purchaseable' => $this->whenLoaded('purchasable', function () {

@@ -109,11 +109,11 @@ return [
     */
     'pipelines' => [
         'creation' => [
-            Lunar\Pipelines\Order\Creation\FillOrderFromCart::class,
-            Lunar\Pipelines\Order\Creation\CreateOrderLines::class,
+            App\Pipelines\Order\Creation\FillOrderFromCart::class,
+            App\Pipelines\Order\Creation\CreateOrderLines::class,
             Lunar\Pipelines\Order\Creation\CreateOrderAddresses::class,
             Lunar\Pipelines\Order\Creation\CreateShippingLine::class,
-            Lunar\Pipelines\Order\Creation\CleanUpOrderLines::class,
+            App\Pipelines\Order\Creation\CleanUpOrderLines::class,
             Lunar\Pipelines\Order\Creation\MapDiscountBreakdown::class,
         ],
     ],
