@@ -125,6 +125,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::get('/cart', [EcommerceController::class, 'cart'])->name('api.ecommerce.cart');
         Route::post('/cart/add', [EcommerceController::class, 'addToCart'])->name('api.ecommerce.cart.add');
         Route::post('/cart/remove', [EcommerceController::class, 'removeFromCart'])->name('api.ecommerce.cart.remove');
+        Route::post('/cart/update-quantity', [EcommerceController::class, 'updateCartLineQuantity'])->name('api.ecommerce.cart.update-quantity');
         Route::post('/cart/select-lines', [EcommerceController::class, 'selectLines'])->name('api.ecommerce.cart.select-lines');
 
         // Checkout and payment routes

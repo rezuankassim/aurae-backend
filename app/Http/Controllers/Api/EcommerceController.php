@@ -100,6 +100,36 @@ class EcommerceController extends Controller
             ]);
     }
 
+    public function updateCartLineQuantity(Request $request)
+    {
+        $request->validate([
+            'cart_line_id' => ['required', 'exists:lunar_cart_lines,id'],
+            'quantity' => ['required', 'integer', 'min:1', 'max:10000'],
+        ]);
+
+        $cart = Cart::where('user_id', $request->user()->id)->firstOrFail();
+
+        $line = $cart->lines()->where('id', $request->cart_line_id)->first();
+
+        if (! $line) {
+            return response()->json([
+                'status' => 422,
+                'message' => 'Cart line does not belong to your cart.',
+                'data' => null,
+            ], 422);
+        }
+
+        $line->update(['quantity' => $request->quantity]);
+
+        $cart = $cart->recalculate();
+
+        return CartResource::make($cart)
+            ->additional([
+                'status' => 200,
+                'message' => 'Cart line quantity updated successfully.',
+            ]);
+    }
+
     /**
      * Set which cart lines are selected for checkout.
      *
