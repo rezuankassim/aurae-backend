@@ -19,6 +19,7 @@ class EcommerceController extends Controller
         $collections = Collection::query()
             ->with([
                 'thumbnail',
+                'products' => fn ($q) => $q->where('status', 'published'),
                 'products.media',
                 'products.variants.basePrices.currency',
                 'products.variants.basePrices.priceable',
