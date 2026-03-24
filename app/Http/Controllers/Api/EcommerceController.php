@@ -36,7 +36,7 @@ class EcommerceController extends Controller
 
     public function cart(Request $request)
     {
-        $cart = Cart::with(['lines.purchasable'])
+        $cart = Cart::with(['lines.purchasable.product'])
             ->where('user_id', $request->user()->id)
             ->first();
 
@@ -46,6 +46,16 @@ class EcommerceController extends Controller
                 'currency_id' => Currency::getDefault()->id,
                 'channel_id' => Channel::getDefault()->id,
             ]);
+        } else {
+            // Remove any cart lines whose product is no longer published (active)
+            $inactiveLineIds = $cart->lines
+                ->filter(fn ($line) => $line->purchasable?->product?->status !== 'published')
+                ->pluck('id');
+
+            if ($inactiveLineIds->isNotEmpty()) {
+                $cart->lines()->whereIn('id', $inactiveLineIds)->delete();
+                $cart->unsetRelation('lines');
+            }
         }
 
         $cart = $cart->recalculate();
