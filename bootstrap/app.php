@@ -45,7 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     return BaseResource::make([])
                         ->additional([
                             'status' => 500,
-                            'message' => $exception->errors(),
+                            'message' => $exception->validator->errors()->first(),
                         ])
                         ->response();
                 }
