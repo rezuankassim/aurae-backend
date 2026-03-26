@@ -52,6 +52,10 @@ class AuthenticationController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['required', 'string', 'max:20', 'unique:users,phone'],
+        ], [
+            'phone.unique' => 'This phone number is already registered. Please login or use a different phone number.',
+            'email.unique' => 'This email address is already registered. Please login or use a different email.',
+            'username.unique' => 'This username is already taken. Please choose a different username.',
         ]);
 
         $user = User::create([

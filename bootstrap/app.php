@@ -10,6 +10,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -40,6 +41,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (Throwable $exception, Request $request) {
             if ($request->is('api/*')) {
+                if ($exception instanceof ValidationException) {
+                    return BaseResource::make([])
+                        ->additional([
+                            'status' => 500,
+                            'message' => $exception->errors(),
+                        ])
+                        ->response();
+                }
+
                 return BaseResource::make([])
                     ->additional([
                         'status' => 500,
