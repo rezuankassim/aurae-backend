@@ -20,6 +20,7 @@ class DiscountEditExtension extends EditPageExtension
     {
         $schema = $form->getComponents();
         $this->makeFieldsRequired($schema);
+        $this->hidePercentageField($schema);
 
         return $form->schema($schema);
     }
@@ -33,6 +34,19 @@ class DiscountEditExtension extends EditPageExtension
 
             if (method_exists($component, 'getChildComponents')) {
                 $this->makeFieldsRequired($component->getChildComponents());
+            }
+        }
+    }
+
+    protected function hidePercentageField(array $components): void
+    {
+        foreach ($components as $component) {
+            if ($component instanceof TextInput && $component->getName() === 'data.percentage') {
+                $component->hidden();
+            }
+
+            if (method_exists($component, 'getChildComponents')) {
+                $this->hidePercentageField($component->getChildComponents());
             }
         }
     }
