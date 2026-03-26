@@ -88,6 +88,19 @@ class AppServiceProvider extends ServiceProvider
     {
         \Lunar\Facades\Telemetry::optOut();
 
+        \Filament\Support\Facades\FilamentView::registerRenderHook(
+            \Filament\View\PanelsRenderHook::PAGE_START,
+            fn () => new \Illuminate\Support\HtmlString(
+                '<div class="px-6 pt-6">
+                    <a href="/dashboard" class="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-gray-950/10 dark:bg-gray-800 dark:ring-white/20">
+                        <img src="' . asset('logo.png') . '" alt="Lunar logo" class="rounded-full size-8" style="background: black;" />
+                        <span class="text-gray-700 dark:text-gray-200">Back to Admin Panel</span>
+                    </a>
+                </div>'
+            ),
+            scopes: \App\Filament\Pages\LunarDashboard::class,
+        );
+
         Event::listen(Login::class, LogSuccessfulLogin::class);
         Event::listen(Logout::class, LogLogout::class);
         Event::listen(Failed::class, LogFailedLogin::class);
