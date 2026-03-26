@@ -13,6 +13,9 @@ class CustomerGroupEditExtension extends EditPageExtension
             Actions\DeleteAction::make()
                 ->before(function ($record) {
                     $record->customers()->detach();
+                    $record->discounts()->detach();
+                    $record->products()->detach();
+                    $record->collections()->detach();
                 }),
         ];
     }
