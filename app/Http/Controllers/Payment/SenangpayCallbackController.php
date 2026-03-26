@@ -10,7 +10,6 @@ use App\Services\SenangpaySignatureService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Lunar\Models\Cart;
 use Lunar\Models\Order;
 use Lunar\Models\Transaction;
 
@@ -259,22 +258,10 @@ class SenangpayCallbackController extends Controller
             ]),
         ]);
 
-        // Complete and delete user's cart
-        if ($order->user_id) {
-            $cart = Cart::where('user_id', $order->user_id)
-                ->whereNull('completed_at')
-                ->first();
-
-            if ($cart) {
-                $cart->update(['completed_at' => now()]);
-                $cart->delete();
-
-                Log::info('SenangPay capture: Cart completed and deleted', [
-                    'cart_id' => $cart->id,
-                    'user_id' => $order->user_id,
-                ]);
-            }
-        }
+        // Note: do NOT delete the cart here. The custom CreateOrder action already
+        // removes checked-out lines and resets any remaining ones to selected=true,
+        // so the cart stays alive for the user's next checkout. Deleting it would
+        // force a new cart to be created with no shipping address, breaking checkout.
 
         Log::info('SenangPay capture: Payment captured', [
             'order_id' => $order->id,

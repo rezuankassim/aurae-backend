@@ -9,6 +9,8 @@ use App\Listeners\LogConnectionPruned;
 use App\Listeners\LogFailedLogin;
 use App\Listeners\LogLogout;
 use App\Listeners\LogSuccessfulLogin;
+use App\Lunar\Extensions\CustomerGroupEditExtension;
+use App\Lunar\Extensions\CustomerGroupResourceExtension;
 use App\Lunar\Extensions\ShippingMethodEditExtension;
 use App\Lunar\Extensions\ShippingMethodListExtension;
 use App\PaymentTypes\SenangpayPayment;
@@ -22,6 +24,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\Events\ConnectionPruned;
 use Lunar\Admin\Support\Facades\LunarPanel;
+use Lunar\Admin\Filament\Resources\CustomerGroupResource;
+use Lunar\Admin\Filament\Resources\CustomerGroupResource\Pages\EditCustomerGroup;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\EditShippingMethod;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\ListShippingMethod;
 use Lunar\Shipping\ShippingPlugin;
@@ -45,6 +49,8 @@ class AppServiceProvider extends ServiceProvider
 
         LunarPanel::disableTwoFactorAuth()
             ->extensions([
+                EditCustomerGroup::class => CustomerGroupEditExtension::class,
+                CustomerGroupResource::class => CustomerGroupResourceExtension::class,
                 EditShippingMethod::class => ShippingMethodEditExtension::class,
                 ListShippingMethod::class => ShippingMethodListExtension::class,
             ])
