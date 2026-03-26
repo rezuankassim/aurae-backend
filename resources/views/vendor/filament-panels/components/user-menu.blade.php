@@ -26,7 +26,7 @@
         <button
             aria-label="{{ __('filament-panels::layout.actions.open_user_menu.label') }}"
             type="button"
-            class="shrink-0"
+            class="shrink-0 rounded-full bg-black p-0.5"
         >
             <x-filament-panels::avatar.user :user="$user" />
         </button>
