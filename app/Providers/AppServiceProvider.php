@@ -28,6 +28,7 @@ use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 use Laravel\Reverb\Events\ConnectionPruned;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource\Pages\EditCustomerGroup;
@@ -105,6 +106,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Lunar\Facades\Telemetry::optOut();
+
+        Livewire::component('app.lunar.widgets.product-options-widget', \App\Lunar\Widgets\ProductOptionsWidget::class);
 
         Event::listen(Login::class, LogSuccessfulLogin::class);
         Event::listen(Logout::class, LogLogout::class);
