@@ -21,6 +21,11 @@ class ProductLimitationRelationManagerExtension extends RelationManagerExtension
                     ->types([
                         Forms\Components\MorphToSelect\Type::make(Product::modelClass())
                             ->titleAttribute('name.en')
+                            ->getOptionsUsing(static function (): array {
+                                return Product::modelClass()::all()
+                                    ->mapWithKeys(fn (ProductContract $record): array => [$record->getKey() => $record->attr('name')])
+                                    ->all();
+                            })
                             ->getSearchResultsUsing(static function (Forms\Components\Select $component, string $search): array {
                                 return get_search_builder(Product::modelClass(), $search)
                                     ->get()

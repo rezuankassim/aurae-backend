@@ -11,6 +11,7 @@ use App\Listeners\LogLogout;
 use App\Listeners\LogSuccessfulLogin;
 use App\Lunar\Extensions\CustomerGroupEditExtension;
 use App\Lunar\Extensions\CustomerGroupResourceExtension;
+use App\Lunar\Extensions\DiscountEditExtension;
 use App\Lunar\Extensions\DiscountListExtension;
 use App\Lunar\Extensions\ManageProductVariantsExtension;
 use App\Lunar\Extensions\ProductConditionRelationManagerExtension;
@@ -30,6 +31,7 @@ use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\Events\ConnectionPruned;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource\Pages\EditCustomerGroup;
+use Lunar\Admin\Filament\Resources\DiscountResource\Pages\EditDiscount;
 use Lunar\Admin\Filament\Resources\DiscountResource\Pages\ListDiscounts;
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductConditionRelationManager;
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductLimitationRelationManager;
@@ -61,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
             ->extensions([
                 EditCustomerGroup::class => CustomerGroupEditExtension::class,
                 CustomerGroupResource::class => CustomerGroupResourceExtension::class,
+                EditDiscount::class => DiscountEditExtension::class,
                 ListDiscounts::class => DiscountListExtension::class,
                 ProductConditionRelationManager::class => ProductConditionRelationManagerExtension::class,
                 ProductLimitationRelationManager::class => ProductLimitationRelationManagerExtension::class,

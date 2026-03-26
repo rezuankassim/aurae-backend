@@ -25,6 +25,11 @@ class ProductConditionRelationManagerExtension extends RelationManagerExtension
                     ->types([
                         Forms\Components\MorphToSelect\Type::make(Collection::modelClass())
                             ->titleAttribute('name.en')
+                            ->getOptionsUsing(static function (): array {
+                                return Collection::modelClass()::all()
+                                    ->mapWithKeys(fn (CollectionContract $record): array => [$record->getKey() => $record->attr('name')])
+                                    ->all();
+                            })
                             ->getSearchResultsUsing(static function (Forms\Components\Select $component, string $search): array {
                                 return get_search_builder(Collection::modelClass(), $search)
                                     ->get()
@@ -34,6 +39,11 @@ class ProductConditionRelationManagerExtension extends RelationManagerExtension
 
                         Forms\Components\MorphToSelect\Type::make(Product::modelClass())
                             ->titleAttribute('name.en')
+                            ->getOptionsUsing(static function (): array {
+                                return Product::modelClass()::all()
+                                    ->mapWithKeys(fn (ProductContract $record): array => [$record->getKey() => $record->attr('name')])
+                                    ->all();
+                            })
                             ->getSearchResultsUsing(static function (Forms\Components\Select $component, string $search): array {
                                 return get_search_builder(Product::modelClass(), $search)
                                     ->get()
@@ -43,6 +53,12 @@ class ProductConditionRelationManagerExtension extends RelationManagerExtension
 
                         Forms\Components\MorphToSelect\Type::make(ProductVariant::modelClass())
                             ->titleAttribute('sku')
+                            ->getOptionsUsing(static function (): array {
+                                return ProductVariant::modelClass()::with('product')
+                                    ->get()
+                                    ->mapWithKeys(fn (ProductVariantContract $record): array => [$record->getKey() => $record->product->attr('name').' - '.$record->sku])
+                                    ->all();
+                            })
                             ->getSearchResultsUsing(static function (Forms\Components\Select $component, string $search): array {
                                 return get_search_builder(ProductVariant::modelClass(), $search)
                                     ->orWhere('sku', 'like', $search.'%')
