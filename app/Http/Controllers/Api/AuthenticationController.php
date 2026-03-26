@@ -65,7 +65,7 @@ class AuthenticationController extends Controller
 
         $customer = Customer::create([
             'first_name' => Str::before($request->name, ' '),
-            'last_name' => Str::afterLast($request->name, ' '),
+            'last_name' => Str::after($request->name, ' '),
         ]);
 
         $customer->users()->attach($user->id);
