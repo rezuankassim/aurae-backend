@@ -11,6 +11,7 @@ use App\Listeners\LogLogout;
 use App\Listeners\LogSuccessfulLogin;
 use App\Lunar\Extensions\CustomerGroupEditExtension;
 use App\Lunar\Extensions\CustomerGroupResourceExtension;
+use App\Lunar\Extensions\DiscountListExtension;
 use App\Lunar\Extensions\ShippingMethodEditExtension;
 use App\Lunar\Extensions\ShippingMethodListExtension;
 use App\PaymentTypes\SenangpayPayment;
@@ -26,6 +27,7 @@ use Laravel\Reverb\Events\ConnectionPruned;
 use Lunar\Admin\Support\Facades\LunarPanel;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource\Pages\EditCustomerGroup;
+use Lunar\Admin\Filament\Resources\DiscountResource\Pages\ListDiscounts;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\EditShippingMethod;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\ListShippingMethod;
 use Lunar\Shipping\ShippingPlugin;
@@ -51,6 +53,7 @@ class AppServiceProvider extends ServiceProvider
             ->extensions([
                 EditCustomerGroup::class => CustomerGroupEditExtension::class,
                 CustomerGroupResource::class => CustomerGroupResourceExtension::class,
+                ListDiscounts::class => DiscountListExtension::class,
                 EditShippingMethod::class => ShippingMethodEditExtension::class,
                 ListShippingMethod::class => ShippingMethodListExtension::class,
             ])
@@ -87,19 +90,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Lunar\Facades\Telemetry::optOut();
-
-        \Filament\Support\Facades\FilamentView::registerRenderHook(
-            \Filament\View\PanelsRenderHook::PAGE_START,
-            fn () => new \Illuminate\Support\HtmlString(
-                '<div class="px-6 pt-6">
-                    <a href="/dashboard" class="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-gray-950/10 dark:bg-gray-800 dark:ring-white/20">
-                        <img src="' . asset('logo.png') . '" alt="Lunar logo" class="rounded-full size-8" style="background: black;" />
-                        <span class="text-gray-700 dark:text-gray-200">Back to Admin Panel</span>
-                    </a>
-                </div>'
-            ),
-            scopes: \App\Filament\Pages\LunarDashboard::class,
-        );
 
         Event::listen(Login::class, LogSuccessfulLogin::class);
         Event::listen(Logout::class, LogLogout::class);
