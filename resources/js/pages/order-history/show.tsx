@@ -80,7 +80,7 @@ export default function OrderShow({ order }: Props) {
                                 <div key={line.id} className="flex gap-4">
                                     <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-muted">
                                         <img
-                                            src={line.purchasable?.product?.thumbnail?.url || '/placeholder-product.png'}
+src={line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg'}
                                             alt={line.purchasable?.product?.attribute_data?.name?.en || 'Product'}
                                             className="h-full w-full object-cover"
                                         />

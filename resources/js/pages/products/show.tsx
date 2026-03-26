@@ -77,7 +77,7 @@ export default function ProductShow({ product, relatedProducts }: Props) {
     };
 
     const getProductImage = (product: Product) => {
-        return product.thumbnail?.original_url || '/placeholder-product.png';
+        return product.thumbnail?.original_url || '/placeholder-product.svg';
     };
 
     return (

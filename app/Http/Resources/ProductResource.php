@@ -18,10 +18,10 @@ class ProductResource extends BaseResource
             'id' => $this->id,
             'name' => $this->translateAttribute('name'),
             'description' => $this->translateAttribute('description'),
-            'thumbnail' => [
+            'thumbnail' => $this->thumbnail ? [
                 'url' => $this->thumbnail->getUrl(),
                 'name' => $this->translateAttribute('name'),
-            ],
+            ] : null,
             'price' => $this->getPricing()?->price->formatted(),
             'main_image' => $this->getMainImage(),
             'images' => $this->getImages(),

@@ -38,7 +38,7 @@ export default function CheckoutReview({ cart }: Props) {
     };
 
     const getProductImage = (line: any) => {
-        return line.purchasable?.product?.thumbnail?.url || '/placeholder-product.png';
+return line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg';
     };
 
     const getProductName = (line: any) => {

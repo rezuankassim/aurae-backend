@@ -41,7 +41,7 @@ export default function ProductsIndex({ collectionGroups, products }: Props) {
 
     const getProductImage = (product: Product) => {
         console.log(product);
-        return product.thumbnail?.original_url || '/placeholder-product.png';
+        return product.thumbnail?.original_url || '/placeholder-product.svg';
     };
 
     return (
