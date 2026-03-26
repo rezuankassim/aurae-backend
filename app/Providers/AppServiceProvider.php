@@ -12,6 +12,7 @@ use App\Listeners\LogSuccessfulLogin;
 use App\Lunar\Extensions\CustomerGroupEditExtension;
 use App\Lunar\Extensions\CustomerGroupResourceExtension;
 use App\Lunar\Extensions\DiscountListExtension;
+use App\Lunar\Extensions\ManageProductVariantsExtension;
 use App\Lunar\Extensions\ShippingMethodEditExtension;
 use App\Lunar\Extensions\ShippingMethodListExtension;
 use App\PaymentTypes\SenangpayPayment;
@@ -28,6 +29,7 @@ use Lunar\Admin\Support\Facades\LunarPanel;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource\Pages\EditCustomerGroup;
 use Lunar\Admin\Filament\Resources\DiscountResource\Pages\ListDiscounts;
+use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductVariants;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\EditShippingMethod;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\ListShippingMethod;
 use Lunar\Shipping\ShippingPlugin;
@@ -54,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
                 EditCustomerGroup::class => CustomerGroupEditExtension::class,
                 CustomerGroupResource::class => CustomerGroupResourceExtension::class,
                 ListDiscounts::class => DiscountListExtension::class,
+                ManageProductVariants::class => ManageProductVariantsExtension::class,
                 EditShippingMethod::class => ShippingMethodEditExtension::class,
                 ListShippingMethod::class => ShippingMethodListExtension::class,
             ])
