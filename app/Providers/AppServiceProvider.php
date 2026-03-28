@@ -19,6 +19,7 @@ use App\Lunar\Extensions\ProductLimitationRelationManagerExtension;
 use App\Lunar\Extensions\ProductRewardRelationManagerExtension;
 use App\Lunar\Extensions\ShippingMethodEditExtension;
 use App\Lunar\Extensions\ShippingMethodListExtension;
+use App\Lunar\FieldTypes\TranslatedText as CustomTranslatedText;
 use App\PaymentTypes\SenangpayPayment;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Panel;
@@ -28,8 +29,8 @@ use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use Livewire\Livewire;
 use Laravel\Reverb\Events\ConnectionPruned;
+use Livewire\Livewire;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource\Pages\EditCustomerGroup;
 use Lunar\Admin\Filament\Resources\DiscountResource\Pages\EditDiscount;
@@ -106,6 +107,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Lunar\Facades\Telemetry::optOut();
+
+        // Register custom TranslatedText field type to persist rich editor image uploads
+        \Lunar\Admin\Support\Facades\AttributeData::registerFieldType(
+            \Lunar\FieldTypes\TranslatedText::class,
+            CustomTranslatedText::class,
+        );
 
         Livewire::component('app.lunar.widgets.product-options-widget', \App\Lunar\Widgets\ProductOptionsWidget::class);
 
