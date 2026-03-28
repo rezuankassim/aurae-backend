@@ -20,7 +20,6 @@ use App\Lunar\Extensions\ProductLimitationRelationManagerExtension;
 use App\Lunar\Extensions\ProductRewardRelationManagerExtension;
 use App\Lunar\Extensions\ShippingMethodEditExtension;
 use App\Lunar\Extensions\ShippingMethodListExtension;
-use App\Lunar\FieldTypes\TranslatedText as CustomTranslatedText;
 use App\PaymentTypes\SenangpayPayment;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Panel;
@@ -110,16 +109,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Lunar\Facades\Telemetry::optOut();
-
-        // Register custom TranslatedText field type to persist rich editor image uploads.
-        // Must use resolving() because lunar-attribute-data is a scoped binding
-        // that gets recreated for each Livewire request.
-        $this->app->resolving('lunar-attribute-data', function (\Lunar\Admin\Support\Forms\AttributeData $data) {
-            $data->registerFieldType(
-                \Lunar\FieldTypes\TranslatedText::class,
-                CustomTranslatedText::class,
-            );
-        });
 
         Livewire::component('app.lunar.widgets.product-options-widget', \App\Lunar\Widgets\ProductOptionsWidget::class);
 
