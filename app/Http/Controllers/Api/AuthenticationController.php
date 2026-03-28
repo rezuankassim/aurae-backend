@@ -65,7 +65,6 @@ class AuthenticationController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
-            'phone_verified_at' => now(),
         ]);
 
         $customer = Customer::create([

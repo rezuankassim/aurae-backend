@@ -173,6 +173,21 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
         ]);
     }
 
+    protected static function booted(): void
+    {
+        static::softDeleted(function (User $user) {
+            $user->updateQuietly([
+                'email' => $user->email . '_deleted_' . $user->id,
+                'username' => $user->username . '_deleted_' . $user->id,
+            ]);
+        });
+
+        static::restoring(function (User $user) {
+            $user->email = preg_replace('/_deleted_\d+$/', '', $user->email);
+            $user->username = preg_replace('/_deleted_\d+$/', '', $user->username);
+        });
+    }
+
     /**
      * Determine if the user can access the Filament panel.
      */
