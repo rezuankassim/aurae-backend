@@ -53,10 +53,18 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'status' => ['required', 'string', 'in:awaiting-payment,payment-offline,payment-received,dispatched'],
+            'tracking_number' => ['required_if:status,dispatched', 'nullable', 'string', 'max:255'],
         ]);
+
+        $meta = $order->meta ?? [];
+
+        if ($validated['status'] === 'dispatched') {
+            $meta['tracking_number'] = $validated['tracking_number'];
+        }
 
         $order->update([
             'status' => $validated['status'],
+            'meta' => $meta,
         ]);
 
         return back()->with('success', 'Order status updated successfully.');

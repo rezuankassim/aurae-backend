@@ -1,6 +1,8 @@
+import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
@@ -13,8 +15,9 @@ interface Props {
 }
 
 export default function AdminOrderShow({ order }: Props) {
-    const { data, setData, put, processing } = useForm({
+    const { data, setData, put, processing, errors } = useForm({
         status: order.status,
+        tracking_number: (order.meta?.tracking_number as string) || '',
     });
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -214,9 +217,27 @@ src={line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg'}
                                             <SelectItem value="dispatched">Dispatched</SelectItem>
                                         </SelectContent>
                                     </Select>
+                                    <InputError message={errors.status} />
                                 </div>
 
-                                <Button className="w-full" onClick={handleUpdateStatus} disabled={processing || data.status === order.status}>
+                                {data.status === 'dispatched' && (
+                                    <div className="space-y-2">
+                                        <Label htmlFor="tracking_number">Tracking Number</Label>
+                                        <Input
+                                            id="tracking_number"
+                                            value={data.tracking_number}
+                                            onChange={(e) => setData('tracking_number', e.target.value)}
+                                            placeholder="Enter tracking number"
+                                        />
+                                        <InputError message={errors.tracking_number} />
+                                    </div>
+                                )}
+
+                                <Button
+                                    className="w-full"
+                                    onClick={handleUpdateStatus}
+                                    disabled={processing || (data.status === order.status && data.tracking_number === ((order.meta?.tracking_number as string) || ''))}
+                                >
                                     Update Status
                                 </Button>
                             </CardContent>
