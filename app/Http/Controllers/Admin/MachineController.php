@@ -224,6 +224,7 @@ class MachineController extends Controller
         $machine->update([
             'user_id' => null,
             'device_id' => null,
+            'user_subscription_id' => null,
         ]);
 
         return back()->with('success', 'Machine unbound successfully.');
