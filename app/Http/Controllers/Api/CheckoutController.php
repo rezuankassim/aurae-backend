@@ -531,7 +531,7 @@ class CheckoutController extends Controller
         $orders->each(function ($order) {
             $productLines = $order->lines->where('type', '!=', 'shipping');
             if ($productLines->isNotEmpty()) {
-                $productLines->load(['purchasable.product.productType', 'purchasable.product.thumbnail']);
+                $productLines->load(['purchasable.product.productType', 'purchasable.product.thumbnail', 'purchasable.values.option']);
             }
         });
 
@@ -567,7 +567,7 @@ class CheckoutController extends Controller
         // Load purchasable only for non-shipping lines to avoid morphTo issues
         $productLines = $order->lines->where('type', '!=', 'shipping');
         if ($productLines->isNotEmpty()) {
-            $productLines->load(['purchasable.product.productType', 'purchasable.product.thumbnail']);
+            $productLines->load(['purchasable.product.productType', 'purchasable.product.thumbnail', 'purchasable.values.option']);
         }
 
         return OrderResource::make($order)

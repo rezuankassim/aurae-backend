@@ -68,6 +68,16 @@ class OrderResource extends BaseResource
                         'variant' => $isShippingLine ? null : [
                             'id' => $purchasable?->id,
                             'sku' => $purchasable?->sku,
+                            'values' => $purchasable?->values?->map(function ($value) {
+                                return [
+                                    'id' => $value->id,
+                                    'name' => $value->translate('name'),
+                                    'option' => [
+                                        'id' => $value->option?->id,
+                                        'name' => $value->option?->translate('name'),
+                                    ],
+                                ];
+                            }) ?? [],
                         ],
                     ];
                 });

@@ -27,12 +27,10 @@ class ProductController extends Controller
             ->get();
 
         $draftCount = Product::where('status', 'draft')->count();
-        $productTypes = ProductType::all();
 
         return Inertia::render('admin/products/index', [
             'products' => $products,
             'draftCount' => $draftCount,
-            'productType' => $productTypes,
         ]);
     }
 
@@ -43,12 +41,12 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'exists:lunar_product_types,id'],
             'sku' => ['required', 'string', 'max:255'],
             'base_price' => ['required', 'numeric', 'min:0'],
         ]);
 
         $currency = Currency::getDefault();
+        $productType = ProductType::first();
 
         $nameAttribute = Attribute::whereAttributeType(
             Product::morphName()
@@ -59,7 +57,7 @@ class ProductController extends Controller
 
         $product = Product::create([
             'status' => 'draft',
-            'product_type_id' => $request->type,
+            'product_type_id' => $productType->id,
             'attribute_data' => [
                 'name' => new $nameAttribute(collect([
                     'en' => new Text($request->name),
@@ -86,14 +84,12 @@ class ProductController extends Controller
     {
         $product->load(['productType', 'brand', 'variants', 'tags']);
 
-        $productTypes = ProductType::all();
         $tags = Tag::all();
 
         $product->tags_array = $product->tags->pluck('id')->toArray();
 
         return Inertia::render('admin/products/edit', [
             'product' => $product,
-            'productTypes' => $productTypes,
             'tags' => $tags,
             'withVariants' => $product->productOptions()->count() > 0,
         ]);
@@ -110,7 +106,6 @@ class ProductController extends Controller
         $htmlDescription = $validated['html_content'] ?? '';
 
         $product->update([
-            'product_type_id' => $validated['type'],
             'attribute_data' => [
                 'name' => new TranslatedText(collect([
                     'en' => new Text($validated['name']),

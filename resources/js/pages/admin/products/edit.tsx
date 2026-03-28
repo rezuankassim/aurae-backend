@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { Product, ProductType, Tag, type BreadcrumbItem } from '@/types';
+import { Product, Tag, type BreadcrumbItem } from '@/types';
 import { Form, Head, Link, router } from '@inertiajs/react';
 
 import InputError from '@/components/input-error';
@@ -17,7 +17,6 @@ import { SetStateAction, useState } from 'react';
 import ProductController from '@/actions/App/Http/Controllers/Admin/ProductController';
 import HeadingSmall from '@/components/heading-small';
 import { Card, CardContent } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tags, TagsContent, TagsEmpty, TagsGroup, TagsInput, TagsItem, TagsList, TagsTrigger, TagsValue } from '@/components/ui/tags';
 import ProductsLayout from '@/layouts/products/layout';
 
@@ -34,12 +33,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function EditProducts({
     product,
-    productTypes,
     tags,
     withVariants,
 }: {
     product: Product;
-    productTypes: ProductType[];
     tags: Tag[];
     withVariants: boolean;
 }) {
@@ -137,25 +134,6 @@ export default function EditProducts({
                             <>
                                 <Card className="mt-0">
                                     <CardContent className="space-y-6">
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="product_type">Product Type</Label>
-
-                                            <Select name="type" defaultValue={String(product.product_type_id)}>
-                                                <SelectTrigger id="product_type" name="product_type">
-                                                    <SelectValue placeholder="Select product type" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {productTypes.map((type) => (
-                                                        <SelectItem key={type.id} value={String(type.id)}>
-                                                            {type.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-
-                                            <InputError message={errors.type} />
-                                        </div>
-
                                         <div className="grid gap-2">
                                             <Label htmlFor="tags">Tags</Label>
 

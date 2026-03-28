@@ -3,8 +3,6 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-use Lunar\Models\ProductType;
 
 class ProductUpdateRequest extends FormRequest
 {
@@ -24,7 +22,6 @@ class ProductUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', Rule::exists(ProductType::class, 'id')],
             'name' => ['required', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
             'html_content' => ['nullable', 'string'],

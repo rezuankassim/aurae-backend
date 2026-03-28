@@ -82,6 +82,7 @@ class AppServiceProvider extends ServiceProvider
             fn ($resource) => ! in_array($resource, [
                 \Lunar\Admin\Filament\Resources\AttributeGroupResource::class,
                 \Lunar\Admin\Filament\Resources\ChannelResource::class,
+                \Lunar\Admin\Filament\Resources\ProductTypeResource::class,
             ])
         )));
 
@@ -142,6 +143,11 @@ class AppServiceProvider extends ServiceProvider
         \Lunar\Facades\ModelManifest::replace(
             \Lunar\Models\Contracts\Discount::class,
             \App\Models\Discount::class,
+        );
+
+        \Lunar\Facades\ModelManifest::replace(
+            \Lunar\Models\Contracts\ProductVariant::class,
+            \App\Models\ProductVariant::class,
         );
 
         Livewire::component('app.lunar.widgets.product-options-widget', \App\Lunar\Widgets\ProductOptionsWidget::class);

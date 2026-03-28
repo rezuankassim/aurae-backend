@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { Product, ProductType, type BreadcrumbItem } from '@/types';
+import { Product, type BreadcrumbItem } from '@/types';
 import { Form, Head } from '@inertiajs/react';
 
 import ProductController from '@/actions/App/Http/Controllers/Admin/ProductController';
@@ -10,7 +10,6 @@ import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogT
 import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { index } from '@/routes/admin/products';
 import { useState } from 'react';
 import { columns } from './columns';
@@ -26,11 +25,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function ProductsIndex({
     products,
     draftCount,
-    productType,
 }: {
     products: Product[];
     draftCount: number;
-    productType: ProductType[];
 }) {
     const [open, setOpen] = useState(false);
 
@@ -74,22 +71,6 @@ export default function ProductsIndex({
                                                 <Input id="sku" name="sku" placeholder="SKU" />
 
                                                 <InputError message={errors.sku} />
-                                            </div>
-
-                                            <div className="grid gap-2">
-                                                <Label htmlFor="product_type">Product Type</Label>
-                                                <Select name="type">
-                                                    <SelectTrigger id="product_type" name="product_type">
-                                                        <SelectValue placeholder="Select product type" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {productType.map((type) => (
-                                                            <SelectItem key={type.id} value={String(type.id)}>
-                                                                {type.name}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
                                             </div>
 
                                             <div className="grid gap-2">
