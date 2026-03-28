@@ -4,6 +4,8 @@ namespace App\Lunar\Extensions;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
@@ -23,7 +25,7 @@ class DiscountEditExtension extends EditPageExtension
     {
         $schema = $form->getComponents();
         $this->makeFieldsRequired($schema);
-        $this->hidePercentageField($schema);
+        $this->forceFixedValueOnly($schema);
         $this->setMinDateOnStartsAt($schema);
 
         return $form->schema($schema);
@@ -42,53 +44,42 @@ class DiscountEditExtension extends EditPageExtension
         }
     }
 
-    public function beforeFill(array $data): array
-    {
-        $data['data']['fixed_value'] = true;
-
-        return $data;
-    }
-
-    public function beforeSave(array $data): array
-    {
-        $data['data']['fixed_value'] = true;
-
-        return $data;
-    }
-
-    protected function hidePercentageField(array $components): void
+    protected function forceFixedValueOnly(array $components): void
     {
         foreach ($components as $component) {
-            if ($component instanceof TextInput && $component->getName() === 'data.percentage') {
-                $component->hidden();
-            }
+            if ($component instanceof Section) {
+                $children = $component->getChildComponents();
+                $isAmountOffSection = false;
+                $currencyGroup = null;
 
-            if ($component instanceof Toggle && $component->getName() === 'data.fixed_value') {
-                $component->default(true)
-                    ->hidden()
-                    ->dehydrated(true)
-                    ->afterStateHydrated(fn (Toggle $c) => $c->state(true));
-            }
+                foreach ($children as $child) {
+                    if ($child instanceof Toggle && $child->getName() === 'data.fixed_value') {
+                        $isAmountOffSection = true;
+                    }
 
-            if ($component instanceof Group && $this->isFixedValuesGroup($component)) {
-                $component->visible(true);
+                    if ($child instanceof Group) {
+                        $currencyGroup = $child;
+                    }
+                }
+
+                if ($isAmountOffSection && $currencyGroup) {
+                    $currencyGroup->visible(true);
+
+                    $component->schema([
+                        Hidden::make('data.fixed_value')
+                            ->default(true)
+                            ->afterStateHydrated(fn ($c) => $c->state(true)),
+                        $currencyGroup,
+                    ]);
+
+                    continue;
+                }
             }
 
             if (method_exists($component, 'getChildComponents')) {
-                $this->hidePercentageField($component->getChildComponents());
+                $this->forceFixedValueOnly($component->getChildComponents());
             }
         }
-    }
-
-    protected function isFixedValuesGroup(Group $group): bool
-    {
-        foreach ($group->getChildComponents() as $child) {
-            if ($child instanceof TextInput && str_starts_with($child->getName(), 'data.fixed_values.')) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     protected function setMinDateOnStartsAt(array $components): void
