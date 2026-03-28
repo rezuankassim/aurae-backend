@@ -15,6 +15,7 @@ use App\Lunar\Extensions\CustomerListExtension;
 use App\Lunar\Extensions\DiscountEditExtension;
 use App\Lunar\Extensions\DiscountListExtension;
 use App\Lunar\Extensions\ManageProductVariantsExtension;
+use App\Lunar\Extensions\ProductResourceExtension;
 use App\Lunar\Extensions\ProductConditionRelationManagerExtension;
 use App\Lunar\Extensions\ProductLimitationRelationManagerExtension;
 use App\Lunar\Extensions\ProductRewardRelationManagerExtension;
@@ -39,6 +40,7 @@ use Lunar\Admin\Filament\Resources\DiscountResource\Pages\ListDiscounts;
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductConditionRelationManager;
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductLimitationRelationManager;
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductRewardRelationManager;
+use Lunar\Admin\Filament\Resources\ProductResource;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductVariants;
 use Lunar\Admin\Support\Facades\LunarPanel;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\EditShippingMethod;
@@ -81,6 +83,7 @@ class AppServiceProvider extends ServiceProvider
                 ProductLimitationRelationManager::class => ProductLimitationRelationManagerExtension::class,
                 ProductRewardRelationManager::class => ProductRewardRelationManagerExtension::class,
                 ManageProductVariants::class => ManageProductVariantsExtension::class,
+                ProductResource::class => ProductResourceExtension::class,
                 EditShippingMethod::class => ShippingMethodEditExtension::class,
                 ListShippingMethod::class => ShippingMethodListExtension::class,
             ])

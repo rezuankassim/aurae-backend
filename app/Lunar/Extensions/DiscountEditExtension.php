@@ -4,6 +4,7 @@ namespace App\Lunar\Extensions;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Lunar\Admin\Support\Extending\EditPageExtension;
@@ -45,6 +46,13 @@ class DiscountEditExtension extends EditPageExtension
         foreach ($components as $component) {
             if ($component instanceof TextInput && $component->getName() === 'data.percentage') {
                 $component->hidden();
+            }
+
+            if ($component instanceof Toggle && $component->getName() === 'data.fixed_value') {
+                $component->default(true)
+                    ->hidden()
+                    ->dehydrated(true)
+                    ->afterStateHydrated(fn (Toggle $c) => $c->state(true));
             }
 
             if (method_exists($component, 'getChildComponents')) {
