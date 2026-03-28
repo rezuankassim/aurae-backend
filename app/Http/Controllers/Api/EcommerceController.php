@@ -191,7 +191,7 @@ class EcommerceController extends Controller
         if ($lineIds->isNotEmpty() && $validCount !== $lineIds->count()) {
             return response()->json([
                 'status' => 422,
-                'message' => 'One or more line IDs do not belong to your cart.',
+                'message' => 'Oops! It looks like one of your items just sold out. Please review your cart before checking out.',
                 'data' => null,
             ], 422);
         }

@@ -41,7 +41,7 @@ class ManageProductCollections extends BaseManageProductCollections
                                         ->mapWithKeys(fn (CollectionContract $record): array => [$record->getKey() => $record->breadcrumb->push($record->translateAttribute('name'))->join(' > ')])
                                         ->all();
                                 })
-                                ->getOptionsUsing(static function (self $livewire): array {
+                                ->options(static function (self $livewire): array {
                                     $relationModel = $livewire->getRelationship()->getRelated()::class;
 
                                     return $relationModel::all()
