@@ -16,9 +16,11 @@ use App\Lunar\Extensions\CustomerGroupCreateExtension;
 use App\Lunar\Extensions\CustomerGroupEditExtension;
 use App\Lunar\Extensions\CustomerGroupResourceExtension;
 use App\Lunar\Extensions\CustomerListExtension;
+use App\Lunar\Extensions\CustomerResourceExtension;
 use App\Lunar\Extensions\DiscountEditExtension;
 use App\Lunar\Extensions\DiscountListExtension;
 use App\Lunar\Extensions\DiscountResourceExtension;
+use App\Lunar\Extensions\ManageOrderExtension;
 use App\Lunar\Extensions\ManageProductVariantsExtension;
 use App\Lunar\Extensions\ProductConditionRelationManagerExtension;
 use App\Lunar\Extensions\ProductLimitationRelationManagerExtension;
@@ -43,6 +45,7 @@ use Lunar\Admin\Filament\Resources\CollectionGroupResource\Pages\EditCollectionG
 use Lunar\Admin\Filament\Resources\CustomerGroupResource;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource\Pages\CreateCustomerGroup;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource\Pages\EditCustomerGroup;
+use Lunar\Admin\Filament\Resources\CustomerResource;
 use Lunar\Admin\Filament\Resources\CustomerResource\Pages\ListCustomers;
 use Lunar\Admin\Filament\Resources\DiscountResource;
 use Lunar\Admin\Filament\Resources\DiscountResource\Pages\EditDiscount;
@@ -50,6 +53,7 @@ use Lunar\Admin\Filament\Resources\DiscountResource\Pages\ListDiscounts;
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductConditionRelationManager;
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductLimitationRelationManager;
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductRewardRelationManager;
+use Lunar\Admin\Filament\Resources\OrderResource\Pages\ManageOrder;
 use Lunar\Admin\Filament\Resources\ProductResource;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductVariants;
 use Lunar\Admin\Support\Facades\LunarPanel;
@@ -91,6 +95,7 @@ class AppServiceProvider extends ServiceProvider
                 CreateCollectionGroup::class => CollectionGroupCreateExtension::class,
                 EditCollectionGroup::class => CollectionGroupEditExtension::class,
                 CollectionGroupResource::class => CollectionGroupResourceExtension::class,
+                CustomerResource::class => CustomerResourceExtension::class,
                 ListCustomers::class => CustomerListExtension::class,
                 CreateCustomerGroup::class => CustomerGroupCreateExtension::class,
                 EditCustomerGroup::class => CustomerGroupEditExtension::class,
@@ -101,6 +106,7 @@ class AppServiceProvider extends ServiceProvider
                 ProductConditionRelationManager::class => ProductConditionRelationManagerExtension::class,
                 ProductLimitationRelationManager::class => ProductLimitationRelationManagerExtension::class,
                 ProductRewardRelationManager::class => ProductRewardRelationManagerExtension::class,
+                ManageOrder::class => ManageOrderExtension::class,
                 ManageProductVariants::class => ManageProductVariantsExtension::class,
                 ProductResource::class => ProductResourceExtension::class,
                 EditShippingMethod::class => ShippingMethodEditExtension::class,
