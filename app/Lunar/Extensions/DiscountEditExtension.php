@@ -3,6 +3,7 @@
 namespace App\Lunar\Extensions;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
@@ -41,6 +42,20 @@ class DiscountEditExtension extends EditPageExtension
         }
     }
 
+    public function beforeFill(array $data): array
+    {
+        $data['data']['fixed_value'] = true;
+
+        return $data;
+    }
+
+    public function beforeSave(array $data): array
+    {
+        $data['data']['fixed_value'] = true;
+
+        return $data;
+    }
+
     protected function hidePercentageField(array $components): void
     {
         foreach ($components as $component) {
@@ -55,10 +70,25 @@ class DiscountEditExtension extends EditPageExtension
                     ->afterStateHydrated(fn (Toggle $c) => $c->state(true));
             }
 
+            if ($component instanceof Group && $this->isFixedValuesGroup($component)) {
+                $component->visible(true);
+            }
+
             if (method_exists($component, 'getChildComponents')) {
                 $this->hidePercentageField($component->getChildComponents());
             }
         }
+    }
+
+    protected function isFixedValuesGroup(Group $group): bool
+    {
+        foreach ($group->getChildComponents() as $child) {
+            if ($child instanceof TextInput && str_starts_with($child->getName(), 'data.fixed_values.')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function setMinDateOnStartsAt(array $components): void
