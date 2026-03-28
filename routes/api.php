@@ -136,6 +136,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::get('/checkout/payment-status/{reference}', [CheckoutController::class, 'checkPaymentStatus'])->name('api.checkout.payment-status');
         Route::get('/orders', [CheckoutController::class, 'orderHistory'])->name('api.orders.index');
         Route::get('/orders/{order}', [CheckoutController::class, 'orderDetail'])->name('api.orders.show');
+        Route::post('/orders/{order}/repay', [CheckoutController::class, 'repay'])->name('api.orders.repay');
 
         Route::get('/payment-history', [PaymentHistoryController::class, 'index'])->name('api.payment-history.index');
 

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
+use App\Services\SenangpaySignatureService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Lunar\Facades\Payments;
 use Lunar\Models\Cart;
 use Lunar\Models\Order;
@@ -540,6 +542,132 @@ class CheckoutController extends Controller
                 'status' => 200,
                 'message' => 'Orders retrieved successfully.',
             ]);
+    }
+
+    /**
+     * Initiate repayment for an existing order in payment-pending or payment-failed status.
+     */
+    public function repay(Request $request, Order $order, SenangpaySignatureService $signatureService)
+    {
+        // Ensure user can only repay their own orders
+        if ($order->user_id !== $request->user()->id) {
+            return response()->json([
+                'status' => 403,
+                'message' => 'Unauthorized.',
+                'data' => null,
+            ], 403);
+        }
+
+        // Ensure order is in a repayable status
+        if (! in_array($order->status, ['payment-pending', 'payment-failed'])) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'This order is not eligible for repayment.',
+                'data' => null,
+            ], 400);
+        }
+
+        try {
+            $merchantId = config('services.senangpay.merchant_id');
+            $secretKey = config('services.senangpay.secret_key');
+            $baseUrl = config('services.senangpay.base_url', 'https://app.senangpay.my');
+
+            // Generate a new unique reference number to avoid SenangPay "Duplicated Order Id" rejection
+            $referenceNumber = 'ORD-'.date('Y').'-'.str_pad($order->id, 5, '0', STR_PAD_LEFT).'-R'.now()->format('His');
+
+            // Format amount to decimal
+            $amount = $signatureService->formatAmount($order->total->value);
+
+            // Get customer details from the order's billing address
+            $customerName = '';
+            $customerEmail = '';
+            $customerPhone = '';
+
+            if ($order->billingAddress) {
+                $customerName = $order->billingAddress->first_name.' '.$order->billingAddress->last_name;
+                $customerEmail = $order->billingAddress->contact_email;
+                $customerPhone = $order->billingAddress->contact_phone;
+            }
+
+            // Build detail description
+            $detail = 'Order_'.$referenceNumber;
+
+            // Generate hash
+            $hash = $signatureService->generatePaymentHash(
+                $secretKey,
+                $detail,
+                $amount,
+                $referenceNumber
+            );
+
+            // Create new intent transaction
+            Transaction::create([
+                'order_id' => $order->id,
+                'success' => true,
+                'type' => 'intent',
+                'driver' => 'senangpay',
+                'amount' => $order->total,
+                'reference' => $referenceNumber,
+                'status' => 'pending',
+                'card_type' => '',
+                'last_four' => '',
+                'notes' => 'Repayment intent created',
+                'meta' => [
+                    'customer_name' => $customerName,
+                    'customer_email' => $customerEmail,
+                    'customer_phone' => $customerPhone,
+                    'amount' => $amount,
+                    'detail' => $detail,
+                    'is_repayment' => true,
+                ],
+            ]);
+
+            // Build payment URL
+            $paymentUrl = $baseUrl.'/payment/'.$merchantId.'?'.http_build_query([
+                'detail' => $detail,
+                'amount' => $amount,
+                'order_id' => $referenceNumber,
+                'hash' => $hash,
+                'name' => $customerName,
+                'email' => $customerEmail,
+                'phone' => $customerPhone,
+            ]);
+
+            // Update order meta with new reference number
+            $order->update([
+                'status' => 'payment-pending',
+                'meta' => array_merge((array) $order->meta, [
+                    'senangpay_reference' => $referenceNumber,
+                    'repayment_initiated_at' => now()->toIso8601String(),
+                ]),
+            ]);
+
+            Log::info('SenangPay repayment initiated', [
+                'order_id' => $order->id,
+                'reference' => $referenceNumber,
+                'amount' => $amount,
+            ]);
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Repayment initiated successfully.',
+                'data' => [
+                    'payment_url' => $paymentUrl,
+                    'reference_number' => $referenceNumber,
+                    'order_id' => $order->id,
+                    'amount' => $order->total->formatted,
+                    'currency' => $order->currency->code,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            report($e);
+
+            return response()->json([
+                'status' => 500,
+                'message' => 'Something went wrong while initiating repayment. Please try again later.',
+                'data' => null,
+            ], 500);
+        }
     }
 
     /**

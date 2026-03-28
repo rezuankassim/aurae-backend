@@ -399,6 +399,118 @@ class CheckoutControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    #[Test]
+    public function it_initiates_repayment_for_payment_pending_order()
+    {
+        config([
+            'services.senangpay.merchant_id' => 'TEST_MERCHANT',
+            'services.senangpay.secret_key' => 'test-secret-key',
+            'services.senangpay.base_url' => 'https://app.senangpay.my',
+        ]);
+
+        $user = User::factory()->create();
+        $order = $this->createTestOrder($user);
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->withHeaders($this->deviceHeaders())
+            ->postJson("/api/orders/{$order->id}/repay");
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'status' => 200,
+            'message' => 'Repayment initiated successfully.',
+        ]);
+
+        $response->assertJsonStructure([
+            'data' => [
+                'payment_url',
+                'reference_number',
+                'order_id',
+                'amount',
+                'currency',
+            ],
+        ]);
+
+        // Assert new intent transaction was created
+        $this->assertDatabaseHas('lunar_transactions', [
+            'order_id' => $order->id,
+            'type' => 'intent',
+            'driver' => 'senangpay',
+            'status' => 'pending',
+        ]);
+
+        // Assert order status is still payment-pending
+        $this->assertDatabaseHas('lunar_orders', [
+            'id' => $order->id,
+            'status' => 'payment-pending',
+        ]);
+    }
+
+    #[Test]
+    public function it_initiates_repayment_for_payment_failed_order()
+    {
+        config([
+            'services.senangpay.merchant_id' => 'TEST_MERCHANT',
+            'services.senangpay.secret_key' => 'test-secret-key',
+            'services.senangpay.base_url' => 'https://app.senangpay.my',
+        ]);
+
+        $user = User::factory()->create();
+        $order = $this->createTestOrderWithStatus($user, 'payment-failed');
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->withHeaders($this->deviceHeaders())
+            ->postJson("/api/orders/{$order->id}/repay");
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'status' => 200,
+            'message' => 'Repayment initiated successfully.',
+        ]);
+
+        // Assert order status updated to payment-pending
+        $this->assertDatabaseHas('lunar_orders', [
+            'id' => $order->id,
+            'status' => 'payment-pending',
+        ]);
+    }
+
+    #[Test]
+    public function it_rejects_repayment_for_non_eligible_order()
+    {
+        $user = User::factory()->create();
+        $order = $this->createTestOrderWithStatus($user, 'payment-received');
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->withHeaders($this->deviceHeaders())
+            ->postJson("/api/orders/{$order->id}/repay");
+
+        $response->assertStatus(400);
+        $response->assertJson([
+            'status' => 400,
+            'message' => 'This order is not eligible for repayment.',
+        ]);
+    }
+
+    #[Test]
+    public function it_prevents_repayment_of_another_users_order()
+    {
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+
+        $order = $this->createTestOrder($user1);
+
+        $response = $this->actingAs($user2, 'sanctum')
+            ->withHeaders($this->deviceHeaders())
+            ->postJson("/api/orders/{$order->id}/repay");
+
+        $response->assertStatus(403);
+        $response->assertJson([
+            'status' => 403,
+            'message' => 'Unauthorized.',
+        ]);
+    }
+
     private function createCartForUser(User $user): Cart
     {
         $currency = Currency::firstOrCreate(
@@ -497,6 +609,27 @@ class CheckoutControllerTest extends TestCase
             'status' => 'payment-pending',
             'total' => 10000,
             'meta' => ['revpay_reference' => 'ORD-2026-00001'],
+        ]);
+    }
+
+    private function createTestOrderWithStatus(User $user, string $status): Order
+    {
+        $currency = Currency::firstOrCreate(
+            ['code' => 'MYR'],
+            ['name' => 'Malaysian Ringgit', 'default' => true, 'decimal_places' => 2, 'enabled' => true, 'exchange_rate' => 1.00]
+        );
+        $channel = Channel::firstOrCreate(
+            ['default' => true],
+            ['name' => 'Default', 'handle' => 'default', 'url' => 'http://localhost']
+        );
+
+        return Order::factory()->create([
+            'user_id' => $user->id,
+            'currency_code' => $currency->code,
+            'channel_id' => $channel->id,
+            'status' => $status,
+            'total' => 10000,
+            'meta' => ['senangpay_reference' => 'ORD-2026-00001'],
         ]);
     }
 }
