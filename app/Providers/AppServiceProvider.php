@@ -62,6 +62,14 @@ class AppServiceProvider extends ServiceProvider
             $pagesRef->getValue()
         ));
 
+        // Remove AttributeGroupResource from Lunar panel navigation
+        $resourcesRef = new \ReflectionProperty(\Lunar\Admin\LunarPanelManager::class, 'resources');
+        $resourcesRef->setAccessible(true);
+        $resourcesRef->setValue(null, array_values(array_filter(
+            $resourcesRef->getValue(),
+            fn ($resource) => $resource !== \Lunar\Admin\Filament\Resources\AttributeGroupResource::class
+        )));
+
         LunarPanel::disableTwoFactorAuth()
             ->extensions([
                 ListCustomers::class => CustomerListExtension::class,
