@@ -10,7 +10,12 @@ class CustomerGroupResourceExtension extends ResourceExtension
 {
     public function extendTable(Table $table): Table
     {
-        return $table->bulkActions([
+        $columns = array_values(array_filter(
+            $table->getColumns(),
+            fn ($column) => $column->getName() !== 'handle'
+        ));
+
+        return $table->columns($columns)->bulkActions([
             Tables\Actions\BulkActionGroup::make([
                 Tables\Actions\DeleteBulkAction::make()
                     ->before(function ($records) {

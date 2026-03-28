@@ -2,12 +2,12 @@
 
 namespace App\Lunar\Extensions;
 
-use Filament\Actions;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Lunar\Admin\Support\Extending\EditPageExtension;
+use Illuminate\Support\Str;
+use Lunar\Admin\Support\Extending\CreatePageExtension;
 
-class CustomerGroupEditExtension extends EditPageExtension
+class CustomerGroupCreateExtension extends CreatePageExtension
 {
     public function extendForm(Form $form): Form
     {
@@ -30,16 +30,12 @@ class CustomerGroupEditExtension extends EditPageExtension
         }
     }
 
-    public function headerActions(array $actions): array
+    public function beforeCreate(array $data): array
     {
-        return [
-            Actions\DeleteAction::make()
-                ->before(function ($record) {
-                    $record->customers()->detach();
-                    $record->discounts()->detach();
-                    $record->products()->detach();
-                    $record->collections()->detach();
-                }),
-        ];
+        if (empty($data['handle'])) {
+            $data['handle'] = Str::slug($data['name']);
+        }
+
+        return $data;
     }
 }

@@ -17,7 +17,7 @@ class ProductResource extends BaseResource
         return [
             'id' => $this->id,
             'name' => $this->translateAttribute('name'),
-            'description' => $this->translateAttribute('description'),
+            'description' => $this->cleanDescription($this->translateAttribute('description')),
             'thumbnail' => $this->thumbnail ? [
                 'url' => $this->thumbnail->getUrl(),
                 'name' => $this->translateAttribute('name'),
@@ -30,6 +30,19 @@ class ProductResource extends BaseResource
             }),
             'options' => $this->getProductOptions(),
         ];
+    }
+
+    /**
+     * Strip Trix attachment captions (filename/size) from HTML description.
+     */
+    protected function cleanDescription(?string $html): ?string
+    {
+        if (! $html) {
+            return $html;
+        }
+
+        // Remove <figcaption class="attachment__caption">...</figcaption>
+        return preg_replace('/<figcaption[^>]*class="[^"]*attachment__caption[^"]*"[^>]*>.*?<\/figcaption>/s', '', $html);
     }
 
     public function getProductOptions()

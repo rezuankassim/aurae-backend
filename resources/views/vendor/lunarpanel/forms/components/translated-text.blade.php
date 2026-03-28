@@ -59,8 +59,8 @@
     @if ($getOptionRichtext())
         @once
             <style>
-                [data-lunar-richtext] .trix-content .attachment__caption {
-                    display: none;
+                [data-lunar-richtext] .attachment__caption {
+                    display: none !important;
                 }
             </style>
             <script>
