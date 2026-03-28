@@ -11,6 +11,7 @@ use App\Listeners\LogLogout;
 use App\Listeners\LogSuccessfulLogin;
 use App\Lunar\Extensions\CustomerGroupEditExtension;
 use App\Lunar\Extensions\CustomerGroupResourceExtension;
+use App\Lunar\Extensions\CustomerListExtension;
 use App\Lunar\Extensions\DiscountEditExtension;
 use App\Lunar\Extensions\DiscountListExtension;
 use App\Lunar\Extensions\ManageProductVariantsExtension;
@@ -33,6 +34,7 @@ use Laravel\Reverb\Events\ConnectionPruned;
 use Livewire\Livewire;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource;
 use Lunar\Admin\Filament\Resources\CustomerGroupResource\Pages\EditCustomerGroup;
+use Lunar\Admin\Filament\Resources\CustomerResource\Pages\ListCustomers;
 use Lunar\Admin\Filament\Resources\DiscountResource\Pages\EditDiscount;
 use Lunar\Admin\Filament\Resources\DiscountResource\Pages\ListDiscounts;
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductConditionRelationManager;
@@ -63,6 +65,7 @@ class AppServiceProvider extends ServiceProvider
 
         LunarPanel::disableTwoFactorAuth()
             ->extensions([
+                ListCustomers::class => CustomerListExtension::class,
                 EditCustomerGroup::class => CustomerGroupEditExtension::class,
                 CustomerGroupResource::class => CustomerGroupResourceExtension::class,
                 EditDiscount::class => DiscountEditExtension::class,
