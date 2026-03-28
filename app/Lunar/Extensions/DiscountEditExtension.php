@@ -2,6 +2,7 @@
 
 namespace App\Lunar\Extensions;
 
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -21,6 +22,7 @@ class DiscountEditExtension extends EditPageExtension
         $schema = $form->getComponents();
         $this->makeFieldsRequired($schema);
         $this->hidePercentageField($schema);
+        $this->setMinDateOnStartsAt($schema);
 
         return $form->schema($schema);
     }
@@ -47,6 +49,29 @@ class DiscountEditExtension extends EditPageExtension
 
             if (method_exists($component, 'getChildComponents')) {
                 $this->hidePercentageField($component->getChildComponents());
+            }
+        }
+    }
+
+    protected function setMinDateOnStartsAt(array $components): void
+    {
+        foreach ($components as $component) {
+            if ($component instanceof DateTimePicker && $component->getName() === 'starts_at') {
+                $component->minDate(function () {
+                    $record = $this->caller?->getRecord();
+                    $originalStartsAt = $record?->starts_at;
+                    $today = now()->startOfDay();
+
+                    if ($originalStartsAt && $originalStartsAt->isBefore($today)) {
+                        return $originalStartsAt;
+                    }
+
+                    return $today;
+                });
+            }
+
+            if (method_exists($component, 'getChildComponents')) {
+                $this->setMinDateOnStartsAt($component->getChildComponents());
             }
         }
     }

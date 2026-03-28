@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ChunkedUploadController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EditorUploadController;
 use App\Http\Controllers\Admin\CollectionGroupCollectionController;
 use App\Http\Controllers\Admin\CollectionGroupController;
 use App\Http\Controllers\Admin\DeviceLocationController;
@@ -37,6 +38,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+
+    // Editor image upload
+    Route::post('/editor-upload', [EditorUploadController::class, 'store'])->name('editor-upload.store');
 
     // Chunked upload routes
     Route::post('/chunked-upload/initiate', [ChunkedUploadController::class, 'initiate'])->name('chunked-upload.initiate');

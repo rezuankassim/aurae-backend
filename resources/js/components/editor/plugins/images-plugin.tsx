@@ -74,19 +74,41 @@ export function InsertImageUriDialogBody({ onClick }: { onClick: (payload: Inser
 export function InsertImageUploadedDialogBody({ onClick }: { onClick: (payload: InsertImagePayload) => void }) {
     const [src, setSrc] = useState('');
     const [altText, setAltText] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadError, setUploadError] = useState('');
 
-    const isDisabled = src === '';
+    const isDisabled = src === '' || isUploading;
 
-    const loadImage = (files: FileList | null) => {
-        const reader = new FileReader();
-        reader.onload = function () {
-            if (typeof reader.result === 'string') {
-                setSrc(reader.result);
+    const loadImage = async (files: FileList | null) => {
+        if (!files || files.length === 0) return;
+
+        setIsUploading(true);
+        setUploadError('');
+
+        const formData = new FormData();
+        formData.append('image', files[0]);
+
+        try {
+            const response = await fetch('/admin/editor-upload', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+                    Accept: 'application/json',
+                },
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const error = await response.json().catch(() => null);
+                throw new Error(error?.message || 'Upload failed');
             }
-            return '';
-        };
-        if (files !== null) {
-            reader.readAsDataURL(files[0]);
+
+            const data = await response.json();
+            setSrc(data.url);
+        } catch (error) {
+            setUploadError(error instanceof Error ? error.message : 'Upload failed');
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -99,8 +121,11 @@ export function InsertImageUploadedDialogBody({ onClick }: { onClick: (payload: 
                     type="file"
                     onChange={(e) => loadImage(e.target.files)}
                     accept="image/*"
+                    disabled={isUploading}
                     data-test-id="image-modal-file-upload"
                 />
+                {isUploading && <p className="text-sm text-muted-foreground">Uploading...</p>}
+                {uploadError && <p className="text-sm text-destructive">{uploadError}</p>}
             </div>
             <div className="grid gap-2">
                 <Label htmlFor="alt-text">Alt Text</Label>
@@ -113,7 +138,7 @@ export function InsertImageUploadedDialogBody({ onClick }: { onClick: (payload: 
                 />
             </div>
             <Button type="submit" disabled={isDisabled} onClick={() => onClick({ altText, src })} data-test-id="image-modal-file-upload-btn">
-                Confirm
+                {isUploading ? 'Uploading...' : 'Confirm'}
             </Button>
         </div>
     );
