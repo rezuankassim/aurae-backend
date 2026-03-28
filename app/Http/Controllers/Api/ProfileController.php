@@ -9,6 +9,7 @@ use App\Models\Verification;
 use App\Services\ExabytesService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -73,6 +74,14 @@ class ProfileController extends Controller
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->phone_country_code = $validated['phone_country_code'] ?? $user->phone_country_code;
+
+        // Sync customer record with updated name
+        $customer = $user->customers()->first();
+        if ($customer) {
+            $customer->first_name = Str::before($validated['name'], ' ');
+            $customer->last_name = Str::after($validated['name'], ' ');
+            $customer->save();
+        }
 
         // If phone is changed, require verification
         if ($phoneChanged) {
