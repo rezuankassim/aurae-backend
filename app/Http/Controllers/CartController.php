@@ -50,9 +50,11 @@ class CartController extends Controller
         $cart = CartSession::current();
 
         if (! $cart) {
+            $user = auth()->user();
             $cart = Cart::create([
                 'currency_id' => Currency::getDefault()->id,
-                'user_id' => auth()->id(),
+                'user_id' => $user->id,
+                'customer_id' => $user->customers->first()?->id,
                 'channel_id' => Channel::getDefault()->id,
             ]);
             CartSession::use($cart);

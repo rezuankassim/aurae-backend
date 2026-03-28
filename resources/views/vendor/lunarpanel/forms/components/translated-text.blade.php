@@ -58,6 +58,11 @@
     {{-- Filament's Alpine handler) and uploads them directly to a permanent endpoint. --}}
     @if ($getOptionRichtext())
         @once
+            <style>
+                [data-lunar-richtext] .trix-content .attachment__caption {
+                    display: none;
+                }
+            </style>
             <script>
                 if (!window.__lunarRichtextUploadRegistered) {
                     window.__lunarRichtextUploadRegistered = true;
