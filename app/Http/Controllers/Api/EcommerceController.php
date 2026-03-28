@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CartResource;
 use App\Http\Resources\CollectionResource;
 use Illuminate\Http\Request;
+use Lunar\Exceptions\Carts\CartException;
 use Lunar\Models\Cart;
 use Lunar\Models\Channel;
 use Lunar\Models\Collection;
@@ -50,12 +51,15 @@ class EcommerceController extends Controller
             ]);
         } else {
             // Remove any cart lines whose product is no longer published (active)
-            $inactiveLineIds = $cart->lines
-                ->filter(fn ($line) => $line->purchasable?->product?->status !== 'published')
+            // or whose variant can no longer fulfill the requested quantity (out of stock)
+            $staleLineIds = $cart->lines
+                ->filter(fn ($line) => $line->purchasable?->product?->status !== 'published'
+                    || ! $line->purchasable?->canBeFulfilledAtQuantity($line->quantity)
+                )
                 ->pluck('id');
 
-            if ($inactiveLineIds->isNotEmpty()) {
-                $cart->lines()->whereIn('id', $inactiveLineIds)->delete();
+            if ($staleLineIds->isNotEmpty()) {
+                $cart->lines()->whereIn('id', $staleLineIds)->delete();
                 $cart->unsetRelation('lines');
             }
         }
@@ -87,7 +91,15 @@ class EcommerceController extends Controller
 
         $productVariant = ProductVariant::findOrFail($request->product_variant_id);
 
-        $cart->add($productVariant, $request->quantity);
+        try {
+            $cart->add($productVariant, $request->quantity);
+        } catch (CartException $e) {
+            return response()->json([
+                'status' => 422,
+                'message' => $e->errors()->first(),
+                'data' => null,
+            ], 422);
+        }
 
         return CartResource::make($cart)
             ->additional([
@@ -132,9 +144,15 @@ class EcommerceController extends Controller
             ], 422);
         }
 
-        $line->update(['quantity' => $request->quantity]);
-
-        $cart = $cart->recalculate();
+        try {
+            $cart = $cart->updateLine($request->cart_line_id, $request->quantity);
+        } catch (CartException $e) {
+            return response()->json([
+                'status' => 422,
+                'message' => $e->errors()->first(),
+                'data' => null,
+            ], 422);
+        }
 
         return CartResource::make($cart)
             ->additional([

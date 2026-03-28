@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Lunar\Models\Order;
+use Lunar\Models\ProductVariant;
 use Lunar\Models\Transaction;
 
 class SenangpayCallbackController extends Controller
@@ -257,6 +258,23 @@ class SenangpayCallbackController extends Controller
                 'payment_completed_at' => now()->toIso8601String(),
             ]),
         ]);
+
+        // Decrement stock for each product variant in the order
+        foreach ($order->lines()->where('purchasable_type', 'product_variant')->get() as $line) {
+            $variant = ProductVariant::find($line->purchasable_id);
+
+            if ($variant) {
+                $variant->decrement('stock', $line->quantity);
+
+                Log::info('SenangPay capture: Stock decremented', [
+                    'order_id' => $order->id,
+                    'variant_id' => $variant->id,
+                    'sku' => $variant->sku,
+                    'quantity' => $line->quantity,
+                    'new_stock' => $variant->fresh()->stock,
+                ]);
+            }
+        }
 
         // Note: do NOT delete the cart here. The custom CreateOrder action already
         // removes checked-out lines and resets any remaining ones to selected=true,

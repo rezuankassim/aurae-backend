@@ -3,6 +3,7 @@
 namespace App\Lunar\Extensions;
 
 use Filament\Forms\Form;
+use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductAssociations;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductUrls;
 use Lunar\Admin\Support\Extending\ResourceExtension;
 
@@ -12,7 +13,10 @@ class ProductResourceExtension extends ResourceExtension
     {
         return array_values(array_filter(
             $pages,
-            fn ($page) => $page !== ManageProductUrls::class
+            fn ($page) => ! in_array($page, [
+                ManageProductUrls::class,
+                ManageProductAssociations::class,
+            ])
         ));
     }
 
