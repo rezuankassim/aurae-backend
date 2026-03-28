@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Lunar\Admin\Support\Extending\EditPageExtension;
 use Lunar\DiscountTypes\BuyXGetY;
+use Lunar\Models\Currency;
 
 class DiscountEditExtension extends EditPageExtension
 {
@@ -23,7 +24,7 @@ class DiscountEditExtension extends EditPageExtension
 
     public function extendForm(Form $form): Form
     {
-        $schema = $form->getComponents();
+        $schema = $form->getComponents(withHidden: true);
         $this->makeFieldsRequired($schema);
         $this->forceFixedValueOnly($schema);
         $this->setMinDateOnStartsAt($schema);
@@ -63,13 +64,20 @@ class DiscountEditExtension extends EditPageExtension
                 }
 
                 if ($isAmountOffSection && $currencyGroup) {
-                    $currencyGroup->visible(true);
+                    $enabledCodes = Currency::enabled()->pluck('code')->all();
+
+                    $filteredInputs = array_filter(
+                        $currencyGroup->getChildComponents(),
+                        fn ($input) => $input instanceof TextInput
+                            && in_array(last(explode('.', $input->getName())), $enabledCodes)
+                    );
 
                     $component->schema([
                         Hidden::make('data.fixed_value')
                             ->default(true)
-                            ->afterStateHydrated(fn ($c) => $c->state(true)),
-                        $currencyGroup,
+                            ->afterStateHydrated(fn ($component) => $component->state(true)),
+                        Group::make(array_values($filteredInputs))
+                            ->columns(count($filteredInputs)),
                     ]);
 
                     continue;
