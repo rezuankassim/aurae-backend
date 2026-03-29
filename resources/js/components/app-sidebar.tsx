@@ -245,7 +245,7 @@ export function AppSidebar() {
                     </SidebarMenu>
                 </SidebarGroup>
 
-                <NavMain items={mainNavItems} />
+                {!auth.user.is_admin ? <NavMain items={mainNavItems} /> : null}
                 {auth.user.is_admin ? <NavManagement items={managementNavItems} /> : null}
             </SidebarContent>
 
