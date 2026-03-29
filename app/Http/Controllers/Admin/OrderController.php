@@ -52,7 +52,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'status' => ['required', 'string', 'in:awaiting-payment,payment-offline,payment-received,dispatched'],
+            'status' => ['required', 'string', 'in:awaiting-payment,payment-received,dispatched,delivered'],
             'tracking_number' => ['required_if:status,dispatched', 'nullable', 'string', 'max:255'],
         ]);
 

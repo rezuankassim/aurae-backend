@@ -31,10 +31,10 @@ export default function AdminOrdersIndex({ orders }: Props) {
 
     const getStatusBadge = (status: string) => {
         const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-            'awaiting-payment': { label: 'Awaiting Payment', variant: 'secondary' },
-            'payment-offline': { label: 'Payment Offline', variant: 'default' },
+            'awaiting-payment': { label: 'Payment Pending', variant: 'secondary' },
             'payment-received': { label: 'Payment Received', variant: 'default' },
             dispatched: { label: 'Dispatched', variant: 'outline' },
+            delivered: { label: 'Delivered', variant: 'default' },
         };
 
         const config = statusMap[status] || { label: status, variant: 'secondary' };

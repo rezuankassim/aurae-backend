@@ -43,10 +43,10 @@ export default function AdminOrderShow({ order }: Props) {
 
     const getStatusBadge = (status: string) => {
         const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-            'awaiting-payment': { label: 'Awaiting Payment', variant: 'secondary' },
-            'payment-offline': { label: 'Payment Offline', variant: 'default' },
+            'awaiting-payment': { label: 'Payment Pending', variant: 'secondary' },
             'payment-received': { label: 'Payment Received', variant: 'default' },
             dispatched: { label: 'Dispatched', variant: 'outline' },
+            delivered: { label: 'Delivered', variant: 'default' },
         };
 
         const config = statusMap[status] || { label: status, variant: 'secondary' };
@@ -211,10 +211,10 @@ src={line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg'}
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="awaiting-payment">Awaiting Payment</SelectItem>
-                                            <SelectItem value="payment-offline">Payment Offline</SelectItem>
+                                            <SelectItem value="awaiting-payment">Payment Pending</SelectItem>
                                             <SelectItem value="payment-received">Payment Received</SelectItem>
                                             <SelectItem value="dispatched">Dispatched</SelectItem>
+                                            <SelectItem value="delivered">Delivered</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <InputError message={errors.status} />

@@ -63,16 +63,8 @@ return [
     'statuses' => [
 
         'awaiting-payment' => [
-            'label' => 'Awaiting Payment',
+            'label' => 'Payment Pending',
             'color' => '#848a8c',
-            'mailers' => [],
-            'notifications' => [],
-            'favourite' => true,
-        ],
-
-        'payment-offline' => [
-            'label' => 'Payment Offline',
-            'color' => '#0A81D7',
             'mailers' => [],
             'notifications' => [],
             'favourite' => true,
@@ -88,6 +80,14 @@ return [
 
         'dispatched' => [
             'label' => 'Dispatched',
+            'mailers' => [],
+            'notifications' => [],
+            'favourite' => true,
+        ],
+
+        'delivered' => [
+            'label' => 'Delivered',
+            'color' => '#2ecc71',
             'mailers' => [],
             'notifications' => [],
             'favourite' => true,
