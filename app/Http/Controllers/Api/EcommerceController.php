@@ -40,11 +40,11 @@ class EcommerceController extends Controller
     {
         $cart = Cart::with([
             'lines.purchasable.values.option',
-            'lines.purchasable.media',
+            'lines.purchasable.images',
             'lines.purchasable.basePrices',
             'lines.purchasable.product.variants.values.option',
             'lines.purchasable.product.variants.basePrices',
-            'lines.purchasable.product.variants.media',
+            'lines.purchasable.product.variants.images',
             'lines.purchasable.product.media',
             'lines.purchasable.product.thumbnail',
         ])
