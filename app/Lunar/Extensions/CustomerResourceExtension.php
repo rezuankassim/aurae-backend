@@ -2,6 +2,7 @@
 
 namespace App\Lunar\Extensions;
 
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Lunar\Admin\Support\Extending\ResourceExtension;
@@ -26,8 +27,16 @@ class CustomerResourceExtension extends ResourceExtension
     public function extendForm(Form $form): Form
     {
         foreach ($form->getFlatComponents(withHidden: true) as $component) {
-            if (method_exists($component, 'getName') && $component->getName() === 'customerGroups') {
-                $component->hidden();
+            if ($component instanceof Section) {
+                $children = $component->getChildComponents();
+
+                foreach ($children as $child) {
+                    if (method_exists($child, 'getName') && $child->getName() === 'customerGroups') {
+                        $component->hidden();
+
+                        break;
+                    }
+                }
             }
         }
 
