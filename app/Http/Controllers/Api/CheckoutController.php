@@ -173,6 +173,12 @@ class CheckoutController extends Controller
         // Set the shipping option on the cart
         $cart->setShippingOption($shippingOption);
 
+        // Clear stale shipping breakdown from the prior calculate() call.
+        // Without this, ApplyShipping reuses the existing breakdown and
+        // accumulates the old shipping option alongside the new one,
+        // resulting in an incorrect shipping total.
+        $cart->shippingBreakdown = null;
+
         // Re-scope to selected lines and force-recalculate so totals include shipping
         // against only the items being checked out (not the full cart)
         $this->scopeCartToSelected($cart);
@@ -377,6 +383,10 @@ class CheckoutController extends Controller
                 ], 400);
             }
         }
+
+        // Clear stale shipping breakdown from the prior calculate() call to
+        // prevent accumulation of old shipping items during recalculate.
+        $cart->shippingBreakdown = null;
 
         // Force-recalculate after shipping is confirmed so $cart->total correctly
         // reflects selected lines + shipping. This covers both the case where
