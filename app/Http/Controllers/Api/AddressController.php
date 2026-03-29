@@ -75,7 +75,8 @@ class AddressController extends Controller
             $customer->addresses()->update(['billing_default' => false]);
         }
 
-        $stateName = $request->state ? State::find($request->state)?->name : null;
+        $stateName = $request->state;
+        // ? State::find($request->state)?->name : null;
 
         $address = $customer->addresses()->create([
             'country_id' => $request->country_id,
@@ -183,7 +184,8 @@ class AddressController extends Controller
         ]);
 
         if ($request->has('state')) {
-            $data['state'] = $request->state ? State::find($request->state)?->name : null;
+            $data['state'] = $request->state;
+            // ? State::find($request->state)?->name : null;
         }
 
         $address->update($data);
