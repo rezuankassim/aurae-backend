@@ -75,6 +75,8 @@ class AddressController extends Controller
             $customer->addresses()->update(['billing_default' => false]);
         }
 
+        $stateName = $request->state ? State::find($request->state)?->name : null;
+
         $address = $customer->addresses()->create([
             'country_id' => $request->country_id,
             'title' => $request->title,
@@ -85,7 +87,7 @@ class AddressController extends Controller
             'line_two' => $request->line_two,
             'line_three' => $request->line_three,
             'city' => $request->city,
-            'state' => $request->state,
+            'state' => $stateName,
             'postcode' => $request->postcode,
             'delivery_instructions' => $request->delivery_instructions,
             'contact_email' => $request->contact_email,
@@ -144,7 +146,7 @@ class AddressController extends Controller
             'line_two' => ['nullable', 'string', 'max:255'],
             'line_three' => ['nullable', 'string', 'max:255'],
             'city' => ['sometimes', 'string', 'max:255'],
-            'state' => ['nullable', 'string', 'max:255'],
+            'state' => ['nullable', 'exists:lunar_states,id'],
             'postcode' => ['nullable', 'string', 'max:255'],
             'delivery_instructions' => ['nullable', 'string'],
             'contact_email' => ['nullable', 'email', 'max:255'],
@@ -162,7 +164,7 @@ class AddressController extends Controller
             $customer->addresses()->where('id', '!=', $address->id)->update(['billing_default' => false]);
         }
 
-        $address->update($request->only([
+        $data = $request->only([
             'country_id',
             'title',
             'first_name',
@@ -172,14 +174,19 @@ class AddressController extends Controller
             'line_two',
             'line_three',
             'city',
-            'state',
             'postcode',
             'delivery_instructions',
             'contact_email',
             'contact_phone',
             'shipping_default',
             'billing_default',
-        ]));
+        ]);
+
+        if ($request->has('state')) {
+            $data['state'] = $request->state ? State::find($request->state)?->name : null;
+        }
+
+        $address->update($data);
 
         return AddressResource::make($address->fresh())
             ->additional([
