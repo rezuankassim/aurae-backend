@@ -38,7 +38,16 @@ class EcommerceController extends Controller
 
     public function cart(Request $request)
     {
-        $cart = Cart::with(['lines.purchasable.product'])
+        $cart = Cart::with([
+            'lines.purchasable.values.option',
+            'lines.purchasable.media',
+            'lines.purchasable.basePrices',
+            'lines.purchasable.product.variants.values.option',
+            'lines.purchasable.product.variants.basePrices',
+            'lines.purchasable.product.variants.media',
+            'lines.purchasable.product.media',
+            'lines.purchasable.product.thumbnail',
+        ])
             ->where('user_id', $request->user()->id)
             ->first();
 
@@ -158,6 +167,67 @@ class EcommerceController extends Controller
             ->additional([
                 'status' => 200,
                 'message' => 'Cart line quantity updated successfully.',
+            ]);
+    }
+
+    public function swapCartLineVariant(Request $request)
+    {
+        $request->validate([
+            'cart_line_id' => ['required', 'exists:lunar_cart_lines,id'],
+            'product_variant_id' => ['required', 'exists:lunar_product_variants,id'],
+        ]);
+
+        $cart = Cart::where('user_id', $request->user()->id)->firstOrFail();
+
+        $line = $cart->lines()->with('purchasable')->where('id', $request->cart_line_id)->first();
+
+        if (! $line) {
+            return response()->json([
+                'status' => 422,
+                'message' => 'Cart line does not belong to your cart.',
+                'data' => null,
+            ], 422);
+        }
+
+        $newVariant = ProductVariant::with('product')->findOrFail($request->product_variant_id);
+
+        // Ensure the new variant belongs to the same product
+        if ($line->purchasable->product_id !== $newVariant->product_id) {
+            return response()->json([
+                'status' => 422,
+                'message' => 'The selected variant does not belong to the same product.',
+                'data' => null,
+            ], 422);
+        }
+
+        // If the same variant is selected, nothing to do
+        if ($line->purchasable_id === $newVariant->id) {
+            $cart = $cart->recalculate();
+
+            return CartResource::make($cart)
+                ->additional([
+                    'status' => 200,
+                    'message' => 'Cart updated successfully.',
+                ]);
+        }
+
+        $quantity = $line->quantity;
+
+        try {
+            $cart->remove($line->id, refresh: false);
+            $cart = $cart->add($newVariant, $quantity);
+        } catch (CartException $e) {
+            return response()->json([
+                'status' => 422,
+                'message' => $e->errors()->first(),
+                'data' => null,
+            ], 422);
+        }
+
+        return CartResource::make($cart)
+            ->additional([
+                'status' => 200,
+                'message' => 'Cart variant swapped successfully.',
             ]);
     }
 

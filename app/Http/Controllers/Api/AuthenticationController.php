@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
+use App\Models\LoginActivity;
 use App\Models\User;
 use App\Models\Verification;
 use App\Services\ExabytesService;
@@ -26,6 +27,17 @@ class AuthenticationController extends Controller
         $user = User::where('phone', $request->phone)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
+            LoginActivity::create([
+                'user_id' => $user?->id,
+                'event' => 'failed',
+                'guard' => 'api',
+                'session_id' => null,
+                'ip_address' => $request->ip(),
+                'user_agent' => substr($request->userAgent() ?? '', 0, 500),
+                'succeeded' => false,
+                'occurred_at' => now(),
+            ]);
+
             throw ValidationException::withMessages([
                 'phone' => ['The provided credentials are incorrect.'],
             ]);
@@ -34,6 +46,17 @@ class AuthenticationController extends Controller
         $request->device->update([
             'deviceable_type' => User::class,
             'deviceable_id' => $user->id,
+        ]);
+
+        LoginActivity::create([
+            'user_id' => $user->id,
+            'event' => 'login',
+            'guard' => 'api',
+            'session_id' => $request->device->udid,
+            'ip_address' => $request->ip(),
+            'user_agent' => substr($request->userAgent() ?? '', 0, 500),
+            'succeeded' => true,
+            'occurred_at' => now(),
         ]);
 
         $user->token = $user->createToken($request->device->udid)->plainTextToken;
