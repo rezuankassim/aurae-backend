@@ -25,7 +25,7 @@ export const columns: ColumnDef<Music>[] = [
         accessorKey: 'is_active',
         header: 'Status',
         cell: ({ row }) => {
-            return row.getValue('is_active') ? <Badge>Active</Badge> : <Badge variant="outline">Inactive</Badge>;
+            return row.getValue('is_active') ? <Badge>Active</Badge> : <Badge variant="destructive">Inactive</Badge>;
         },
     },
     {

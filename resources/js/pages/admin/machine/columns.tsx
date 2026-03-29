@@ -28,7 +28,7 @@ export const columns: ColumnDef<Machine>[] = [
         header: 'Status',
         cell: ({ row }) => {
             const status = row.original.status;
-            return <Badge variant={status === 1 ? 'default' : 'secondary'}>{status === 1 ? 'Active' : 'Inactive'}</Badge>;
+            return <Badge variant={status === 1 ? 'default' : 'destructive'}>{status === 1 ? 'Active' : 'Inactive'}</Badge>;
         },
     },
     {

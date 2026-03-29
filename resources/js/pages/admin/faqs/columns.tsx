@@ -22,7 +22,7 @@ export const columns: ColumnDef<Faq>[] = [
         header: 'Status',
         cell: ({ row }) => {
             const status = row.getValue('status') as number;
-            return status == 1 ? <Badge>Active</Badge> : <Badge variant="secondary">Inactive</Badge>;
+            return status == 1 ? <Badge>Active</Badge> : <Badge variant="destructive">Inactive</Badge>;
         },
     },
     {
