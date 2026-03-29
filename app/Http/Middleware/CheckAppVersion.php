@@ -6,6 +6,7 @@ use App\Http\Resources\BaseResource;
 use App\Models\GeneralSetting;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckAppVersion
@@ -19,7 +20,7 @@ class CheckAppVersion
     {
         $mobileAppVersion = $request->header('X-Device-App-Version');
         $tabletAppVersion = $request->header('X-Device-Tablet-App-Version');
-        $generalSetting = GeneralSetting::first();
+        $generalSetting = Cache::remember('general_setting', 300, fn () => GeneralSetting::first());
 
         // Check mobile app version if header is present
         if ($mobileAppVersion && $generalSetting && $generalSetting->apk_version) {

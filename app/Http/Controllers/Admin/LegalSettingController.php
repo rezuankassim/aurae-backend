@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\GeneralSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class LegalSettingController extends Controller
@@ -35,6 +36,8 @@ class LegalSettingController extends Controller
 
         $generalSetting = GeneralSetting::first();
         $generalSetting->update($validated);
+
+        Cache::forget('general_setting');
 
         return to_route('admin.legal-settings.edit')->with('success', 'Legal settings updated successfully.');
     }

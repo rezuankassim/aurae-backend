@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Http\Resources\BaseResource;
-use App\Models\DeviceLocation;
+use App\Jobs\LogDeviceLocation;
 use App\Models\UserDevice;
 use Closure;
 use Illuminate\Http\Request;
@@ -62,16 +62,16 @@ class EnsureDevice
             return;
         }
 
-        DeviceLocation::create([
-            'user_device_id' => $device->id,
-            'latitude' => $latitude,
-            'longitude' => $longitude,
-            'accuracy' => $request->header('X-Device-Accuracy'),
-            'altitude' => $request->header('X-Device-Altitude'),
-            'speed' => $request->header('X-Device-Speed'),
-            'heading' => $request->header('X-Device-Heading'),
-            'api_endpoint' => $request->path(),
-            'ip_address' => $request->ip(),
-        ]);
+        LogDeviceLocation::dispatch(
+            userDeviceId: $device->id,
+            latitude: $latitude,
+            longitude: $longitude,
+            accuracy: $request->header('X-Device-Accuracy'),
+            altitude: $request->header('X-Device-Altitude'),
+            speed: $request->header('X-Device-Speed'),
+            heading: $request->header('X-Device-Heading'),
+            apiEndpoint: $request->path(),
+            ipAddress: $request->ip(),
+        );
     }
 }

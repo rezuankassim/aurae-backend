@@ -95,9 +95,15 @@ class HealthReportController extends Controller
                 ->setStatusCode(404);
         }
 
-        return response()->file(storage_path('app/private/'.$file), [
+        $response = response()->file(storage_path('app/private/'.$file), [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="'.Str::afterLast($file, '/').'"',
         ]);
+
+        $response->setAutoEtag();
+        $response->setAutoLastModified();
+        $response->isNotModified($request);
+
+        return $response;
     }
 }

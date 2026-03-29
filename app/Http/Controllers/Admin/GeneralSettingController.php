@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\GeneralSettingUpdateRequest;
 use App\Models\GeneralSetting;
 use App\Services\MachineSerialService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -103,6 +104,8 @@ class GeneralSettingController extends Controller
         }
 
         $generalSetting->save();
+
+        Cache::forget('general_setting');
 
         return to_route('admin.general-settings.edit')->with('success', 'General settings updated successfully.');
     }

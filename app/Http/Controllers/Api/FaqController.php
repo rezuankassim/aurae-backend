@@ -13,7 +13,9 @@ class FaqController extends Controller
      */
     public function index()
     {
-        $faqs = Faq::all();
+        $faqs = Faq::query()
+            ->where('status', 1)
+            ->get();
 
         return FaqResource::collection($faqs)
             ->additional([
