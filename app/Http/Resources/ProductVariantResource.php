@@ -17,6 +17,8 @@ class ProductVariantResource extends BaseResource
         return [
             'id' => $this->id,
             'sku' => $this->sku,
+            'stock' => $this->stock,
+            'in_stock' => $this->stock > 0,
             'thumbnail' => [
                 'url' => $this->getThumbnail()?->getUrl(),
             ],
