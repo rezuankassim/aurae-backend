@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CartLineResource;
 use App\Http\Resources\CartResource;
 use App\Http\Resources\CollectionResource;
 use Illuminate\Http\Request;
@@ -204,7 +205,20 @@ class EcommerceController extends Controller
         if ($line->purchasable_id === $newVariant->id) {
             $cart = $cart->recalculate();
 
-            return CartResource::make($cart)
+            $updatedLine = $cart->lines->first(fn ($l) => $l->purchasable_id === $newVariant->id && $l->purchasable_type === ProductVariant::modelClass());
+
+            $updatedLine->load([
+                'purchasable.values.option',
+                'purchasable.images',
+                'purchasable.basePrices',
+                'purchasable.product.variants.values.option',
+                'purchasable.product.variants.basePrices',
+                'purchasable.product.variants.images',
+                'purchasable.product.media',
+                'purchasable.product.thumbnail',
+            ]);
+
+            return CartLineResource::make($updatedLine)
                 ->additional([
                     'status' => 200,
                     'message' => 'Cart updated successfully.',
@@ -224,7 +238,20 @@ class EcommerceController extends Controller
             ], 422);
         }
 
-        return CartResource::make($cart)
+        $newLine = $cart->lines->first(fn ($l) => $l->purchasable_id === $newVariant->id && $l->purchasable_type === ProductVariant::modelClass());
+
+        $newLine->load([
+            'purchasable.values.option',
+            'purchasable.images',
+            'purchasable.basePrices',
+            'purchasable.product.variants.values.option',
+            'purchasable.product.variants.basePrices',
+            'purchasable.product.variants.images',
+            'purchasable.product.media',
+            'purchasable.product.thumbnail',
+        ]);
+
+        return CartLineResource::make($newLine)
             ->additional([
                 'status' => 200,
                 'message' => 'Cart variant swapped successfully.',
