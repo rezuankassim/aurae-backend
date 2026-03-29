@@ -8,6 +8,7 @@ use App\Http\Resources\BaseResource;
 use App\Http\Resources\GuestResource;
 use App\Models\Device;
 use App\Models\Guest;
+use App\Models\LoginActivity;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -138,6 +139,18 @@ class DeviceGuestController extends Controller
         $tokenName = "guest-{$guest->id}-device-{$device->uuid}";
         $token = $guest->user->createToken($tokenName)->plainTextToken;
         $guest->token = $token;
+
+        // Log the guest login activity
+        LoginActivity::create([
+            'user_id' => $guest->user_id,
+            'event' => 'login',
+            'guard' => 'api',
+            'session_id' => $device->udid,
+            'ip_address' => $request->ip(),
+            'user_agent' => substr($request->userAgent() ?? '', 0, 500),
+            'succeeded' => true,
+            'occurred_at' => now(),
+        ]);
 
         // Broadcast the authentication event
         DeviceAuthenticated::dispatch($device->uuid, $token);
