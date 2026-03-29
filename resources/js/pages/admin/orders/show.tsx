@@ -97,7 +97,7 @@ export default function AdminOrderShow({ order }: Props) {
                                     <div key={line.id} className="flex gap-4">
                                         <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-muted">
                                             <img
-src={line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg'}
+                                                src={line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg'}
                                                 alt={line.purchasable?.product?.attribute_data?.name?.en || 'Product'}
                                                 className="h-full w-full object-cover"
                                             />
@@ -222,21 +222,24 @@ src={line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg'}
 
                                 {data.status === 'dispatched' && (
                                     <div className="space-y-2">
-                                        <Label htmlFor="tracking_number">Tracking Number</Label>
+                                        <Label htmlFor="tracking_link">Tracking Link</Label>
                                         <Input
-                                            id="tracking_number"
-                                            value={data.tracking_number}
-                                            onChange={(e) => setData('tracking_number', e.target.value)}
-                                            placeholder="Enter tracking number"
+                                            id="tracking_link"
+                                            value={data.tracking_link}
+                                            onChange={(e) => setData('tracking_link', e.target.value)}
+                                            placeholder="Enter tracking link"
                                         />
-                                        <InputError message={errors.tracking_number} />
+                                        <InputError message={errors.tracking_link} />
                                     </div>
                                 )}
 
                                 <Button
                                     className="w-full"
                                     onClick={handleUpdateStatus}
-                                    disabled={processing || (data.status === order.status && data.tracking_number === ((order.meta?.tracking_number as string) || ''))}
+                                    disabled={
+                                        processing ||
+                                        (data.status === order.status && data.tracking_link === ((order.meta?.tracking_link as string) || ''))
+                                    }
                                 >
                                     Update Status
                                 </Button>

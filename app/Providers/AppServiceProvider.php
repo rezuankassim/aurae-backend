@@ -12,6 +12,7 @@ use App\Listeners\LogSuccessfulLogin;
 use App\Lunar\Extensions\CollectionGroupCreateExtension;
 use App\Lunar\Extensions\CollectionGroupEditExtension;
 use App\Lunar\Extensions\CollectionGroupResourceExtension;
+use App\Lunar\Extensions\CurrencyResourceExtension;
 use App\Lunar\Extensions\CustomerListExtension;
 use App\Lunar\Extensions\CustomerResourceExtension;
 use App\Lunar\Extensions\DiscountEditExtension;
@@ -19,9 +20,13 @@ use App\Lunar\Extensions\DiscountListExtension;
 use App\Lunar\Extensions\DiscountResourceExtension;
 use App\Lunar\Extensions\ListProductsExtension;
 use App\Lunar\Extensions\ManageOrderExtension;
+use App\Lunar\Extensions\ManageProductInventoryExtension;
 use App\Lunar\Extensions\ManageProductPricingExtension;
 use App\Lunar\Extensions\ManageProductVariantsExtension;
+use App\Lunar\Extensions\ManageVariantInventoryExtension;
 use App\Lunar\Extensions\ManageVariantPricingExtension;
+use App\Lunar\Pages\ManageProductPricingPage;
+use App\Lunar\Pages\ManageVariantPricingPage;
 use App\Lunar\Extensions\ProductConditionRelationManagerExtension;
 use App\Lunar\Extensions\ProductLimitationRelationManagerExtension;
 use App\Lunar\Extensions\ProductResourceExtension;
@@ -42,6 +47,7 @@ use Livewire\Livewire;
 use Lunar\Admin\Filament\Resources\CollectionGroupResource;
 use Lunar\Admin\Filament\Resources\CollectionGroupResource\Pages\CreateCollectionGroup;
 use Lunar\Admin\Filament\Resources\CollectionGroupResource\Pages\EditCollectionGroup;
+use Lunar\Admin\Filament\Resources\CurrencyResource;
 use Lunar\Admin\Filament\Resources\CustomerResource;
 use Lunar\Admin\Filament\Resources\CustomerResource\Pages\ListCustomers;
 use Lunar\Admin\Filament\Resources\DiscountResource;
@@ -53,8 +59,10 @@ use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductRewa
 use Lunar\Admin\Filament\Resources\OrderResource\Pages\ManageOrder;
 use Lunar\Admin\Filament\Resources\ProductResource;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ListProducts;
+use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductInventory;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductPricing;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductVariants;
+use Lunar\Admin\Filament\Resources\ProductVariantResource\Pages\ManageVariantInventory;
 use Lunar\Admin\Filament\Resources\ProductVariantResource\Pages\ManageVariantPricing;
 use Lunar\Admin\Support\Facades\LunarPanel;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\EditShippingMethod;
@@ -98,11 +106,13 @@ class AppServiceProvider extends ServiceProvider
                 \Lunar\Admin\Filament\Resources\ChannelResource::class,
                 \Lunar\Admin\Filament\Resources\ProductTypeResource::class,
                 \Lunar\Admin\Filament\Resources\CustomerGroupResource::class,
+                \Lunar\Admin\Filament\Resources\DiscountResource::class,
             ])
         )));
 
         LunarPanel::disableTwoFactorAuth()
             ->extensions([
+                CurrencyResource::class => CurrencyResourceExtension::class,
                 CreateCollectionGroup::class => CollectionGroupCreateExtension::class,
                 EditCollectionGroup::class => CollectionGroupEditExtension::class,
                 CollectionGroupResource::class => CollectionGroupResourceExtension::class,
@@ -116,9 +126,13 @@ class AppServiceProvider extends ServiceProvider
                 ProductRewardRelationManager::class => ProductRewardRelationManagerExtension::class,
                 ManageOrder::class => ManageOrderExtension::class,
                 ListProducts::class => ListProductsExtension::class,
+                ManageProductInventory::class => ManageProductInventoryExtension::class,
                 ManageProductPricing::class => ManageProductPricingExtension::class,
+                ManageProductPricingPage::class => ManageProductPricingExtension::class,
                 ManageProductVariants::class => ManageProductVariantsExtension::class,
+                ManageVariantInventory::class => ManageVariantInventoryExtension::class,
                 ManageVariantPricing::class => ManageVariantPricingExtension::class,
+                ManageVariantPricingPage::class => ManageVariantPricingExtension::class,
                 ProductResource::class => ProductResourceExtension::class,
                 EditShippingMethod::class => ShippingMethodEditExtension::class,
                 ListShippingMethod::class => ShippingMethodListExtension::class,
@@ -168,6 +182,10 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Livewire::component('app.lunar.widgets.product-options-widget', \App\Lunar\Widgets\ProductOptionsWidget::class);
+
+        // Override Lunar pricing pages to remove Customer Group Pricing and Price Breaks relation managers
+        Livewire::component('lunar.admin.filament.resources.product-resource.pages.manage-product-pricing', ManageProductPricingPage::class);
+        Livewire::component('lunar.admin.filament.resources.product-variant-resource.pages.manage-variant-pricing', ManageVariantPricingPage::class);
 
         Event::listen(Login::class, LogSuccessfulLogin::class);
         Event::listen(Logout::class, LogLogout::class);
