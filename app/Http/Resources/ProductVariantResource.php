@@ -35,9 +35,6 @@ class ProductVariantResource extends BaseResource
                 ];
             }),
             'values_ids' => $this->values->pluck('id'),
-            'product' => $this->whenLoaded('product', function () {
-                return ProductResource::make($this->product);
-            }),
         ];
     }
 

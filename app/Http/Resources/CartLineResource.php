@@ -27,6 +27,13 @@ class CartLineResource extends BaseResource
             'purchaseable' => $this->whenLoaded('purchasable', function () {
                 return ProductVariantResource::make($this->purchasable);
             }),
+            'product' => $this->whenLoaded('purchasable', function () {
+                if ($this->purchasable->relationLoaded('product')) {
+                    return ProductResource::make($this->purchasable->product);
+                }
+
+                return null;
+            }),
         ];
     }
 }
