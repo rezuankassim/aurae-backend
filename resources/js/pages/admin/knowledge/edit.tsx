@@ -23,11 +23,11 @@ import dayjs from 'dayjs';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Knowledge Center Management',
+        title: 'Tutorials',
         href: index().url,
     },
     {
-        title: 'Edit knowledge',
+        title: 'Edit tutorial',
         href: '#',
     },
 ];
@@ -73,9 +73,9 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Edit knowledge" />
+            <Head title="Edit tutorial" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl px-4 py-6">
-                <Heading title="Edit knowledge" description="Edit knowledge for the system" />
+                <Heading title="Edit tutorial" description="Edit tutorial for the system" />
 
                 <Form
                     {...KnowledgeController.update.form(knowledge.id)}

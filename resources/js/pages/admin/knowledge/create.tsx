@@ -23,11 +23,11 @@ import dayjs from 'dayjs';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Knowledge Center Management',
+        title: 'Tutorials',
         href: index().url,
     },
     {
-        title: 'Create knowledge',
+        title: 'Create tutorial',
         href: create().url,
     },
 ];
