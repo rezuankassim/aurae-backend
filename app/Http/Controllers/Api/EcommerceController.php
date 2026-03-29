@@ -238,6 +238,8 @@ class EcommerceController extends Controller
             ], 422);
         }
 
+        $cart->refresh();
+
         $newLine = $cart->lines->first(fn ($l) => $l->purchasable_id === $newVariant->id && $l->purchasable_type === ProductVariant::modelClass());
 
         $newLine->load([
