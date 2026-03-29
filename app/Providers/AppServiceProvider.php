@@ -12,16 +12,16 @@ use App\Listeners\LogSuccessfulLogin;
 use App\Lunar\Extensions\CollectionGroupCreateExtension;
 use App\Lunar\Extensions\CollectionGroupEditExtension;
 use App\Lunar\Extensions\CollectionGroupResourceExtension;
-use App\Lunar\Extensions\CustomerGroupCreateExtension;
-use App\Lunar\Extensions\CustomerGroupEditExtension;
-use App\Lunar\Extensions\CustomerGroupResourceExtension;
 use App\Lunar\Extensions\CustomerListExtension;
 use App\Lunar\Extensions\CustomerResourceExtension;
 use App\Lunar\Extensions\DiscountEditExtension;
 use App\Lunar\Extensions\DiscountListExtension;
 use App\Lunar\Extensions\DiscountResourceExtension;
+use App\Lunar\Extensions\ListProductsExtension;
 use App\Lunar\Extensions\ManageOrderExtension;
+use App\Lunar\Extensions\ManageProductPricingExtension;
 use App\Lunar\Extensions\ManageProductVariantsExtension;
+use App\Lunar\Extensions\ManageVariantPricingExtension;
 use App\Lunar\Extensions\ProductConditionRelationManagerExtension;
 use App\Lunar\Extensions\ProductLimitationRelationManagerExtension;
 use App\Lunar\Extensions\ProductResourceExtension;
@@ -42,9 +42,6 @@ use Livewire\Livewire;
 use Lunar\Admin\Filament\Resources\CollectionGroupResource;
 use Lunar\Admin\Filament\Resources\CollectionGroupResource\Pages\CreateCollectionGroup;
 use Lunar\Admin\Filament\Resources\CollectionGroupResource\Pages\EditCollectionGroup;
-use Lunar\Admin\Filament\Resources\CustomerGroupResource;
-use Lunar\Admin\Filament\Resources\CustomerGroupResource\Pages\CreateCustomerGroup;
-use Lunar\Admin\Filament\Resources\CustomerGroupResource\Pages\EditCustomerGroup;
 use Lunar\Admin\Filament\Resources\CustomerResource;
 use Lunar\Admin\Filament\Resources\CustomerResource\Pages\ListCustomers;
 use Lunar\Admin\Filament\Resources\DiscountResource;
@@ -55,7 +52,10 @@ use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductLimi
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductRewardRelationManager;
 use Lunar\Admin\Filament\Resources\OrderResource\Pages\ManageOrder;
 use Lunar\Admin\Filament\Resources\ProductResource;
+use Lunar\Admin\Filament\Resources\ProductResource\Pages\ListProducts;
+use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductPricing;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductVariants;
+use Lunar\Admin\Filament\Resources\ProductVariantResource\Pages\ManageVariantPricing;
 use Lunar\Admin\Support\Facades\LunarPanel;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\EditShippingMethod;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\ListShippingMethod;
@@ -87,6 +87,7 @@ class AppServiceProvider extends ServiceProvider
                 \Lunar\Admin\Filament\Resources\AttributeGroupResource::class,
                 \Lunar\Admin\Filament\Resources\ChannelResource::class,
                 \Lunar\Admin\Filament\Resources\ProductTypeResource::class,
+                \Lunar\Admin\Filament\Resources\CustomerGroupResource::class,
             ])
         )));
 
@@ -97,9 +98,6 @@ class AppServiceProvider extends ServiceProvider
                 CollectionGroupResource::class => CollectionGroupResourceExtension::class,
                 CustomerResource::class => CustomerResourceExtension::class,
                 ListCustomers::class => CustomerListExtension::class,
-                CreateCustomerGroup::class => CustomerGroupCreateExtension::class,
-                EditCustomerGroup::class => CustomerGroupEditExtension::class,
-                CustomerGroupResource::class => CustomerGroupResourceExtension::class,
                 EditDiscount::class => DiscountEditExtension::class,
                 ListDiscounts::class => DiscountListExtension::class,
                 DiscountResource::class => DiscountResourceExtension::class,
@@ -107,7 +105,10 @@ class AppServiceProvider extends ServiceProvider
                 ProductLimitationRelationManager::class => ProductLimitationRelationManagerExtension::class,
                 ProductRewardRelationManager::class => ProductRewardRelationManagerExtension::class,
                 ManageOrder::class => ManageOrderExtension::class,
+                ListProducts::class => ListProductsExtension::class,
+                ManageProductPricing::class => ManageProductPricingExtension::class,
                 ManageProductVariants::class => ManageProductVariantsExtension::class,
+                ManageVariantPricing::class => ManageVariantPricingExtension::class,
                 ProductResource::class => ProductResourceExtension::class,
                 EditShippingMethod::class => ShippingMethodEditExtension::class,
                 ListShippingMethod::class => ShippingMethodListExtension::class,

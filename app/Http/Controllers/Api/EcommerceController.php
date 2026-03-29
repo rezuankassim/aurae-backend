@@ -54,7 +54,7 @@ class EcommerceController extends Controller
         if (! $cart) {
             $cart = Cart::create([
                 'user_id' => $request->user()->id,
-                'customer_id' => $request->user()->customers->first()?->id,
+                'customer_id' => $request->user()->getOrCreateCustomer()->id,
                 'currency_id' => Currency::getDefault()->id,
                 'channel_id' => Channel::getDefault()->id,
             ]);
@@ -92,7 +92,7 @@ class EcommerceController extends Controller
         $cart = Cart::firstOrCreate(
             ['user_id' => $request->user()->id],
             [
-                'customer_id' => $request->user()->customers->first()?->id,
+                'customer_id' => $request->user()->getOrCreateCustomer()->id,
                 'currency_id' => Currency::getDefault()->id,
                 'channel_id' => Channel::getDefault()->id,
             ]

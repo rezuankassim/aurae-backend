@@ -5,6 +5,7 @@ namespace App\Lunar\Extensions;
 use App\Lunar\Pages\ManageProductCollections;
 use Filament\Forms\Form;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductAssociations;
+use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductAvailability;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductCollections as BaseManageProductCollections;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductUrls;
 use Lunar\Admin\Support\Extending\ResourceExtension;
@@ -23,6 +24,7 @@ class ProductResourceExtension extends ResourceExtension
         return array_values(array_filter(
             $pages,
             fn ($page) => ! in_array($page, [
+                ManageProductAvailability::class,
                 ManageProductUrls::class,
                 ManageProductAssociations::class,
             ])

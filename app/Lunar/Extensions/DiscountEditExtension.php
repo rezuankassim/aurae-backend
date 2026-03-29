@@ -133,11 +133,27 @@ class DiscountEditExtension extends EditPageExtension
     {
         $schema = $form->getComponents(withHidden: true);
         $this->hideHandleField($schema);
+        $this->hideConditionFields($schema);
         $this->makeFieldsRequired($schema);
         $this->forceFixedValueOnly($schema);
         $this->setMinDateOnStartsAt($schema);
 
         return $form->schema($schema);
+    }
+
+    protected function hideConditionFields(array $components): void
+    {
+        $hiddenFields = ['coupon', 'max_uses', 'max_uses_per_user'];
+
+        foreach ($components as $component) {
+            if ($component instanceof TextInput && in_array($component->getName(), $hiddenFields)) {
+                $component->hidden(true);
+            }
+
+            if (method_exists($component, 'getChildComponents')) {
+                $this->hideConditionFields($component->getChildComponents());
+            }
+        }
     }
 
     protected function hideHandleField(array $components): void

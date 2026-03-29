@@ -9,9 +9,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
+use Lunar\Models\Customer;
 
 class RegisteredUserController extends Controller
 {
@@ -41,6 +43,13 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        $customer = Customer::create([
+            'first_name' => Str::before($request->name, ' '),
+            'last_name' => Str::after($request->name, ' '),
+        ]);
+
+        $customer->users()->attach($user->id);
 
         event(new Registered($user));
 

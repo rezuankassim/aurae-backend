@@ -10,11 +10,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Lunar\Base\LunarUser as LunarUserInterface;
 use Lunar\Base\Traits\LunarUser;
+use Lunar\Models\Customer;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUserInterface
@@ -171,6 +173,25 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
         return $this->setting ?? $this->setting()->create([
             'allow_app_notification' => true,
         ]);
+    }
+
+    /**
+     * Get the user's Lunar customer, creating one if it doesn't exist.
+     */
+    public function getOrCreateCustomer(): Customer
+    {
+        $customer = $this->customers()->first();
+
+        if (! $customer) {
+            $customer = Customer::create([
+                'first_name' => Str::before($this->name, ' '),
+                'last_name' => Str::after($this->name, ' '),
+            ]);
+
+            $customer->users()->attach($this->id);
+        }
+
+        return $customer;
     }
 
     protected static function booted(): void
