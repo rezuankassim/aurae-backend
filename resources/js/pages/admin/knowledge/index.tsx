@@ -132,10 +132,10 @@ export default function KnowledgeIndex({ knowledge: initialKnowledge }: { knowle
                         ) : (
                             <>
                                 <Button variant="outline" onClick={() => setShowSortable(true)}>
-                                    Reorder Knowledge
+                                    Reorder tutorials
                                 </Button>
                                 <Button asChild>
-                                    <Link href={create().url}>Create knowledge</Link>
+                                    <Link href={create().url}>Create tutorial</Link>
                                 </Button>
                             </>
                         )}
@@ -146,7 +146,7 @@ export default function KnowledgeIndex({ knowledge: initialKnowledge }: { knowle
                     <Card>
                         <CardContent className="pt-3">
                             <div className="mb-4 text-sm text-muted-foreground">
-                                Drag and drop to reorder knowledge entries. The order will be reflected in the mobile app.
+                                Drag and drop to reorder tutorial entries. The order will be reflected in the mobile app.
                             </div>
                             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                                 <SortableContext items={knowledge.map((k) => k.id)} strategy={verticalListSortingStrategy}>

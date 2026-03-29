@@ -90,9 +90,9 @@ export default function KnowledgeCreate() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Create knowledge" />
+            <Head title="Create tutorial" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl px-4 py-6">
-                <Heading title="Create knowledge" description="Create new knowledge for the system" />
+                <Heading title="Create tutorial" description="Create new tutorial for the system" />
 
                 <Form
                     {...KnowledgeController.store.form()}
