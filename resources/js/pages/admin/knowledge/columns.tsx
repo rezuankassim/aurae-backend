@@ -78,14 +78,14 @@ export const columns: ColumnDef<Knowledge>[] = [
                                 Edit
                             </Link>
                         </DropdownMenuItem>
-                        {row.original.is_published && (
+                        {row.original.is_published ? (
                             <>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="text-destructive hover:cursor-pointer focus:text-destructive" onClick={handleUnpublish}>
                                     Unpublish
                                 </DropdownMenuItem>
                             </>
-                        )}
+                        ) : null}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive hover:cursor-pointer focus:text-destructive" onClick={handleDelete}>
                             Delete

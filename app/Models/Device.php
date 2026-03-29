@@ -14,6 +14,8 @@ class Device extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'user_id' => 'integer',
+        'status' => 'integer',
         'started_at' => 'date',
         'should_end_at' => 'date',
         'last_used_at' => 'datetime',

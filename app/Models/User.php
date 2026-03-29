@@ -149,6 +149,21 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
     }
 
     /**
+     * Get the maximum number of devices this user can bind based on their active subscription.
+     * Defaults to 1 if no active subscription.
+     */
+    public function getMaxDevices(): int
+    {
+        $activeSubscription = $this->activeSubscription;
+
+        if (! $activeSubscription) {
+            return 1;
+        }
+
+        return $activeSubscription->subscription->max_devices ?? 1;
+    }
+
+    /**
      * Get the maximum number of machines this user can have based on subscriptions.
      * Each active subscription allows 1 machine.
      */
