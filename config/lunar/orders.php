@@ -58,11 +58,11 @@ return [
     | make sense for the store you're building.
     |
     */
-    'draft_status' => 'awaiting-payment',
+    'draft_status' => 'payment-pending',
 
     'statuses' => [
 
-        'awaiting-payment' => [
+        'payment-pending' => [
             'label' => 'Payment Pending',
             'color' => '#848a8c',
             'mailers' => [],
@@ -73,6 +73,14 @@ return [
         'payment-received' => [
             'label' => 'Payment Received',
             'color' => '#6a67ce',
+            'mailers' => [],
+            'notifications' => [],
+            'favourite' => true,
+        ],
+
+        'payment-failed' => [
+            'label' => 'Payment Failed',
+            'color' => '#e74c3c',
             'mailers' => [],
             'notifications' => [],
             'favourite' => true,
@@ -92,7 +100,6 @@ return [
             'notifications' => [],
             'favourite' => true,
         ],
-
     ],
 
     /*
