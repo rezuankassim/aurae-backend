@@ -67,7 +67,7 @@ class KnowledgeController extends Controller
 
         Knowledge::create($validated);
 
-        return to_route('admin.knowledge.index')->with('success', 'Knowledge entry created successfully.');
+        return to_route('admin.knowledge.index')->with('success', 'Tutorial created successfully.');
     }
 
     /**
@@ -139,7 +139,7 @@ class KnowledgeController extends Controller
 
         $knowledge->update($validated);
 
-        return to_route('admin.knowledge.index')->with('success', 'Knowledge entry updated successfully.');
+        return to_route('admin.knowledge.index')->with('success', 'Tutorial updated successfully.');
     }
 
     /**
@@ -157,7 +157,7 @@ class KnowledgeController extends Controller
             Knowledge::where('id', $entry['id'])->update(['order' => $entry['order']]);
         }
 
-        return back()->with('success', 'Knowledge entries reordered successfully.');
+        return back()->with('success', 'Tutorials reordered successfully.');
     }
 
     /**
@@ -170,7 +170,7 @@ class KnowledgeController extends Controller
             'published_at' => null,
         ]);
 
-        return back()->with('success', 'Knowledge entry unpublished successfully.');
+        return back()->with('success', 'Tutorial unpublished successfully.');
     }
 
     /**
@@ -190,6 +190,6 @@ class KnowledgeController extends Controller
 
         $knowledge->delete();
 
-        return to_route('admin.knowledge.index')->with('success', 'Knowledge entry deleted successfully.');
+        return to_route('admin.knowledge.index')->with('success', 'Tutorial deleted successfully.');
     }
 }

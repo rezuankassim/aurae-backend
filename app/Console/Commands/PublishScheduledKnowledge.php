@@ -19,7 +19,7 @@ class PublishScheduledKnowledge extends Command
      *
      * @var string
      */
-    protected $description = 'Publish knowledge entries that have reached their scheduled published_at time';
+    protected $description = 'Publish tutorial entries that have reached their scheduled published_at time';
 
     /**
      * Execute the console command.
@@ -33,7 +33,7 @@ class PublishScheduledKnowledge extends Command
             ->get();
 
         if ($knowledgeToPublish->isEmpty()) {
-            $this->info('No scheduled knowledge entries to publish.');
+            $this->info('No scheduled tutorials to publish.');
 
             return Command::SUCCESS;
         }
@@ -46,7 +46,7 @@ class PublishScheduledKnowledge extends Command
             ->where('published_at', '<=', now())
             ->update(['is_published' => true]);
 
-        $this->info("Successfully published {$count} scheduled knowledge entry(ies).");
+        $this->info("Successfully published {$count} scheduled tutorial(s).");
 
         return Command::SUCCESS;
     }

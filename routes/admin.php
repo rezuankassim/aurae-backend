@@ -118,15 +118,15 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/legal-settings', [\App\Http\Controllers\Admin\LegalSettingController::class, 'edit'])->name('legal-settings.edit');
     Route::put('/legal-settings', [\App\Http\Controllers\Admin\LegalSettingController::class, 'update'])->name('legal-settings.update');
 
-    Route::get('/knowledge', [KnowledgeController::class, 'index'])->name('knowledge.index');
-    Route::get('/knowledge/create', [KnowledgeController::class, 'create'])->name('knowledge.create');
-    Route::post('/knowledge', [KnowledgeController::class, 'store'])->name('knowledge.store');
-    Route::post('/knowledge/reorder', [KnowledgeController::class, 'reorder'])->name('knowledge.reorder');
-    Route::get('/knowledge/{knowledge}', [KnowledgeController::class, 'show'])->name('knowledge.show');
-    Route::get('/knowledge/{knowledge}/edit', [KnowledgeController::class, 'edit'])->name('knowledge.edit');
-    Route::put('/knowledge/{knowledge}', [KnowledgeController::class, 'update'])->name('knowledge.update');
-    Route::post('/knowledge/{knowledge}/unpublish', [KnowledgeController::class, 'unpublish'])->name('knowledge.unpublish');
-    Route::delete('/knowledge/{knowledge}', [KnowledgeController::class, 'destroy'])->name('knowledge.destroy');
+    Route::get('/tutorial', [KnowledgeController::class, 'index'])->name('knowledge.index');
+    Route::get('/tutorial/create', [KnowledgeController::class, 'create'])->name('knowledge.create');
+    Route::post('/tutorial', [KnowledgeController::class, 'store'])->name('knowledge.store');
+    Route::post('/tutorial/reorder', [KnowledgeController::class, 'reorder'])->name('knowledge.reorder');
+    Route::get('/tutorial/{knowledge}', [KnowledgeController::class, 'show'])->name('knowledge.show');
+    Route::get('/tutorial/{knowledge}/edit', [KnowledgeController::class, 'edit'])->name('knowledge.edit');
+    Route::put('/tutorial/{knowledge}', [KnowledgeController::class, 'update'])->name('knowledge.update');
+    Route::post('/tutorial/{knowledge}/unpublish', [KnowledgeController::class, 'unpublish'])->name('knowledge.unpublish');
+    Route::delete('/tutorial/{knowledge}', [KnowledgeController::class, 'destroy'])->name('knowledge.destroy');
 
     Route::get('/therapies', [TherapyController::class, 'index'])->name('therapies.index');
     Route::get('/therapies/create', [TherapyController::class, 'create'])->name('therapies.create');

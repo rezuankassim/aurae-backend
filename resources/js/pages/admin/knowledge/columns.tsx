@@ -47,13 +47,13 @@ export const columns: ColumnDef<Knowledge>[] = [
         id: 'actions',
         cell: ({ row }) => {
             const handleDelete = () => {
-                if (confirm('Are you sure you want to delete this knowledge entry?')) {
+                if (confirm('Are you sure you want to delete this tutorial?')) {
                     router.delete(destroy(row.original.id).url);
                 }
             };
 
             const handleUnpublish = () => {
-                if (confirm('Are you sure you want to unpublish this knowledge entry?')) {
+                if (confirm('Are you sure you want to unpublish this tutorial?')) {
                     router.post(unpublish(row.original.id).url);
                 }
             };

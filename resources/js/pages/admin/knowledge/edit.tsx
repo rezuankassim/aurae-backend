@@ -101,7 +101,7 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                             <Card>
                                 <CardContent className="space-y-6">
                                     <div className="space-y-6">
-                                        <FieldLegend className="sr-only">Knowledge</FieldLegend>
+                                        <FieldLegend className="sr-only">Tutorial</FieldLegend>
                                         <Field>
                                             <FieldLabel htmlFor="title">Title</FieldLabel>
                                             <Input id="title" name="title" placeholder="Title" defaultValue={knowledge.title} />

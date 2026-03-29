@@ -11,7 +11,7 @@ import { DndContext, DragEndEvent, PointerSensor, closestCenter, useSensor, useS
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { columns } from './columns';
 import { DataTable } from './data-table';
 
@@ -66,6 +66,10 @@ export default function KnowledgeIndex({ knowledge: initialKnowledge }: { knowle
     const [knowledge, setKnowledge] = useState(initialKnowledge);
     const [isSaving, setIsSaving] = useState(false);
     const [showSortable, setShowSortable] = useState(false);
+
+    useEffect(() => {
+        setKnowledge(initialKnowledge);
+    }, [initialKnowledge]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {

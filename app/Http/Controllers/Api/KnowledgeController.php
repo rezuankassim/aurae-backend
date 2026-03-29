@@ -24,7 +24,7 @@ class KnowledgeController extends Controller
         return KnowledgeResource::collection($knowledge)
             ->additional([
                 'status' => 200,
-                'message' => 'Knowledge retrieved successfully.',
+                'message' => 'Tutorials retrieved successfully.',
             ]);
     }
 
@@ -37,14 +37,14 @@ class KnowledgeController extends Controller
         if (! $knowledge->is_published || ($knowledge->published_at && $knowledge->published_at->isFuture())) {
             return response()->json([
                 'status' => 404,
-                'message' => 'Knowledge not found.',
+                'message' => 'Tutorial not found.',
             ], 404);
         }
 
         return KnowledgeResource::make($knowledge)
             ->additional([
                 'status' => 200,
-                'message' => 'Knowledge retrieved successfully.',
+                'message' => 'Tutorial retrieved successfully.',
             ]);
     }
 }

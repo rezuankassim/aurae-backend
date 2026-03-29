@@ -118,7 +118,7 @@ export default function KnowledgeCreate() {
                             <Card>
                                 <CardContent className="space-y-6">
                                     <div className="space-y-6">
-                                        <FieldLegend className="sr-only">Knowledge</FieldLegend>
+                                        <FieldLegend className="sr-only">Tutorial</FieldLegend>
                                         <Field>
                                             <FieldLabel htmlFor="title">Title</FieldLabel>
                                             <Input id="title" name="title" placeholder="Title" />
@@ -131,7 +131,7 @@ export default function KnowledgeCreate() {
                                             <Input type="file" id="cover_image" name="cover_image" accept="image/*" />
 
                                             <FieldDescription>
-                                                Upload a cover image for this knowledge entry (JPEG, PNG, JPG, GIF, WebP). Maximum size: 10MB.
+                                                Upload a cover image for this tutorial (JPEG, PNG, JPG, GIF, WebP). Maximum size: 10MB.
                                             </FieldDescription>
                                             {errors.cover_image ? <FieldError>{errors.cover_image}</FieldError> : null}
                                         </Field>
