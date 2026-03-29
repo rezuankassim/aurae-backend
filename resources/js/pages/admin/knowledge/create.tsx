@@ -144,6 +144,7 @@ export default function KnowledgeCreate() {
                                                     setEditorState(value)
                                                 }
                                                 onChangeHtml={(html) => setEditorHtmlState(html)}
+                                                hideToolbar
                                             />
 
                                             {errors.content || errors.html_content ? (

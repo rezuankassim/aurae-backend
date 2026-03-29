@@ -176,7 +176,7 @@ const managementNavItems: NavItem[] = [
         icon: Waypoints,
     },
     {
-        title: 'Knowledge Center Management',
+        title: 'Tutorials',
         href: indexKnowledge(),
         icon: BookOpenText,
     },

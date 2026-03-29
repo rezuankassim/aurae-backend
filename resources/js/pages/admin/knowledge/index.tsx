@@ -17,7 +17,7 @@ import { DataTable } from './data-table';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Knowledge Center Management',
+        title: 'Tutorials',
         href: index().url,
     },
 ];
@@ -114,10 +114,10 @@ export default function KnowledgeIndex({ knowledge: initialKnowledge }: { knowle
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Knowledge Center Management" />
+            <Head title="Tutorials" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl px-4 py-6">
                 <div className="flex items-center justify-between">
-                    <Heading title="Knowledge Center Management" description="Manage knowledge of the system" />
+                    <Heading title="Tutorials" description="Manage tutorials of the system" />
 
                     <div className="flex gap-2">
                         {showSortable ? (

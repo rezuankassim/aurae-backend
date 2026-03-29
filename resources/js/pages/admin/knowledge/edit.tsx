@@ -138,6 +138,7 @@ export default function KnowledgeEdit({ knowledge }: { knowledge: Knowledge }) {
                                                     setEditorState(value)
                                                 }
                                                 onChangeHtml={(html) => setEditorHtmlState(html)}
+                                                hideToolbar
                                             />
 
                                             {errors.content ? <FieldError>{errors.content}</FieldError> : null}

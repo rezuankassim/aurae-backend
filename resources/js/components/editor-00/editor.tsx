@@ -26,12 +26,14 @@ export function Editor({
     onChange,
     onSerializedChange,
     onChangeHtml,
+    hideToolbar = false,
 }: {
     editorState?: EditorState;
     editorSerializedState?: SerializedEditorState;
     onChange?: (editorState: EditorState) => void;
     onSerializedChange?: (editorSerializedState: SerializedEditorState) => void;
     onChangeHtml?: (html: string) => void;
+    hideToolbar?: boolean;
 }) {
     return (
         <div className="overflow-hidden rounded-lg border bg-background shadow">
@@ -43,7 +45,7 @@ export function Editor({
                 }}
             >
                 <TooltipProvider>
-                    <Plugins />
+                    <Plugins hideToolbar={hideToolbar} />
 
                     <OnChangePlugin
                         ignoreSelectionChange={true}

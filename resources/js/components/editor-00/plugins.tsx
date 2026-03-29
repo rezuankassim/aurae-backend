@@ -35,7 +35,7 @@ import { LinkToolbarPlugin } from '../editor/plugins/toolbar/link-toolbar-plugin
 import { SubSuperToolbarPlugin } from '../editor/plugins/toolbar/subsuper-toolbar-plugin';
 import { Separator } from '../ui/separator';
 
-export function Plugins() {
+export function Plugins({ hideToolbar = false }: { hideToolbar?: boolean }) {
     const [floatingAnchorElem, setFloatingAnchorElem] = useState<HTMLDivElement | null>(null);
 
     const [isLinkEditMode, setIsLinkEditMode] = useState<boolean>(false);
@@ -49,43 +49,45 @@ export function Plugins() {
     return (
         <div className="relative">
             {/* toolbar plugins */}
-            <ToolbarPlugin>
-                {({ blockType }) => (
-                    <div className="vertical-align-middle sticky top-0 z-10 flex items-center gap-2 overflow-auto border-b p-1">
-                        <HistoryToolbarPlugin />
-                        <Separator orientation="vertical" className="!h-7" />
-                        <BlockFormatDropDown>
-                            <FormatParagraph />
-                            <FormatHeading levels={['h1', 'h2', 'h3']} />
-                            <FormatNumberedList />
-                            <FormatBulletedList />
-                            <FormatCheckList />
-                            <FormatQuote />
-                        </BlockFormatDropDown>
-                        <FontSizeToolbarPlugin />
-                        <Separator orientation="vertical" className="!h-7" />
-                        <FontFormatToolbarPlugin format="bold" />
-                        <FontFormatToolbarPlugin format="italic" />
-                        <FontFormatToolbarPlugin format="underline" />
-                        <FontFormatToolbarPlugin format="strikethrough" />
-                        <Separator orientation="vertical" className="!h-7" />
-                        <SubSuperToolbarPlugin />
-                        <LinkToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
-                        <Separator orientation="vertical" className="!h-7" />
-                        <ClearFormattingToolbarPlugin />
-                        <Separator orientation="vertical" className="!h-7" />
-                        <FontColorToolbarPlugin />
-                        <FontBackgroundToolbarPlugin />
-                        <Separator orientation="vertical" className="!h-7" />
-                        <ElementFormatToolbarPlugin />
-                        <Separator orientation="vertical" className="!h-7" />
-                        <BlockInsertPlugin>
-                            <InsertHorizontalRule />
-                            <InsertImage />
-                        </BlockInsertPlugin>
-                    </div>
-                )}
-            </ToolbarPlugin>
+            {!hideToolbar && (
+                <ToolbarPlugin>
+                    {({ blockType }) => (
+                        <div className="vertical-align-middle sticky top-0 z-10 flex items-center gap-2 overflow-auto border-b p-1">
+                            <HistoryToolbarPlugin />
+                            <Separator orientation="vertical" className="!h-7" />
+                            <BlockFormatDropDown>
+                                <FormatParagraph />
+                                <FormatHeading levels={['h1', 'h2', 'h3']} />
+                                <FormatNumberedList />
+                                <FormatBulletedList />
+                                <FormatCheckList />
+                                <FormatQuote />
+                            </BlockFormatDropDown>
+                            <FontSizeToolbarPlugin />
+                            <Separator orientation="vertical" className="!h-7" />
+                            <FontFormatToolbarPlugin format="bold" />
+                            <FontFormatToolbarPlugin format="italic" />
+                            <FontFormatToolbarPlugin format="underline" />
+                            <FontFormatToolbarPlugin format="strikethrough" />
+                            <Separator orientation="vertical" className="!h-7" />
+                            <SubSuperToolbarPlugin />
+                            <LinkToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
+                            <Separator orientation="vertical" className="!h-7" />
+                            <ClearFormattingToolbarPlugin />
+                            <Separator orientation="vertical" className="!h-7" />
+                            <FontColorToolbarPlugin />
+                            <FontBackgroundToolbarPlugin />
+                            <Separator orientation="vertical" className="!h-7" />
+                            <ElementFormatToolbarPlugin />
+                            <Separator orientation="vertical" className="!h-7" />
+                            <BlockInsertPlugin>
+                                <InsertHorizontalRule />
+                                <InsertImage />
+                            </BlockInsertPlugin>
+                        </div>
+                    )}
+                </ToolbarPlugin>
+            )}
 
             <div className="relative">
                 <RichTextPlugin
@@ -109,19 +111,21 @@ export function Plugins() {
                 <FloatingLinkEditorPlugin anchorElem={floatingAnchorElem} isLinkEditMode={isLinkEditMode} setIsLinkEditMode={setIsLinkEditMode} />
             </div>
             {/* actions plugins */}
-            <ActionsPlugin>
-                <div className="clear-both flex items-center justify-between gap-2 overflow-auto border-t p-1">
-                    <div className="flex flex-1 justify-start">{/* left side action buttons */}</div>
-                    <div>{/* center action buttons */}</div>
-                    <div className="flex flex-1 justify-end">
-                        {/* right side action buttons */}
-                        <>
-                            <ClearEditorActionPlugin />
-                            <ClearEditorPlugin />
-                        </>
+            {!hideToolbar && (
+                <ActionsPlugin>
+                    <div className="clear-both flex items-center justify-between gap-2 overflow-auto border-t p-1">
+                        <div className="flex flex-1 justify-start">{/* left side action buttons */}</div>
+                        <div>{/* center action buttons */}</div>
+                        <div className="flex flex-1 justify-end">
+                            {/* right side action buttons */}
+                            <>
+                                <ClearEditorActionPlugin />
+                                <ClearEditorPlugin />
+                            </>
+                        </div>
                     </div>
-                </div>
-            </ActionsPlugin>
+                </ActionsPlugin>
+            )}
         </div>
     );
 }

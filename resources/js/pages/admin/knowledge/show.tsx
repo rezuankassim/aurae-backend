@@ -10,11 +10,11 @@ import { Clock } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Knowledge Center Management',
+        title: 'Tutorials',
         href: index().url,
     },
     {
-        title: 'Show Knowledge',
+        title: 'Show Tutorial',
         href: '#',
     },
 ];
@@ -22,10 +22,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function ShowKnowledge({ knowledge }: { knowledge: Knowledge }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Show Knowledge" />
+            <Head title="Show Tutorial" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl px-4 py-6">
                 <div className="flex items-center justify-between">
-                    <Heading title="Show Knowledge" description="View system knowledge information" />
+                    <Heading title="Show Tutorial" description="View system tutorial information" />
                 </div>
 
                 <span className="flex items-center gap-2 text-sm text-muted-foreground">
