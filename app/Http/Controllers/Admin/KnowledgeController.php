@@ -19,6 +19,10 @@ class KnowledgeController extends Controller
     {
         $knowledge = Knowledge::orderBy('order', 'asc')->get();
 
+        $knowledge->each(function ($item) {
+            $item->cover_image_url = $item->cover_image_url;
+        });
+
         return Inertia::render('admin/knowledge/index', [
             'knowledge' => $knowledge,
         ]);
