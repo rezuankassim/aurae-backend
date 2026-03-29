@@ -205,7 +205,7 @@ class EcommerceController extends Controller
         if ($line->purchasable_id === $newVariant->id) {
             $cart = $cart->recalculate();
 
-            $updatedLine = $cart->lines->first(fn ($l) => $l->purchasable_id === $newVariant->id && $l->purchasable_type === ProductVariant::modelClass());
+            $updatedLine = $cart->lines->first(fn ($l) => $l->purchasable_id === $newVariant->id && $l->purchasable_type === $newVariant->getMorphClass());
 
             $updatedLine->load([
                 'purchasable.values.option',
@@ -238,9 +238,7 @@ class EcommerceController extends Controller
             ], 422);
         }
 
-        $cart->refresh();
-
-        $newLine = $cart->lines->first(fn ($l) => $l->purchasable_id === $newVariant->id && $l->purchasable_type === ProductVariant::modelClass());
+        $newLine = $cart->lines->first(fn ($l) => $l->purchasable_id === $newVariant->id && $l->purchasable_type === $newVariant->getMorphClass());
 
         $newLine->load([
             'purchasable.values.option',
