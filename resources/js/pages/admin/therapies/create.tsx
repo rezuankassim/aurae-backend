@@ -86,15 +86,15 @@ export default function TherapiesCreate({ music }: { music: Music[] }) {
 
                                         <div className="grid grid-cols-3 gap-2">
                                             <Field>
-                                                <FieldLabel htmlFor="duration">Duration</FieldLabel>
-                                                <Input type="number" id="duration" name="duration" placeholder="Duration" step="0.01" />
+                                                <FieldLabel htmlFor="duration">Duration (Minute)</FieldLabel>
+                                                <Input type="number" id="duration" name="duration" placeholder="Duration" />
 
                                                 {errors.duration ? <FieldError>{errors.duration}</FieldError> : null}
                                             </Field>
 
                                             <Field>
-                                                <FieldLabel htmlFor="temp">Temperature</FieldLabel>
-                                                <Input type="number" id="temp" name="temp" placeholder="Temperature" step="0.01" />
+                                                <FieldLabel htmlFor="temp">Temperature (°C)</FieldLabel>
+                                                <Input type="number" id="temp" name="temp" placeholder="Temperature" />
 
                                                 {errors.temp ? <FieldError>{errors.temp}</FieldError> : null}
                                             </Field>

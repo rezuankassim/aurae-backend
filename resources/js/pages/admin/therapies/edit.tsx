@@ -132,13 +132,12 @@ export default function TherapiesEdit({ therapy, music }: { therapy: Therapy; mu
 
                                         <div className="grid grid-cols-3 gap-2">
                                             <Field>
-                                                <FieldLabel htmlFor="duration">Duration</FieldLabel>
+                                                <FieldLabel htmlFor="duration">Duration (Minute)</FieldLabel>
                                                 <Input
                                                     type="number"
                                                     id="duration"
                                                     name="duration"
                                                     placeholder="Duration"
-                                                    step="0.01"
                                                     defaultValue={therapy.configuration.duration || ''}
                                                 />
 
@@ -146,13 +145,12 @@ export default function TherapiesEdit({ therapy, music }: { therapy: Therapy; mu
                                             </Field>
 
                                             <Field>
-                                                <FieldLabel htmlFor="temp">Temperature</FieldLabel>
+                                                <FieldLabel htmlFor="temp">Temperature (°C)</FieldLabel>
                                                 <Input
                                                     type="number"
                                                     id="temp"
                                                     name="temp"
                                                     placeholder="Temperature"
-                                                    step="0.01"
                                                     defaultValue={therapy.configuration.temperature || ''}
                                                 />
 
