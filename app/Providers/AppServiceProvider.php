@@ -78,6 +78,16 @@ class AppServiceProvider extends ServiceProvider
             $pagesRef->getValue()
         ));
 
+        // Replace OrderTotalsChart with custom one that uses short month names
+        $widgetsRef = new \ReflectionProperty(\Lunar\Admin\LunarPanelManager::class, 'widgets');
+        $widgetsRef->setAccessible(true);
+        $widgetsRef->setValue(null, array_map(
+            fn ($widget) => $widget === \Lunar\Admin\Filament\Widgets\Dashboard\Orders\OrderTotalsChart::class
+                ? \App\Filament\Widgets\OrderTotalsChart::class
+                : $widget,
+            $widgetsRef->getValue()
+        ));
+
         // Remove AttributeGroupResource and ChannelResource from Lunar panel navigation
         $resourcesRef = new \ReflectionProperty(\Lunar\Admin\LunarPanelManager::class, 'resources');
         $resourcesRef->setAccessible(true);
