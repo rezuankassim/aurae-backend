@@ -60,6 +60,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
 
     Route::post('/feedback', [FeedbackController::class, 'store'])->name('api.feedback.store');
 
+    Route::post('/check-unique-values', [AuthenticationController::class, 'checkUniqueValues'])->name('api.check_unique_values');
     Route::post('/login', [AuthenticationController::class, 'login'])->name('api.login');
     Route::post('/register', [AuthenticationController::class, 'register'])->name('api.register');
     Route::post('/send-verify', [AuthenticationController::class, 'sendVerify'])->name('api.send_verify');

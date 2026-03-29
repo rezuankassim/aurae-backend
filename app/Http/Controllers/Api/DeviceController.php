@@ -37,7 +37,7 @@ class DeviceController extends Controller
         return BaseResource::make([
             'qr' => 'data:image/png;base64,'.base64_encode($qr),
             'device_id' => $device->id,
-            'is_bound' => ! is_null($device->user_id),
+            'is_bound' => ! is_null($device->user_id) || $device->machine()->exists(),
         ])
             ->additional([
                 'status' => 200,
@@ -77,10 +77,16 @@ class DeviceController extends Controller
                 ->setStatusCode(404);
         }
 
-        // Check ownership status
-        $isAvailable = is_null($device->user_id);
-        $belongsToUser = $device->user_id === $user->id;
-        $belongsToOther = ! is_null($device->user_id) && $device->user_id !== $user->id;
+        // Check ownership status via direct device binding or machine binding
+        $directOwnership = $device->user_id === $user->id;
+        $machineOwnership = $device->machine()
+            ->where('user_id', $user->id)
+            ->exists();
+        $belongsToUser = $directOwnership || $machineOwnership;
+
+        $hasMachineBound = $device->machine()->exists();
+        $isAvailable = is_null($device->user_id) && ! $hasMachineBound;
+        $belongsToOther = ! $isAvailable && ! $belongsToUser;
 
         return BaseResource::make([
             'exists' => true,

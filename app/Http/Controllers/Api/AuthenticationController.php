@@ -68,6 +68,25 @@ class AuthenticationController extends Controller
             ]);
     }
 
+    public function checkUniqueValues(Request $request)
+    {
+        $request->validate([
+            'username' => ['nullable', 'string', 'max:255', Rule::unique('users', 'username')->whereNull('deleted_at')],
+            'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('users', 'email')->whereNull('deleted_at')],
+            'phone' => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone')->whereNull('deleted_at')],
+        ], [
+            'phone.unique' => 'This phone number is already registered. Please login or use a different phone number.',
+            'email.unique' => 'This email address is already registered. Please login or use a different email.',
+            'username.unique' => 'This username is already taken. Please choose a different username.',
+        ]);
+
+        return BaseResource::make(null)
+            ->additional([
+                'status' => 200,
+                'message' => 'Values are unique.',
+            ]);
+    }
+
     public function register(Request $request)
     {
         $request->validate([
