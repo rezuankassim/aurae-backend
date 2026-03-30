@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
+use Lunar\Shipping\Models\ShippingMethod;
 
 class OrderResource extends BaseResource
 {
@@ -52,11 +53,17 @@ class OrderResource extends BaseResource
                         }
                     }
 
+                    $shippingDescription = null;
+                    if ($isShippingLine && $line->identifier) {
+                        $shippingDescription = ShippingMethod::where('code', $line->identifier)->value('description');
+                    }
+
                     return [
                         'id' => $line->id,
                         'type' => $line->type ?? ($isShippingLine ? 'shipping' : 'physical'),
                         'quantity' => $line->quantity,
                         'description' => $line->description,
+                        'shipping_description' => $shippingDescription,
                         'sub_total' => $line->subTotal?->formatted,
                         'discount_total' => $line->discountTotal?->formatted,
                         'total' => $line->total?->formatted,
