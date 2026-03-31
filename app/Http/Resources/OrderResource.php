@@ -55,7 +55,8 @@ class OrderResource extends BaseResource
 
                     $shippingDescription = null;
                     if ($isShippingLine && $line->identifier) {
-                        $shippingDescription = ShippingMethod::where('code', $line->identifier)->value('description');
+                        $raw = ShippingMethod::where('code', $line->identifier)->value('description');
+                        $shippingDescription = $raw ? html_entity_decode(strip_tags($raw), ENT_QUOTES | ENT_HTML5, 'UTF-8') : null;
                     }
 
                     return [
