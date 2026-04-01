@@ -4,8 +4,8 @@ namespace App\Lunar\Extensions;
 
 use Filament\Actions;
 use Filament\Forms\Components\Group;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Lunar\Admin\Support\Extending\ListPageExtension;
 use Lunar\Models\CustomerGroup;
@@ -37,7 +37,7 @@ class ShippingMethodListExtension extends ListPageExtension
                         ])
                         ->default('ship-by'),
                 ])->columns(2),
-                RichEditor::make('description')
+                Textarea::make('description')
                     ->label(__('lunarpanel.shipping::shippingmethod.form.description.label')),
             ])->after(function (ShippingMethod $shippingMethod) {
                 $customerGroups = CustomerGroup::pluck('id')->mapWithKeys(

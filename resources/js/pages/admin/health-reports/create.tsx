@@ -125,7 +125,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
 
                                     {/* Full Body Health Report */}
                                     <div className="grid gap-2">
-                                        <Label htmlFor="full_body_file">Full Body Health Report (全身健康评估报告): PDF</Label>
+                                        <Label htmlFor="full_body_file">Full Body Health Report (全身健康评估报告): PDF *</Label>
 
                                         <input
                                             ref={fullBodyFileInputRef}
@@ -175,7 +175,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
 
                                     {/* Meridian Health Report */}
                                     <div className="grid gap-2">
-                                        <Label htmlFor="meridian_file">Meridian Health Report (经络健康评估报告): PDF</Label>
+                                        <Label htmlFor="meridian_file">Meridian Health Report (经络健康评估报告): PDF *</Label>
 
                                         <input
                                             ref={meridianFileInputRef}
@@ -225,7 +225,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
 
                                     {/* Multidimensional Health Report */}
                                     <div className="grid gap-2">
-                                        <Label htmlFor="multidimensional_file">Multidimensional Health Report (多维健康评估报告): PDF</Label>
+                                        <Label htmlFor="multidimensional_file">Multidimensional Health Report (多维健康评估报告): PDF *</Label>
 
                                         <input
                                             ref={multidimensionalFileInputRef}
@@ -281,7 +281,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
                             </Card>
 
                             <div className="flex gap-2">
-                                <Button type="submit" disabled={processing || (!fullBodyFile && !meridianFile && !multidimensionalFile)}>
+                                <Button type="submit" disabled={processing || !fullBodyFile || !meridianFile || !multidimensionalFile}>
                                     Upload Report{(fullBodyFile ? 1 : 0) + (meridianFile ? 1 : 0) + (multidimensionalFile ? 1 : 0) > 1 ? 's' : ''}
                                 </Button>
 

@@ -2,7 +2,9 @@
 
 namespace App\Lunar\Extensions;
 
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Lunar\Admin\Support\Extending\EditPageExtension;
 
@@ -14,6 +16,9 @@ class ShippingMethodEditExtension extends EditPageExtension
 
         // Find and modify the driver select field to include all shipping driver options
         $this->modifyDriverSelect($schema);
+
+        // Replace the RichEditor description field with a plain Textarea
+        $this->replaceDescriptionWithTextarea($schema);
 
         return $form->schema($schema);
     }
@@ -37,6 +42,24 @@ class ShippingMethodEditExtension extends EditPageExtension
             if (method_exists($component, 'getChildComponents')) {
                 $childComponents = $component->getChildComponents();
                 $this->modifyDriverSelect($childComponents);
+            }
+        }
+    }
+
+    protected function replaceDescriptionWithTextarea(array &$components): void
+    {
+        foreach ($components as $key => $component) {
+            if ($component instanceof RichEditor && $component->getName() === 'description') {
+                $components[$key] = Textarea::make('description')
+                    ->label(__('lunarpanel.shipping::shippingmethod.form.description.label'));
+
+                return;
+            }
+
+            // Recursively search child components
+            if (method_exists($component, 'getChildComponents')) {
+                $childComponents = $component->getChildComponents();
+                $this->replaceDescriptionWithTextarea($childComponents);
             }
         }
     }

@@ -25,7 +25,6 @@ import { index as indexMachines } from '@/routes/admin/machines';
 import { index as indexMaintenanceBanners } from '@/routes/admin/maintenance-banners';
 import { index as indexMarketplaceBanners } from '@/routes/admin/marketplace-banners';
 import { index as indexMusic } from '@/routes/admin/music';
-import { index as indexNews } from '@/routes/admin/news';
 import { edit as editSocialMedia } from '@/routes/admin/social-media';
 import { index as indexSubscriptions } from '@/routes/admin/subscription';
 import { index as indexTherapies } from '@/routes/admin/therapies';
@@ -36,7 +35,6 @@ import { index as indexCustomTherapies } from '@/routes/custom-therapies';
 import { index as indexDeviceMaintenance } from '@/routes/device-maintenance';
 import { index } from '@/routes/devices';
 import { index as indexHealthReports } from '@/routes/health-reports';
-import { index as indexNewsCustomer } from '@/routes/news';
 import { index as indexUsageHistory } from '@/routes/usage-history';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -54,7 +52,6 @@ import {
     MapPin,
     MessageCircleQuestion,
     Music,
-    Newspaper,
     Radio,
     Scale,
     ShoppingCart,
@@ -95,11 +92,6 @@ const mainNavItems: NavItem[] = [
         title: 'Devices',
         href: index(),
         icon: TabletSmartphone,
-    },
-    {
-        title: 'News',
-        href: indexNewsCustomer(),
-        icon: Newspaper,
     },
 ];
 
@@ -149,11 +141,6 @@ const managementNavItems: NavItem[] = [
         title: 'Music',
         href: indexMusic(),
         icon: Music,
-    },
-    {
-        title: 'News',
-        href: indexNews(),
-        icon: Newspaper,
     },
     {
         title: 'Subscriptions',

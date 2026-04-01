@@ -98,7 +98,11 @@ export default function ProductPricingIndex({
                                                     id="price"
                                                     name="price"
                                                     placeholder="Price"
-                                                    defaultValue={(product.prices?.at(0)?.price as PriceV).value / 100 || ''}
+                                                    defaultValue={
+                                                        product.prices?.at(0)?.price
+                                                            ? (product.prices.at(0)!.price as PriceV).value / 100
+                                                            : ''
+                                                    }
                                                     step="0.01"
                                                 />
                                                 <FieldDescription>The purchase price, before discounts.</FieldDescription>
@@ -111,7 +115,11 @@ export default function ProductPricingIndex({
                                                     id="comparison_price"
                                                     name="comparison_price"
                                                     placeholder="Comparison Price"
-                                                    defaultValue={(product.prices?.at(0)?.compare_price as PriceV).value / 100 || ''}
+                                                    defaultValue={
+                                                        product.prices?.at(0)?.compare_price
+                                                            ? (product.prices.at(0)!.compare_price as PriceV).value / 100
+                                                            : ''
+                                                    }
                                                     step="0.01"
                                                 />
                                                 <FieldDescription>

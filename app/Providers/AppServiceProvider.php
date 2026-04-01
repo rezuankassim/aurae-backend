@@ -25,12 +25,14 @@ use App\Lunar\Extensions\ManageProductPricingExtension;
 use App\Lunar\Extensions\ManageProductVariantsExtension;
 use App\Lunar\Extensions\ManageVariantInventoryExtension;
 use App\Lunar\Extensions\ManageVariantPricingExtension;
+use App\Lunar\Pages\EditShippingZonePage;
 use App\Lunar\Pages\ManageProductPricingPage;
 use App\Lunar\Pages\ManageVariantPricingPage;
 use App\Lunar\Extensions\ProductConditionRelationManagerExtension;
 use App\Lunar\Extensions\ProductLimitationRelationManagerExtension;
 use App\Lunar\Extensions\ProductResourceExtension;
 use App\Lunar\Extensions\ProductRewardRelationManagerExtension;
+use App\Lunar\Extensions\ShippingExclusionRelationManagerExtension;
 use App\Lunar\Extensions\ShippingMethodEditExtension;
 use App\Lunar\Extensions\ShippingMethodListExtension;
 use App\PaymentTypes\SenangpayPayment;
@@ -65,6 +67,7 @@ use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductVariants;
 use Lunar\Admin\Filament\Resources\ProductVariantResource\Pages\ManageVariantInventory;
 use Lunar\Admin\Filament\Resources\ProductVariantResource\Pages\ManageVariantPricing;
 use Lunar\Admin\Support\Facades\LunarPanel;
+use Lunar\Shipping\Filament\Resources\ShippingExclusionListResource\RelationManagers\ShippingExclusionRelationManager;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\EditShippingMethod;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\ListShippingMethod;
 use Lunar\Shipping\ShippingPlugin;
@@ -134,6 +137,7 @@ class AppServiceProvider extends ServiceProvider
                 ManageVariantPricing::class => ManageVariantPricingExtension::class,
                 ManageVariantPricingPage::class => ManageVariantPricingExtension::class,
                 ProductResource::class => ProductResourceExtension::class,
+                ShippingExclusionRelationManager::class => ShippingExclusionRelationManagerExtension::class,
                 EditShippingMethod::class => ShippingMethodEditExtension::class,
                 ListShippingMethod::class => ShippingMethodListExtension::class,
             ])
@@ -186,6 +190,10 @@ class AppServiceProvider extends ServiceProvider
         // Override Lunar pricing pages to remove Customer Group Pricing and Price Breaks relation managers
         Livewire::component('lunar.admin.filament.resources.product-resource.pages.manage-product-pricing', ManageProductPricingPage::class);
         Livewire::component('lunar.admin.filament.resources.product-variant-resource.pages.manage-variant-pricing', ManageVariantPricingPage::class);
+        Livewire::component('lunar.shipping.filament.resources.shipping-zone-resource.pages.edit-shipping-zone', EditShippingZonePage::class);
+
+        // Override Shipping Rates page to hide Price Breaks and Create & Create Another button
+        Livewire::component('lunar.shipping.filament.resources.shipping-zone-resource.pages.manage-shipping-rates', ManageShippingRatesPage::class);
 
         Event::listen(Login::class, LogSuccessfulLogin::class);
         Event::listen(Logout::class, LogLogout::class);

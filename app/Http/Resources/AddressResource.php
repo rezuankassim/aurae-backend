@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
+use Lunar\Models\State;
 
 class AddressResource extends BaseResource
 {
@@ -26,6 +27,7 @@ class AddressResource extends BaseResource
             'line_three' => $this->line_three,
             'city' => $this->city,
             'state' => $this->state,
+            'state_name' => $this->state ? State::find($this->state)?->name : null,
             'postcode' => $this->postcode,
             'delivery_instructions' => $this->delivery_instructions,
             'contact_email' => $this->contact_email,

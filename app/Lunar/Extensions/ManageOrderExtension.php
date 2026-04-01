@@ -17,7 +17,9 @@ class ManageOrderExtension extends ViewPageExtension
 
     public function headerActions(array $actions): array
     {
-        return array_map(function ($action) {
+        $order = $this->caller->record;
+
+        return array_map(function ($action) use ($order) {
             if ($action instanceof BaseUpdateStatusAction) {
                 $caller = $this->caller;
 
@@ -25,6 +27,11 @@ class ManageOrderExtension extends ViewPageExtension
                     ->after(function () use ($caller) {
                         $caller->dispatch(ActivityLogFeed::UPDATED)->to(ActivityLogFeed::class);
                     });
+            }
+
+            // Hide "Capture Payment" for orders with payment-pending or payment-failed status
+            if ($action->getName() === 'capture' && in_array($order->status, ['payment-pending', 'payment-failed'])) {
+                return $action->visible(false);
             }
 
             return $action;

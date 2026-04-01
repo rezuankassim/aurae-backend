@@ -17,7 +17,7 @@ interface Props {
 export default function AdminOrderShow({ order }: Props) {
     const { data, setData, put, processing, errors } = useForm({
         status: order.status,
-        tracking_number: (order.meta?.tracking_number as string) || '',
+        tracking_link: (order.meta?.tracking_link as string) || '',
     });
 
     const breadcrumbs: BreadcrumbItem[] = [

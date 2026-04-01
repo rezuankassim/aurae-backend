@@ -29,14 +29,14 @@ class UpdateStatusAction extends BaseUpdateStatusAction
     {
         $steps = parent::getFormSteps();
 
-        // Insert tracking number field after the status select
+        // Insert tracking link field after the status select
         array_splice($steps, 1, 0, [
-            Forms\Components\TextInput::make('tracking_number')
-                ->label('Tracking Number')
+            Forms\Components\TextInput::make('tracking_link')
+                ->label('Tracking Link')
                 ->required(fn (Forms\Get $get) => $get('status') === 'dispatched')
                 ->visible(fn (Forms\Get $get) => $get('status') === 'dispatched')
-                ->default(fn (?Order $record) => $record?->meta['tracking_number'] ?? null)
-                ->placeholder('Enter tracking number')
+                ->default(fn (?Order $record) => $record?->meta['tracking_link'] ?? null)
+                ->placeholder('Enter tracking link')
                 ->maxLength(255)
                 ->live(),
         ]);
@@ -46,9 +46,9 @@ class UpdateStatusAction extends BaseUpdateStatusAction
 
     protected function updateStatus(Order $record, array $data)
     {
-        if ($data['status'] === 'dispatched' && ! empty($data['tracking_number'])) {
+        if ($data['status'] === 'dispatched' && ! empty($data['tracking_link'])) {
             $meta = $record->meta ?? [];
-            $meta['tracking_number'] = $data['tracking_number'];
+            $meta['tracking_link'] = $data['tracking_link'];
 
             $record->update([
                 'status' => $data['status'],

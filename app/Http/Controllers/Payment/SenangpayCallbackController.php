@@ -250,9 +250,11 @@ class SenangpayCallbackController extends Controller
             ],
         ]);
 
-        // Update order status
+        // Update order status and dissociate from cart so future checkouts
+        // from the same cart create a brand-new order instead of reusing this one.
         $order->update([
             'status' => 'payment-received',
+            'cart_id' => null,
             'meta' => array_merge((array) $order->meta, [
                 'senangpay_transaction_id' => $transactionId,
                 'payment_completed_at' => now()->toIso8601String(),

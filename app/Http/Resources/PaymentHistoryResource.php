@@ -47,7 +47,7 @@ class PaymentHistoryResource extends BaseResource
         return [
             'id' => $order->id,
             'type' => 'marketplace',
-            'title' => "market place #{$orderNumber}",
+            'title' => "Marketplace #{$orderNumber}",
             'amount' => "-{$formattedAmount}", // Negative because it's an expense
             'amount_value' => -abs($amount), // Numeric value for calculations
             'currency' => $currencyCode,
@@ -78,8 +78,8 @@ class PaymentHistoryResource extends BaseResource
                      ($transaction->meta['type'] ?? '') === 'recurring_renewal';
 
         $title = $isRenewal
-            ? "subscription renewal - {$subscriptionName}"
-            : "subscription - {$subscriptionName}";
+            ? "Subscription Renewal - {$subscriptionName}"
+            : "Subscription - {$subscriptionName}";
 
         return [
             'id' => $transaction->id,

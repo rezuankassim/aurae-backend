@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Validator;
 
 class HealthReportCreateRequest extends FormRequest
 {
@@ -24,9 +23,9 @@ class HealthReportCreateRequest extends FormRequest
     {
         return [
             'user_id' => ['required', 'exists:users,id'],
-            'full_body_file' => ['nullable', 'file', 'mimes:pdf', 'max:51200'],
-            'meridian_file' => ['nullable', 'file', 'mimes:pdf', 'max:51200'],
-            'multidimensional_file' => ['nullable', 'file', 'mimes:pdf', 'max:51200'],
+            'full_body_file' => ['required', 'file', 'mimes:pdf', 'max:51200'],
+            'meridian_file' => ['required', 'file', 'mimes:pdf', 'max:51200'],
+            'multidimensional_file' => ['required', 'file', 'mimes:pdf', 'max:51200'],
         ];
     }
 
@@ -47,15 +46,4 @@ class HealthReportCreateRequest extends FormRequest
         ];
     }
 
-    /**
-     * Configure the validator instance.
-     */
-    public function withValidator(Validator $validator): void
-    {
-        $validator->after(function ($validator) {
-            if (! $this->hasFile('full_body_file') && ! $this->hasFile('meridian_file') && ! $this->hasFile('multidimensional_file')) {
-                $validator->errors()->add('files', 'Please upload at least one health report.');
-            }
-        });
-    }
 }

@@ -31,17 +31,16 @@ class SenangpayPayment extends AbstractPayment
             // Check for existing completed order (placed_at is set)
             $existingOrder = $this->cart?->completedOrder()->first();
 
-            if ($existingOrder && in_array($existingOrder->status, ['payment-failed', 'payment-pending'])) {
-                // Dissociate incomplete/failed orders so a fresh one is created with a new unique ID.
-                // Reusing the same order would generate an identical reference number, causing
-                // SenangPay to reject the request with "Duplicated Order Id".
+            if ($existingOrder) {
+                // Dissociate any existing completed order so a fresh one is created
+                // with a new unique ID. This prevents:
+                // - SenangPay "Duplicated Order Id" rejections (for failed/pending orders)
+                // - Overwriting a paid order's status back to payment-pending and
+                //   accumulating extra intent transactions that cause Lunar to
+                //   incorrectly display "partially refunded" (for payment-received orders)
                 $existingOrder->update(['cart_id' => null]);
-                // Refresh the cart to clear cached relationships
                 $this->cart->refresh();
                 $this->order = $this->cart->createOrder();
-            } elseif ($existingOrder) {
-                // Payment already processed (e.g. payment-received) - reuse the existing order
-                $this->order = $existingOrder;
             } else {
                 // No completed order found - use draft or create new
                 $draftOrder = $this->cart?->draftOrder()->first();

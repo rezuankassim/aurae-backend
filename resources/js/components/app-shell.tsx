@@ -12,20 +12,9 @@ interface AppShellProps {
 
 export function AppShell({ children, variant = 'header' }: AppShellProps) {
     const isOpen = usePage<SharedData>().props.sidebarOpen;
-    const success = usePage<SharedData>().props.success;
-    const error = usePage<SharedData>().props.error;
 
     useEffect(() => {
-        // Handle flash messages on initial full page load
-        if (success) {
-            toast.success(success);
-        }
-        if (error) {
-            toast.error(error);
-        }
-
-        // Handle flash messages on subsequent Inertia visits
-        // (router event fires every time, even if the message string is the same)
+        // Handle flash messages on Inertia visits
         const removeListener = router.on('success', (event) => {
             const props = event.detail.page.props as SharedData;
             if (props.success) {
@@ -37,7 +26,6 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
         });
 
         return removeListener;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (variant === 'header') {
