@@ -53,7 +53,7 @@ class ProfileController extends Controller
 
         // Only check phone uniqueness if phone is being changed
         if ($request->phone !== $user->phone) {
-            $rules['phone'][] = Rule::unique('users', 'phone');
+            $rules['phone'][] = Rule::unique('users', 'phone')->whereNull('deleted_at');
         }
 
         // Only validate password fields if password is provided and not empty

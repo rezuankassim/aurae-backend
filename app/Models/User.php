@@ -215,12 +215,14 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
             $user->updateQuietly([
                 'email' => $user->email . '_deleted_' . $user->id,
                 'username' => $user->username . '_deleted_' . $user->id,
+                'phone' => $user->phone . '_deleted_' . $user->id,
             ]);
         });
 
         static::restoring(function (User $user) {
             $user->email = preg_replace('/_deleted_\d+$/', '', $user->email);
             $user->username = preg_replace('/_deleted_\d+$/', '', $user->username);
+            $user->phone = preg_replace('/_deleted_\d+$/', '', $user->phone);
         });
     }
 
