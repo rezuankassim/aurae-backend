@@ -109,7 +109,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
                             <Card className="mt-0">
                                 <CardContent className="space-y-6">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="user_id">Select User</Label>
+<Label htmlFor="user_id">Select User *</Label>
 
                                         <Combobox
                                             value={selectedUserId}

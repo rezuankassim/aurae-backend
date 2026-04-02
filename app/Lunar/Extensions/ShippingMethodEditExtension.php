@@ -56,10 +56,11 @@ class ShippingMethodEditExtension extends EditPageExtension
                 return;
             }
 
-            // Recursively search child components
-            if (method_exists($component, 'getChildComponents')) {
+            // Recursively search child components and set them back on the parent
+            if (method_exists($component, 'getChildComponents') && method_exists($component, 'schema')) {
                 $childComponents = $component->getChildComponents();
                 $this->replaceDescriptionWithTextarea($childComponents);
+                $component->schema($childComponents);
             }
         }
     }
