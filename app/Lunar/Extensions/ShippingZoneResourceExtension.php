@@ -2,7 +2,6 @@
 
 namespace App\Lunar\Extensions;
 
-use App\Lunar\Pages\EditShippingZonePage;
 use App\Lunar\Pages\ManageShippingRatesPage;
 use Filament\Panel;
 use Filament\Resources\Pages\PageRegistration;
@@ -15,8 +14,6 @@ class ShippingZoneResourceExtension extends ResourceExtension
 {
     public function extendPages(array $pages): array
     {
-        $pages['edit'] = EditShippingZonePage::route('/{record}/edit');
-
         // Keep BaseManageShippingRates as the registered page class so the sub-navigation
         // URL lookup (getResourcePageName) can still find it in getPages().
         // The route closure points to ManageShippingRatesPage so the custom
