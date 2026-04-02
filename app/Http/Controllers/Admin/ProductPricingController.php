@@ -20,7 +20,7 @@ class ProductPricingController extends Controller
         $taxClasses = TaxClass::all();
 
         return Inertia::render('admin/products/pricing/index', [
-            'product' => $product->load(['prices', 'variants.taxClass']),
+            'product' => $product->load(['variants.basePrices', 'variants.taxClass']),
             'taxClasses' => $taxClasses,
             'withVariants' => $product->productOptions()->count() > 0,
         ]);
@@ -34,8 +34,8 @@ class ProductPricingController extends Controller
         $validated = $request->validated();
 
         $onlyVariant = $product->variants()->first();
-        $currency = $product->prices()->exists()
-            ? $product->prices()->first()->currency
+        $currency = $onlyVariant->basePrices()->exists()
+            ? $onlyVariant->basePrices()->first()->currency
             : Currency::getDefault();
 
         $onlyVariant->update([

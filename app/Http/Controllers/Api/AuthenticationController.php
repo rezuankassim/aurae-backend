@@ -133,6 +133,29 @@ class AuthenticationController extends Controller
     public function logout(Request $request)
     {
         $user = $request->user();
+        $tokenName = $user->currentAccessToken()->name;
+
+        // Update logout_at on the matching login record
+        $updated = LoginActivity::where('user_id', $user->id)
+            ->where('event', 'login')
+            ->where('guard', 'api')
+            ->where('session_id', $tokenName)
+            ->whereNull('logout_at')
+            ->latest('occurred_at')
+            ->limit(1)
+            ->update(['logout_at' => now()]);
+
+        // Fallback: if no match by session_id (e.g. empty UDID), match by user + latest login
+        if (! $updated) {
+            LoginActivity::where('user_id', $user->id)
+                ->where('event', 'login')
+                ->where('guard', 'api')
+                ->whereNull('logout_at')
+                ->latest('occurred_at')
+                ->limit(1)
+                ->update(['logout_at' => now()]);
+        }
+
         $user->currentAccessToken()->delete();
 
         return BaseResource::make(null)
