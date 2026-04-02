@@ -26,9 +26,7 @@ use App\Lunar\Extensions\ManageProductVariantsExtension;
 use App\Lunar\Extensions\ManageVariantInventoryExtension;
 use App\Lunar\Extensions\ManageVariantPricingExtension;
 use App\Lunar\Extensions\ProductVariantResourceExtension;
-use App\Lunar\Pages\EditShippingZonePage;
 use App\Lunar\Pages\ManageProductPricingPage;
-use App\Lunar\Pages\ManageShippingRatesPage;
 use App\Lunar\Pages\ManageVariantPricingPage;
 use App\Lunar\Extensions\ProductConditionRelationManagerExtension;
 use App\Lunar\Extensions\ProductLimitationRelationManagerExtension;
@@ -193,7 +191,6 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Livewire::component('app.lunar.widgets.product-options-widget', \App\Lunar\Widgets\ProductOptionsWidget::class);
-
 
         Event::listen(Login::class, LogSuccessfulLogin::class);
         Event::listen(Logout::class, LogLogout::class);
