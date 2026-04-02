@@ -6,8 +6,8 @@ use Lunar\Shipping\Filament\Resources\ShippingZoneResource\Pages\EditShippingZon
 
 class EditShippingZonePage extends EditShippingZone
 {
-    protected function getRedirectUrl(): ?string
+    protected function getRedirectUrl(): string
     {
-        return null;
+        return '';
     }
 }
