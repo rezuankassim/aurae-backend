@@ -8,6 +8,6 @@ class EditShippingZonePage extends EditShippingZone
 {
     protected function getRedirectUrl(): string
     {
-        return '';
+        return $this->getResource()::getUrl('edit', ['record' => $this->getRecord()]);
     }
 }

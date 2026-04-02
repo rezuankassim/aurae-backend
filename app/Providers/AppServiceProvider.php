@@ -191,6 +191,7 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Livewire::component('app.lunar.widgets.product-options-widget', \App\Lunar\Widgets\ProductOptionsWidget::class);
+        Livewire::component('app.lunar.pages.manage-shipping-rates-page', \App\Lunar\Pages\ManageShippingRatesPage::class);
 
         Event::listen(Login::class, LogSuccessfulLogin::class);
         Event::listen(Logout::class, LogLogout::class);
