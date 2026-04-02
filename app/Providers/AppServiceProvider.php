@@ -27,6 +27,7 @@ use App\Lunar\Extensions\ManageVariantInventoryExtension;
 use App\Lunar\Extensions\ManageVariantPricingExtension;
 use App\Lunar\Pages\EditShippingZonePage;
 use App\Lunar\Pages\ManageProductPricingPage;
+use App\Lunar\Pages\ManageShippingRatesPage;
 use App\Lunar\Pages\ManageVariantPricingPage;
 use App\Lunar\Extensions\ProductConditionRelationManagerExtension;
 use App\Lunar\Extensions\ProductLimitationRelationManagerExtension;
