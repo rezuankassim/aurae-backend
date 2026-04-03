@@ -221,6 +221,11 @@ class MachineController extends Controller
             return back()->with('error', 'This machine is not bound to any user.');
         }
 
+        // Unbind device from user before clearing the association
+        if ($machine->device) {
+            $machine->device->update(['user_id' => null]);
+        }
+
         $machine->update([
             'user_id' => null,
             'device_id' => null,

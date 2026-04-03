@@ -266,6 +266,11 @@ class MachineController extends Controller
                 ->setStatusCode(403);
         }
 
+        // Unbind device from user before clearing the association
+        if ($machine->device) {
+            $machine->device->update(['user_id' => null]);
+        }
+
         // Unbind machine
         $machine->update([
             'user_id' => null,
