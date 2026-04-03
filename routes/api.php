@@ -83,13 +83,14 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
     Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/user', function (Request $request) {
             $user = $request->user();
-            $user->load('guest');
+            $user->load('guest', 'latestLoginActivity');
 
             return BaseResource::make($user)
                 ->additional([
                     'status' => 200,
                     'message' => 'User retrieved successfully.',
                     'is_guest' => $user->isGuest(),
+                    'last_logged_in_at' => $user->latestLoginActivity?->occurred_at,
                 ]);
         });
 

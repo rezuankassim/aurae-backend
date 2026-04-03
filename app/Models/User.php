@@ -90,6 +90,17 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
     }
 
     /**
+     * Get the latest successful login activity for the user.
+     */
+    public function latestLoginActivity(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(LoginActivity::class)
+            ->where('event', 'login')
+            ->where('succeeded', true)
+            ->latestOfMany('occurred_at');
+    }
+
+    /**
      * Get the guest record if this user is a guest.
      */
     public function guest(): \Illuminate\Database\Eloquent\Relations\HasOne
