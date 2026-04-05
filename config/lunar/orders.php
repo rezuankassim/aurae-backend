@@ -73,7 +73,9 @@ return [
         'payment-received' => [
             'label' => 'Payment Received',
             'color' => '#6a67ce',
-            'mailers' => [],
+            'mailers' => [
+                \App\Mail\Orders\OrderStatusUpdatedMail::class,
+            ],
             'notifications' => [],
             'favourite' => true,
         ],
@@ -81,14 +83,18 @@ return [
         'payment-failed' => [
             'label' => 'Payment Failed',
             'color' => '#e74c3c',
-            'mailers' => [],
+            'mailers' => [
+                \App\Mail\Orders\OrderStatusUpdatedMail::class,
+            ],
             'notifications' => [],
             'favourite' => true,
         ],
 
         'dispatched' => [
             'label' => 'Dispatched',
-            'mailers' => [],
+            'mailers' => [
+                \App\Mail\Orders\OrderStatusUpdatedMail::class,
+            ],
             'notifications' => [],
             'favourite' => true,
         ],
@@ -96,7 +102,9 @@ return [
         'delivered' => [
             'label' => 'Delivered',
             'color' => '#2ecc71',
-            'mailers' => [],
+            'mailers' => [
+                \App\Mail\Orders\OrderStatusUpdatedMail::class,
+            ],
             'notifications' => [],
             'favourite' => true,
         ],

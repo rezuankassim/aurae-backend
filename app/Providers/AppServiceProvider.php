@@ -9,6 +9,7 @@ use App\Listeners\LogConnectionPruned;
 use App\Listeners\LogFailedLogin;
 use App\Listeners\LogLogout;
 use App\Listeners\LogSuccessfulLogin;
+use App\Lunar\Extensions\BrandResourceExtension;
 use App\Lunar\Extensions\CollectionGroupCreateExtension;
 use App\Lunar\Extensions\CollectionGroupEditExtension;
 use App\Lunar\Extensions\CollectionGroupResourceExtension;
@@ -35,6 +36,7 @@ use App\Lunar\Extensions\ProductRewardRelationManagerExtension;
 use App\Lunar\Extensions\ShippingExclusionRelationManagerExtension;
 use App\Lunar\Extensions\ShippingMethodEditExtension;
 use App\Lunar\Extensions\ShippingMethodListExtension;
+use App\Lunar\Extensions\ShippingMethodResourceExtension;
 use App\Lunar\Extensions\ShippingZoneResourceExtension;
 use App\PaymentTypes\SenangpayPayment;
 use Filament\Http\Middleware\Authenticate;
@@ -60,6 +62,7 @@ use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductCond
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductLimitationRelationManager;
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductRewardRelationManager;
 use Lunar\Admin\Filament\Resources\OrderResource\Pages\ManageOrder;
+use Lunar\Admin\Filament\Resources\BrandResource;
 use Lunar\Admin\Filament\Resources\ProductResource;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ListProducts;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductInventory;
@@ -72,6 +75,7 @@ use Lunar\Admin\Support\Facades\LunarPanel;
 use Lunar\Shipping\Filament\Resources\ShippingExclusionListResource\RelationManagers\ShippingExclusionRelationManager;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\EditShippingMethod;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\ListShippingMethod;
+use Lunar\Shipping\Filament\Resources\ShippingMethodResource;
 use Lunar\Shipping\Filament\Resources\ShippingZoneResource;
 use Lunar\Shipping\ShippingPlugin;
 
@@ -118,6 +122,7 @@ class AppServiceProvider extends ServiceProvider
 
         LunarPanel::disableTwoFactorAuth()
             ->extensions([
+                BrandResource::class => BrandResourceExtension::class,
                 CurrencyResource::class => CurrencyResourceExtension::class,
                 CreateCollectionGroup::class => CollectionGroupCreateExtension::class,
                 EditCollectionGroup::class => CollectionGroupEditExtension::class,
@@ -144,6 +149,7 @@ class AppServiceProvider extends ServiceProvider
                 ShippingExclusionRelationManager::class => ShippingExclusionRelationManagerExtension::class,
                 EditShippingMethod::class => ShippingMethodEditExtension::class,
                 ListShippingMethod::class => ShippingMethodListExtension::class,
+                ShippingMethodResource::class => ShippingMethodResourceExtension::class,
                 ShippingZoneResource::class => ShippingZoneResourceExtension::class,
             ])
             ->panel(function (Panel $panel) {

@@ -29,6 +29,11 @@ class ManageOrderExtension extends ViewPageExtension
                     });
             }
 
+        // Always hide "Refund" button
+            if ($action->getName() === 'refund') {
+                return $action->visible(false);
+            }
+
             // Hide "Capture Payment" for orders with payment-pending or payment-failed status
             if ($action->getName() === 'capture' && in_array($order->status, ['payment-pending', 'payment-failed'])) {
                 return $action->visible(false);

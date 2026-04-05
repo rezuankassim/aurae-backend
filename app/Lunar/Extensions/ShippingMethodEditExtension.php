@@ -20,6 +20,9 @@ class ShippingMethodEditExtension extends EditPageExtension
         // Replace the RichEditor description field with a plain Textarea
         $this->replaceDescriptionWithTextarea($schema);
 
+        // Hide the cutoff and stock_available fields
+        $this->hideFields($schema, ['cutoff', 'stock_available']);
+
         return $form->schema($schema);
     }
 
@@ -60,6 +63,22 @@ class ShippingMethodEditExtension extends EditPageExtension
             if (method_exists($component, 'getChildComponents') && method_exists($component, 'schema')) {
                 $childComponents = $component->getChildComponents();
                 $this->replaceDescriptionWithTextarea($childComponents);
+                $component->schema($childComponents);
+            }
+        }
+    }
+
+    protected function hideFields(array &$components, array $fieldNames): void
+    {
+        foreach ($components as $component) {
+            if (method_exists($component, 'getName') && in_array($component->getName(), $fieldNames)) {
+                $component->hidden();
+            }
+
+            // Recursively search child components and set them back on the parent
+            if (method_exists($component, 'getChildComponents') && method_exists($component, 'schema')) {
+                $childComponents = $component->getChildComponents();
+                $this->hideFields($childComponents, $fieldNames);
                 $component->schema($childComponents);
             }
         }

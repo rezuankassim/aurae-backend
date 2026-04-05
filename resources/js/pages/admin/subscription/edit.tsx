@@ -27,6 +27,14 @@ const breadcrumbs = (subscription: Subscription): BreadcrumbItem[] => [
 
 export default function EditSubscription({ subscription }: { subscription: Subscription }) {
     const [isActive, setIsActive] = useState(subscription.is_active);
+    const [iconPreview, setIconPreview] = useState<string | null>(subscription.icon_url || null);
+
+    const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        if (file) {
+            setIconPreview(URL.createObjectURL(file));
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs(subscription)}>
@@ -50,13 +58,13 @@ export default function EditSubscription({ subscription }: { subscription: Subsc
                             <div className="grid gap-2">
                                 <Label htmlFor="icon">Icon</Label>
 
-                                {subscription.icon_url && (
+                                {iconPreview && (
                                     <div className="mb-2">
-                                        <img src={subscription.icon_url} alt="Current icon" className="h-20 w-20 rounded object-contain" />
+                                        <img src={iconPreview} alt="Icon preview" className="h-20 w-20 rounded object-contain" />
                                     </div>
                                 )}
 
-                                <Input type="file" id="icon" name="icon" placeholder="Icon" accept="image/*" />
+                                <Input type="file" id="icon" name="icon" placeholder="Icon" accept="image/*" onChange={handleIconChange} />
 
                                 <InputError message={errors.icon} />
                             </div>

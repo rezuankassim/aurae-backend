@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Payment;
 
 use App\Events\PaymentCompleted;
 use App\Http\Controllers\Controller;
+use App\Mail\Orders\OrderInvoiceMail;
 use App\Models\SubscriptionTransaction;
 use App\Models\UserSubscription;
 use App\Services\SenangpaySignatureService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Lunar\Models\Order;
 use Lunar\Models\ProductVariant;
 use Lunar\Models\Transaction;
@@ -288,6 +290,24 @@ class SenangpayCallbackController extends Controller
             'reference' => $orderId,
             'transaction_id' => $transactionId,
         ]);
+
+        // Send invoice email to the customer
+        $customerEmail = $order->billingAddress?->contact_email
+            ?? $order->shippingAddress?->contact_email
+            ?? $order->user?->email;
+
+        if ($customerEmail) {
+            Mail::to($customerEmail)->queue(new OrderInvoiceMail($order));
+
+            Log::info('SenangPay capture: Invoice email queued', [
+                'order_id' => $order->id,
+                'email' => $customerEmail,
+            ]);
+        } else {
+            Log::warning('SenangPay capture: No customer email found, invoice not sent', [
+                'order_id' => $order->id,
+            ]);
+        }
     }
 
     /**

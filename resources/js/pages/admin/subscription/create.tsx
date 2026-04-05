@@ -26,6 +26,16 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function CreateSubscription() {
     const [isActive, setIsActive] = useState(true);
+    const [iconPreview, setIconPreview] = useState<string | null>(null);
+
+    const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        if (file) {
+            setIconPreview(URL.createObjectURL(file));
+        } else {
+            setIconPreview(null);
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -50,7 +60,13 @@ export default function CreateSubscription() {
                             <div className="grid gap-2">
                                 <Label htmlFor="icon">Icon</Label>
 
-                                <Input type="file" id="icon" name="icon" placeholder="Icon" accept="image/*" />
+                                <Input type="file" id="icon" name="icon" placeholder="Icon" accept="image/*" onChange={handleIconChange} />
+
+                                {iconPreview && (
+                                    <div className="mt-2">
+                                        <img src={iconPreview} alt="Icon preview" className="h-20 w-20 rounded object-contain" />
+                                    </div>
+                                )}
 
                                 <InputError message={errors.icon} />
                             </div>
