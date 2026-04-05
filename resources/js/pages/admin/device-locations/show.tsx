@@ -10,14 +10,11 @@ import { Head } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { ExternalLink } from 'lucide-react';
 
-interface UserDevice {
-    id: number;
-    udid: string;
-    os: string | null;
-    os_version: string | null;
-    manufacturer: string | null;
-    model: string | null;
-    app_version: string | null;
+interface Device {
+    id: string;
+    name: string;
+    uuid: string;
+    status: number;
 }
 
 interface DeviceLocation {
@@ -42,7 +39,7 @@ interface PaginatedLocations {
 }
 
 interface Props {
-    device: UserDevice;
+    device: Device;
     locations: PaginatedLocations;
 }
 
@@ -64,7 +61,7 @@ export default function AdminDeviceLocationsShow({ device, locations }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl px-4 py-6">
                 <Heading
                     title="Device Location History"
-                    description={`GPS location tracking for ${device.manufacturer || 'Unknown'} ${device.model || 'Device'}`}
+                    description={`GPS location tracking for ${device.name}`}
                 />
 
                 <Card>
@@ -73,27 +70,13 @@ export default function AdminDeviceLocationsShow({ device, locations }: Props) {
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-2">
                         <div className="grid gap-2">
-                            <Label>Device</Label>
-                            <p>
-                                {device.manufacturer || 'Unknown'} {device.model || 'Device'}
-                            </p>
+                            <Label>Name</Label>
+                            <p className="font-medium">{device.name}</p>
                         </div>
 
                         <div className="grid gap-2">
-                            <Label>UDID</Label>
-                            <p className="font-mono text-sm">{device.udid}</p>
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label>Operating System</Label>
-                            <p>
-                                {device.os || 'Unknown'} {device.os_version || ''}
-                            </p>
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label>App Version</Label>
-                            <p>{device.app_version || '-'}</p>
+                            <Label>UUID</Label>
+                            <p className="font-mono text-sm">{device.uuid}</p>
                         </div>
 
                         <div className="grid gap-2">

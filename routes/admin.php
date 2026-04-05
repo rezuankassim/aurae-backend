@@ -189,7 +189,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::delete('/marketplace-banners/{marketplaceBanner}', [MarketplaceBannerController::class, 'destroy'])->name('marketplace-banners.destroy');
 
     Route::get('/device-locations', [DeviceLocationController::class, 'index'])->name('device-locations.index');
-    Route::get('/device-locations/{userDevice}', [DeviceLocationController::class, 'show'])->name('device-locations.show');
+    Route::get('/device-locations/{device}', [DeviceLocationController::class, 'show'])->name('device-locations.show');
 
     Route::get('/health-reports', [HealthReportController::class, 'index'])->name('health-reports.index');
     Route::get('/health-reports/create', [HealthReportController::class, 'create'])->name('health-reports.create');

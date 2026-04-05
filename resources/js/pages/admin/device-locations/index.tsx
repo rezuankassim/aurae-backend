@@ -6,24 +6,22 @@ import { Head } from '@inertiajs/react';
 import { columns } from './columns';
 import { DataTable } from './data-table';
 
-interface UserDevice {
-    id: number;
-    udid: string;
-    os: string | null;
-    manufacturer: string | null;
-    model: string | null;
+interface IoTDevice {
+    id: string;
+    name: string;
+    uuid: string;
 }
 
 interface DeviceLocation {
     id: number;
-    user_device_id: number;
+    device_id: string | null;
     latitude: string | null;
     longitude: string | null;
     accuracy: string | null;
     api_endpoint: string | null;
     ip_address: string | null;
     created_at: string;
-    user_device: UserDevice;
+    device: IoTDevice | null;
 }
 
 interface PaginatedLocations {
@@ -35,7 +33,7 @@ interface PaginatedLocations {
 }
 
 interface Device {
-    id: number;
+    id: string;
     label: string;
 }
 

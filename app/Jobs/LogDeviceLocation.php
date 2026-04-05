@@ -15,6 +15,7 @@ class LogDeviceLocation implements ShouldQueue
      */
     public function __construct(
         public int $userDeviceId,
+        public ?string $deviceId,
         public string $latitude,
         public string $longitude,
         public ?string $accuracy,
@@ -32,6 +33,7 @@ class LogDeviceLocation implements ShouldQueue
     {
         DeviceLocation::create([
             'user_device_id' => $this->userDeviceId,
+            'device_id' => $this->deviceId,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'accuracy' => $this->accuracy,

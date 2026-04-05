@@ -6,24 +6,22 @@ import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { ExternalLink, MoreHorizontal } from 'lucide-react';
 
-interface UserDevice {
-    id: number;
-    udid: string;
-    os: string | null;
-    manufacturer: string | null;
-    model: string | null;
+interface Device {
+    id: string;
+    name: string;
+    uuid: string;
 }
 
 interface DeviceLocation {
     id: number;
-    user_device_id: number;
+    device_id: string | null;
     latitude: string | null;
     longitude: string | null;
     accuracy: string | null;
     api_endpoint: string | null;
     ip_address: string | null;
     created_at: string;
-    user_device: UserDevice;
+    device: Device | null;
 }
 
 export const columns: ColumnDef<DeviceLocation>[] = [
@@ -35,16 +33,15 @@ export const columns: ColumnDef<DeviceLocation>[] = [
         },
     },
     {
-        accessorKey: 'user_device',
+        accessorKey: 'device',
         header: 'Device',
         cell: ({ row }) => {
-            const device = row.original.user_device;
+            const device = row.original.device;
+            if (!device) return <span className="text-muted-foreground">-</span>;
             return (
                 <div>
-                    <p className="font-medium">
-                        {device?.manufacturer || 'Unknown'} {device?.model || 'Device'}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{device?.udid || '-'}</p>
+                    <p className="font-medium">{device.name}</p>
+                    <p className="text-xs text-muted-foreground">{device.uuid}</p>
                 </div>
             );
         },
@@ -112,11 +109,13 @@ export const columns: ColumnDef<DeviceLocation>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                            <Link className="hover:cursor-pointer" href={show(row.original.user_device_id).url}>
-                                View Device History
-                            </Link>
-                        </DropdownMenuItem>
+                        {row.original.device_id && (
+                            <DropdownMenuItem asChild>
+                                <Link className="hover:cursor-pointer" href={show(row.original.device_id).url}>
+                                    View Device History
+                                </Link>
+                            </DropdownMenuItem>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

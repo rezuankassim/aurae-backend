@@ -24,6 +24,11 @@ class DeviceLocation extends Model
         return $this->belongsTo(UserDevice::class);
     }
 
+    public function device(): BelongsTo
+    {
+        return $this->belongsTo(Device::class);
+    }
+
     public function getFormattedCoordinatesAttribute(): string
     {
         if (! $this->latitude || ! $this->longitude) {
@@ -42,9 +47,9 @@ class DeviceLocation extends Model
         return sprintf('https://www.google.com/maps?q=%s,%s', $this->latitude, $this->longitude);
     }
 
-    public function scopeForDevice(Builder $query, int $deviceId): Builder
+    public function scopeForDevice(Builder $query, string $deviceId): Builder
     {
-        return $query->where('user_device_id', $deviceId);
+        return $query->where('device_id', $deviceId);
     }
 
     public function scopeDateRange(Builder $query, ?string $from = null, ?string $to = null): Builder

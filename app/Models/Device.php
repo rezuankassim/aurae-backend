@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Device extends Model
 {
@@ -25,6 +26,16 @@ class Device extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function locations(): HasMany
+    {
+        return $this->hasMany(DeviceLocation::class);
+    }
+
+    public function latestLocation(): HasOne
+    {
+        return $this->hasOne(DeviceLocation::class)->latestOfMany('created_at');
     }
 
     public function guests(): HasMany

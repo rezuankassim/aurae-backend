@@ -10,18 +10,46 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
+import { ExternalLink, MapPin } from 'lucide-react';
+
+interface DeviceLocation {
+    id: number;
+    latitude: string | null;
+    longitude: string | null;
+    accuracy: string | null;
+    created_at: string;
+}
 
 interface Device {
     id: string;
     name: string;
     uuid: string;
     status: number;
+    latest_location: DeviceLocation | null;
+}
+
+interface Address {
+    id: number;
+    is_default: boolean;
+    type: number;
+    name: string;
+    phone: string | null;
+    line1: string;
+    line2: string | null;
+    line3: string | null;
+    city: string;
+    state: string;
+    postal_code: string;
+    country: string;
 }
 
 interface User {
     id: number;
     name: string;
     email: string;
+    phone: string | null;
+    phone_country_code: string | null;
+    addresses: Address[];
 }
 
 interface ChangeHistory {
@@ -106,6 +134,100 @@ export default function AdminDeviceMaintenanceShow({ maintenance }: Props) {
 
                 <div className="grid gap-6 lg:grid-cols-3">
                     <div className="space-y-6 lg:col-span-2">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Device Last Known Location</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {maintenance.device?.latest_location?.latitude && maintenance.device?.latest_location?.longitude ? (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <MapPin className="h-4 w-4 text-muted-foreground" />
+                                            <span className="font-mono text-sm">
+                                                {parseFloat(maintenance.device.latest_location.latitude).toFixed(6)},{' '}
+                                                {parseFloat(maintenance.device.latest_location.longitude).toFixed(6)}
+                                            </span>
+                                            {maintenance.device.latest_location.accuracy && (
+                                                <span className="text-xs text-muted-foreground">
+                                                    ±{parseFloat(maintenance.device.latest_location.accuracy).toFixed(1)}m
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-xs text-muted-foreground">
+                                                Last logged:{' '}
+                                                {format(new Date(maintenance.device.latest_location.created_at), 'MMM d, yyyy HH:mm')}
+                                            </p>
+                                            <a
+                                                href={`https://www.google.com/maps?q=${maintenance.device.latest_location.latitude},${maintenance.device.latest_location.longitude}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-1 text-sm text-primary hover:text-primary/80"
+                                            >
+                                                <ExternalLink className="h-3 w-3" />
+                                                View on Map
+                                            </a>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-muted-foreground">No location data available for this device.</p>
+                                )}
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Customer Contact & Location</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div>
+                                    <Label className="text-muted-foreground">Contact Number</Label>
+                                    <p className="font-medium">
+                                        {maintenance.user.phone
+                                            ? `${maintenance.user.phone_country_code ? '+' + maintenance.user.phone_country_code + ' ' : ''}${maintenance.user.phone}`
+                                            : '-'}
+                                    </p>
+                                </div>
+
+                                {(() => {
+                                    const address =
+                                        maintenance.user.addresses.find((a) => a.is_default) ?? maintenance.user.addresses[0];
+
+                                    if (!address) {
+                                        return (
+                                            <div className="border-t pt-4">
+                                                <Label className="text-muted-foreground">Address</Label>
+                                                <p className="text-sm text-muted-foreground">No address on file</p>
+                                            </div>
+                                        );
+                                    }
+
+                                    const lines = [
+                                        address.line1,
+                                        address.line2,
+                                        address.line3,
+                                        [address.city, address.state, address.postal_code].filter(Boolean).join(', '),
+                                        address.country,
+                                    ].filter(Boolean);
+
+                                    return (
+                                        <div className="border-t pt-4">
+                                            <Label className="text-muted-foreground">
+                                                Address{address.is_default ? ' (Default)' : ''}
+                                            </Label>
+                                            <div className="mt-1 space-y-0.5">
+                                                {lines.map((line, i) => (
+                                                    <p key={i} className="font-medium">
+                                                        {line}
+                                                    </p>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+                            </CardContent>
+                        </Card>
+
                         <Card>
                             <CardHeader>
                                 <CardTitle>Request Details</CardTitle>

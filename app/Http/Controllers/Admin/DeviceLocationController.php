@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Device;
 use App\Models\DeviceLocation;
-use App\Models\UserDevice;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -30,13 +30,13 @@ class DeviceLocationController extends Controller
 
         $locations = $query->paginate(50);
 
-        // Get all devices for filter dropdown
-        $devices = UserDevice::orderBy('updated_at', 'desc')
+        // Get all IoT devices for filter dropdown
+        $devices = Device::orderBy('name')
             ->get()
             ->map(function ($device) {
                 return [
                     'id' => $device->id,
-                    'label' => sprintf('%s %s (%s)', $device->manufacturer ?? 'Unknown', $device->model ?? 'Device', $device->udid),
+                    'label' => sprintf('%s (%s)', $device->name, $device->uuid),
                 ];
             });
 
@@ -52,17 +52,17 @@ class DeviceLocationController extends Controller
     }
 
     /**
-     * Display location history for a specific device
+     * Display location history for a specific IoT device
      */
-    public function show(UserDevice $userDevice)
+    public function show(Device $device)
     {
         $locations = DeviceLocation::query()
-            ->where('user_device_id', $userDevice->id)
+            ->where('device_id', $device->id)
             ->latest()
             ->paginate(50);
 
         return Inertia::render('admin/device-locations/show', [
-            'device' => $userDevice,
+            'device' => $device,
             'locations' => $locations,
         ]);
     }

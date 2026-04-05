@@ -51,7 +51,7 @@ class DeviceMaintenanceController extends Controller
      */
     public function show(DeviceMaintenance $deviceMaintenance)
     {
-        $deviceMaintenance->load(['user', 'device']);
+        $deviceMaintenance->load(['user', 'user.addresses', 'device', 'device.latestLocation']);
 
         // Format requested_at_changes for display
         if ($deviceMaintenance->requested_at_changes) {

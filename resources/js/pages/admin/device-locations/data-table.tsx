@@ -16,7 +16,7 @@ import {
 import { useState } from 'react';
 
 interface Device {
-    id: number;
+    id: string;
     label: string;
 }
 
@@ -76,7 +76,7 @@ export function DataTable<TData, TValue>({ columns, data, devices, filters }: Da
                     </SelectTrigger>
                     <SelectContent>
                         {devices.map((device) => (
-                            <SelectItem key={device.id} value={device.id.toString()}>
+                            <SelectItem key={device.id} value={device.id}>
                                 {device.label}
                             </SelectItem>
                         ))}

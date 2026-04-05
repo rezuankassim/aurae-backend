@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Http\Resources\BaseResource;
 use App\Jobs\LogDeviceLocation;
+use App\Models\Device;
 use App\Models\UserDevice;
 use Closure;
 use Illuminate\Http\Request;
@@ -62,8 +63,23 @@ class EnsureDevice
             return;
         }
 
+        // Try to find the authenticated user's IoT device
+        $iotDeviceId = null;
+        try {
+            $user = $request->user('sanctum');
+            if ($user) {
+                $iotDeviceId = Device::where('user_id', $user->id)
+                    ->where('status', 1)
+                    ->orderBy('last_used_at', 'desc')
+                    ->value('id');
+            }
+        } catch (\Throwable) {
+            // Silently fail — location logging is non-critical
+        }
+
         LogDeviceLocation::dispatch(
             userDeviceId: $device->id,
+            deviceId: $iotDeviceId,
             latitude: $latitude,
             longitude: $longitude,
             accuracy: $request->header('X-Device-Accuracy'),
