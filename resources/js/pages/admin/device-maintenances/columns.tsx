@@ -54,6 +54,7 @@ export const columns: ColumnDef<DeviceMaintenance>[] = [
         },
     },
     {
+        id: 'user',
         accessorKey: 'user.name',
         header: 'User',
         cell: ({ row }) => {
@@ -63,6 +64,15 @@ export const columns: ColumnDef<DeviceMaintenance>[] = [
                     <p className="text-xs text-muted-foreground">{row.original.user.email}</p>
                 </div>
             );
+        },
+        enableGlobalFilter: true,
+        filterFn: (row, id, filterValues) => {
+            const userInfoString = [row.original.user.name, row.original.user.email].filter(Boolean).join(' ');
+
+            const searchTerms = Array.isArray(filterValues) ? filterValues : [filterValues];
+
+            // Check if any of the search terms are included in the userInfoString
+            return searchTerms.some((term) => userInfoString.includes(term.toLowerCase()));
         },
     },
     {
@@ -75,6 +85,13 @@ export const columns: ColumnDef<DeviceMaintenance>[] = [
                     <p className="text-xs text-muted-foreground">{row.original.device?.uuid || '-'}</p>
                 </div>
             );
+        },
+        enableGlobalFilter: true,
+        filterFn: (row, columnId, filterValue) => {
+            const device = row.original.device;
+            if (!device) return false;
+            const searchValue = filterValue.toLowerCase();
+            return device.name.toLowerCase().includes(searchValue) || device.uuid.toLowerCase().includes(searchValue);
         },
     },
     {
@@ -91,6 +108,10 @@ export const columns: ColumnDef<DeviceMaintenance>[] = [
         cell: ({ row }) => {
             const status = row.getValue('status') as number;
             return getStatusBadge(status);
+        },
+        filterFn: (row, columnId, filterValue) => {
+            const status = row.original.status;
+            return filterValue === '' || status.toString() === filterValue;
         },
     },
     {
