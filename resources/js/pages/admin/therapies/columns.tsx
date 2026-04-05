@@ -1,9 +1,9 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { edit } from '@/routes/admin/therapies';
+import { destroy, edit } from '@/routes/admin/therapies';
 import { Therapy } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
 import { MoreHorizontal } from 'lucide-react';
@@ -45,6 +45,12 @@ export const columns: ColumnDef<Therapy>[] = [
     {
         id: 'actions',
         cell: ({ row }) => {
+            const handleDelete = () => {
+                if (confirm('Are you sure you want to delete this therapy?')) {
+                    router.delete(destroy(row.original.id).url);
+                }
+            };
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -59,6 +65,9 @@ export const columns: ColumnDef<Therapy>[] = [
                             <Link className="hover:cursor-pointer" href={edit(row.original.id).url}>
                                 Edit
                             </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDelete} className="text-red-600 hover:cursor-pointer focus:text-red-600">
+                            Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
