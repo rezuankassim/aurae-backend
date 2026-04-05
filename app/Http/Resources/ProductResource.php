@@ -26,7 +26,14 @@ class ProductResource extends BaseResource
             'main_image' => $this->getMainImage(),
             'images' => $this->getImages(),
             'variants' => $this->whenLoaded('variants', function () {
-                return ProductVariantResource::collection($this->variants);
+                $sorted = $this->variants->sortBy(function ($variant) {
+                    return $variant->values
+                        ->sortBy(fn ($v) => optional($v->option)->position ?? 0)
+                        ->map(fn ($v) => str_pad((string) ($v->position ?? 0), 5, '0', STR_PAD_LEFT))
+                        ->implode('-');
+                });
+
+                return ProductVariantResource::collection($sorted->values());
             }),
             'options' => $this->getProductOptions(),
         ];

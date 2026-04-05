@@ -29,7 +29,15 @@ class CartLineResource extends BaseResource
                 $data = ProductVariantResource::make($this->purchasable)->toArray(request());
 
                 if ($this->purchasable->relationLoaded('product') && $this->purchasable->product?->relationLoaded('variants')) {
-                    $data['variants'] = $this->purchasable->product->variants->map(fn ($variant) => [
+                    $data['variants'] = $this->purchasable->product->variants
+                        ->sortBy(function ($variant) {
+                            return $variant->values
+                                ->sortBy(fn ($v) => optional($v->option)->position ?? 0)
+                                ->map(fn ($v) => str_pad((string) ($v->position ?? 0), 5, '0', STR_PAD_LEFT))
+                                ->implode('-');
+                        })
+                        ->values()
+                        ->map(fn ($variant) => [
                         'id' => $variant->id,
                         'sku' => $variant->sku,
                         'thumbnail' => [
