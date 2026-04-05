@@ -104,17 +104,23 @@
                                     @if($record->billingAddress->tax_identifier)
                                       {{ $record->billingAddress->tax_identifier }}<br>
                                     @endif
-                                    {{ $record->billingAddress->line_one }}
+                                    {{ $record->billingAddress->line_one }}<br>
                                     @if($record->billingAddress->line_two)
-                                      <br>{{ $record->billingAddress->line_two }}<br>
+                                    {{ $record->billingAddress->line_two }}<br>
                                     @endif
                                     @if($record->billingAddress->line_three)
-                                      <br>{{ $record->billingAddress->line_three }}<br>
+                                    {{ $record->billingAddress->line_three }}<br>
                                     @endif
                                     {{ $record->billingAddress->city }}<br>
-                                    {{ $record->billingAddress->state }}<br>
                                     {{ $record->billingAddress->postcode }}<br>
+                                    {{ $record->billingAddress->state }}<br>
                                     {{ $record->billingAddress->country->name }}<br>
+                                    @if($record->billingAddress->contact_phone)
+                                    {{ $record->billingAddress->contact_phone }}<br>
+                                    @endif
+                                    @if($record->billingAddress->contact_email)
+                                    {{ $record->billingAddress->contact_email }}<br>
+                                    @endif
                                     @if($record->customer?->tax_identifier)
                                         <p>Tax Identifier: {{ $record->customer?->tax_identifier }}</p>
                                     @endif
@@ -129,17 +135,23 @@
                                     @if($record->shippingAddress->tax_identifier)
                                       {{ $record->shippingAddress->tax_identifier }}<br>
                                     @endif
-                                    {{ $record->shippingAddress->line_one }}
+                                    {{ $record->shippingAddress->line_one }}<br>
                                     @if($record->shippingAddress->line_two)
-                                      <br>{{ $record->shippingAddress->line_two }}<br>
+                                    {{ $record->shippingAddress->line_two }}<br>
                                     @endif
                                     @if($record->shippingAddress->line_three)
-                                      <br>{{ $record->shippingAddress->line_three }}<br>
+                                    {{ $record->shippingAddress->line_three }}<br>
                                     @endif
                                     {{ $record->shippingAddress->city }}<br>
-                                    {{ $record->shippingAddress->state }}<br>
                                     {{ $record->shippingAddress->postcode }}<br>
+                                    {{ $record->shippingAddress->state }}<br>
                                     {{ $record->shippingAddress->country->name }}<br>
+                                    @if($record->shippingAddress->contact_phone)
+                                    {{ $record->shippingAddress->contact_phone }}<br>
+                                    @endif
+                                    @if($record->shippingAddress->contact_email)
+                                    {{ $record->shippingAddress->contact_email }}<br>
+                                    @endif
                                 </td>
 
                                 <td align="right" width="33%">
