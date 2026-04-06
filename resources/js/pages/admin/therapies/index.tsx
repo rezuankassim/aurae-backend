@@ -10,7 +10,7 @@ import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } 
 import { CSS } from '@dnd-kit/utilities';
 import { Head, Link, router } from '@inertiajs/react';
 import { GripVertical } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { columns } from './columns';
 import { DataTable } from './data-table';
 
@@ -64,6 +64,10 @@ export default function TherapiesIndex({ therapies: initialTherapies }: { therap
     const [therapies, setTherapies] = useState(initialTherapies);
     const [isSaving, setIsSaving] = useState(false);
     const [showSortable, setShowSortable] = useState(false);
+
+    useEffect(() => {
+        setTherapies(initialTherapies);
+    }, [initialTherapies]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
