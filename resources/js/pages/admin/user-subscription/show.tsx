@@ -222,7 +222,7 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
                                     </div>
                                     <div>
                                         <Label className="text-muted-foreground">Email</Label>
-                                        <p className="mt-1 font-medium">{userSubscription.user.email}</p>
+                                        <p className="mt-1 break-all font-medium">{userSubscription.user.email}</p>
                                     </div>
                                     <div>
                                         <Label className="text-muted-foreground">Phone</Label>
