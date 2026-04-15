@@ -80,11 +80,11 @@ export function NotificationBell() {
                 {notifications.length === 0 ? (
                     <div className="py-6 text-center text-sm text-muted-foreground">No notifications yet</div>
                 ) : (
-                    <ScrollArea className="max-h-[360px]">
+                    <ScrollArea className="max-h-[360px] overflow-x-hidden">
                         <div className="space-y-0.5 p-1">
                             {notifications.map((notification) => (
                                 <DropdownMenuItem key={notification.id} className="p-0 focus:bg-transparent" asChild>
-                                    <div>
+                                    <div className="w-full min-w-0">
                                         <NotificationItem notification={notification} />
                                     </div>
                                 </DropdownMenuItem>
