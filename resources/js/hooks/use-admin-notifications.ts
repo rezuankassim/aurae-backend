@@ -56,14 +56,19 @@ export function useAdminNotifications() {
                 setNotifications((prev) => [event, ...prev].slice(0, 5));
                 setUnreadCount((prev) => prev + 1);
 
+                const userLabel = event.data
+                    ? `${event.data.user_name}${event.data.is_guest ? ' (Guest)' : ''} · ${event.data.user_phone}`
+                    : '';
+                const description = userLabel ? `${userLabel}\n${event.body}` : event.body;
+
                 if (event.type === 'emergency') {
                     toast.error(event.title, {
-                        description: event.body,
+                        description,
                         duration: 8000,
                     });
                 } else {
                     toast.info(event.title, {
-                        description: event.body,
+                        description,
                         duration: 5000,
                     });
                 }

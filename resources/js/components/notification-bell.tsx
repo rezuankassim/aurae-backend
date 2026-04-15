@@ -4,8 +4,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAdminNotifications } from '@/hooks/use-admin-notifications';
 import { cn } from '@/lib/utils';
+import { index } from '@/routes/admin/notifications';
 import { AdminNotification } from '@/types';
-import { Bell, ShieldAlert } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { Bell, ShieldAlert, User } from 'lucide-react';
 
 function timeAgo(dateStr: string): string {
     const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
@@ -18,6 +20,7 @@ function timeAgo(dateStr: string): string {
 function NotificationItem({ notification }: { notification: AdminNotification }) {
     const isEmergency = notification.type === 'emergency';
     const isUnread = !notification.read_at;
+    const data = notification.data;
 
     return (
         <div
@@ -36,8 +39,16 @@ function NotificationItem({ notification }: { notification: AdminNotification })
             </div>
             <div className="min-w-0 flex-1">
                 <p className={cn('truncate text-sm font-medium leading-none', isEmergency && 'text-destructive')}>{notification.title}</p>
-                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{notification.body}</p>
-                <p className="mt-1 text-xs text-muted-foreground/70">{timeAgo(notification.created_at)}</p>
+                {data && (
+                    <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                        <User className="h-3 w-3" />
+                        <span className="truncate">
+                            {data.user_name} {data.is_guest ? '(Guest)' : ''} · {data.user_phone}
+                        </span>
+                    </div>
+                )}
+                <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{notification.body}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground/70">{timeAgo(notification.created_at)}</p>
             </div>
             {isUnread && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
         </div>
@@ -92,17 +103,12 @@ export function NotificationBell() {
                         </div>
                     </ScrollArea>
                 )}
-                {notifications.length > 0 && (
-                    <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            className="justify-center text-xs text-muted-foreground focus:text-foreground"
-                            onClick={markAllAsRead}
-                        >
-                            Mark all as read
-                        </DropdownMenuItem>
-                    </>
-                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="justify-center p-0 focus:bg-transparent" asChild>
+                    <Link href={index().url} className="flex w-full justify-center py-2 text-xs font-medium text-primary hover:text-primary/80">
+                        View more
+                    </Link>
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );

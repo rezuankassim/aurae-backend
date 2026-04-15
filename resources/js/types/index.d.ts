@@ -569,12 +569,26 @@ export interface ProgramLog {
     [key: string]: unknown;
 }
 
+export interface AdminNotificationData {
+    program_log_id: number;
+    therapy_id: number;
+    therapy_name: string;
+    user_id: number;
+    user_name: string;
+    user_phone: string;
+    is_guest: boolean;
+    program_duration: string;
+    program_error_message: string | null;
+    emergency: boolean;
+    [key: string]: unknown;
+}
+
 export interface AdminNotification {
     id: number;
     type: 'normal' | 'emergency';
     title: string;
     body: string;
-    data: Record<string, unknown> | null;
+    data: AdminNotificationData | null;
     read_at: string | null;
     created_at: string;
     updated_at: string;

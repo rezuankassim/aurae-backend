@@ -42,8 +42,9 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
 
     // Admin notifications
     Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{notification}/read', [AdminNotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::get('/notifications/{notification}', [AdminNotificationController::class, 'show'])->name('notifications.show');
     Route::post('/notifications/read-all', [AdminNotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::post('/notifications/{notification}/read', [AdminNotificationController::class, 'markAsRead'])->name('notifications.read');
 
     // Editor image upload
     Route::post('/editor-upload', [EditorUploadController::class, 'store'])->name('editor-upload.store');

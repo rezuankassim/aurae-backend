@@ -106,7 +106,9 @@ class ProgramController extends Controller
             $notificationBody .= " Error: {$request->input('program_error_message')}";
         }
 
-        $programLog->load('user');
+        $programLog->load('user.guest');
+
+        $isGuest = $programLog->user->isGuest();
 
         $adminNotification = AdminNotification::create([
             'type' => $notificationType,
@@ -118,6 +120,8 @@ class ProgramController extends Controller
                 'therapy_name' => $programLog->therapy->name,
                 'user_id' => $programLog->user_id,
                 'user_name' => $programLog->user->name,
+                'user_phone' => $programLog->user->phone,
+                'is_guest' => $isGuest,
                 'program_duration' => $programLog->program_duration,
                 'program_error_message' => $request->input('program_error_message'),
                 'emergency' => $emergency,
