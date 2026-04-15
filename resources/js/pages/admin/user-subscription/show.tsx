@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import { cancel, index, show } from '@/routes/admin/user-subscriptions';
+import { activate, cancel, index, show } from '@/routes/admin/user-subscriptions';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { AlertTriangle, RefreshCcw, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, RefreshCcw, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import type { UserSubscription } from './index';
 
@@ -31,6 +31,7 @@ interface Props {
 export default function UserSubscriptionShow({ userSubscription }: Props) {
     const { flash } = usePage().props as any;
     const [isCancelling, setIsCancelling] = useState(false);
+    const [isActivating, setIsActivating] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -64,6 +65,20 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
 
         const config = statusMap[status] || { label: status, variant: 'secondary' };
         return <Badge variant={config.variant}>{config.label}</Badge>;
+    };
+
+    const handleActivate = () => {
+        if (!confirm('Activate this subscription manually? This will set the payment method to "manual" and disable recurring billing from SenangPay.')) return;
+
+        setIsActivating(true);
+        router.post(
+            activate(userSubscription.id).url,
+            {},
+            {
+                preserveScroll: true,
+                onFinish: () => setIsActivating(false),
+            },
+        );
     };
 
     const handleCancel = () => {
@@ -241,6 +256,29 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
 
                     {/* Actions */}
                     <div className="space-y-6">
+                        {userSubscription.status !== 'active' && userSubscription.status !== 'cancelled' && (
+                            <Card className="border-green-200 dark:border-green-900">
+                                <CardHeader>
+                                    <CardTitle className="text-green-600 dark:text-green-400">Activate Manually</CardTitle>
+                                    <CardDescription>
+                                        Activate this subscription without going through SenangPay. Sets payment method to
+                                        <span className="font-semibold"> manual</span> and disables recurring billing.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-950"
+                                        onClick={handleActivate}
+                                        disabled={isActivating}
+                                    >
+                                        <CheckCircle className="mr-2 h-4 w-4" />
+                                        {isActivating ? 'Activating...' : 'Activate Manually'}
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        )}
+
                         {userSubscription.status !== 'cancelled' && (
                             <Card className="border-red-200 dark:border-red-900">
                                 <CardHeader>

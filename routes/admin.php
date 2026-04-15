@@ -209,6 +209,7 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/user-subscriptions/{userSubscription}', [UserSubscriptionController::class, 'show'])->name('user-subscriptions.show');
     Route::post('/user-subscriptions/{userSubscription}/cancel', [UserSubscriptionController::class, 'cancel'])->name('user-subscriptions.cancel');
     Route::post('/user-subscriptions/{userSubscription}/extend', [UserSubscriptionController::class, 'extend'])->name('user-subscriptions.extend');
+    Route::post('/user-subscriptions/{userSubscription}/activate', [UserSubscriptionController::class, 'activate'])->name('user-subscriptions.activate');
 
     // Machines
     Route::get('/machines', [MachineController::class, 'index'])->name('machines.index');

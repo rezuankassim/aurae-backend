@@ -82,6 +82,36 @@ class UserSubscriptionController extends Controller
     }
 
     /**
+     * Manually activate a user subscription.
+     * Detaches from SenangPay by setting payment_method to 'manual' and disabling recurring.
+     */
+    public function activate(UserSubscription $userSubscription)
+    {
+        if ($userSubscription->status === 'active') {
+            return back()->with('error', 'Subscription is already active.');
+        }
+
+        $startsAt = $userSubscription->starts_at ?? now();
+        $endsAt = $userSubscription->ends_at && $userSubscription->ends_at->isFuture()
+            ? $userSubscription->ends_at
+            : $startsAt->copy()->addMonth();
+
+        $userSubscription->update([
+            'status'          => 'active',
+            'payment_status'  => 'completed',
+            'payment_method'  => 'manual',
+            'paid_at'         => now(),
+            'starts_at'       => $startsAt,
+            'ends_at'         => $endsAt,
+            'is_recurring'    => false,
+            'next_billing_at' => null,
+            'cancelled_at'    => null,
+        ]);
+
+        return back()->with('success', 'Subscription activated manually. Payment method set to manual and recurring billing disabled.');
+    }
+
+    /**
      * Extend user subscription.
      */
     public function extend(Request $request, UserSubscription $userSubscription)
