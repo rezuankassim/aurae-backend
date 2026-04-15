@@ -21,47 +21,56 @@ export function useAdminNotifications() {
             return;
         }
 
-        // @ts-expect-error — Pusher must be on window for Echo's reverb broadcaster
-        window.Pusher = Pusher;
+        if (!import.meta.env.VITE_REVERB_APP_KEY) {
+            console.warn('[AdminNotifications] VITE_REVERB_APP_KEY is not set — skipping WebSocket connection.');
+            return;
+        }
 
-        echoRef.current = new Echo<'reverb'>({
-            broadcaster: 'reverb',
-            key: import.meta.env.VITE_REVERB_APP_KEY,
-            wsHost: import.meta.env.VITE_REVERB_HOST,
-            wsPort: import.meta.env.VITE_REVERB_PORT ?? 8080,
-            wssPort: import.meta.env.VITE_REVERB_PORT ?? 8080,
-            forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'http') === 'https',
-            enabledTransports: ['ws', 'wss'],
-            disableStats: true,
-            authEndpoint: '/broadcasting/auth',
-            auth: {
-                headers: {
-                    'X-XSRF-TOKEN': decodeURIComponent(
-                        document.cookie
-                            .split('; ')
-                            .find((row) => row.startsWith('XSRF-TOKEN='))
-                            ?.split('=')[1] ?? '',
-                    ),
+        try {
+            // @ts-expect-error — Pusher must be on window for Echo's reverb broadcaster
+            window.Pusher = Pusher;
+
+            echoRef.current = new Echo<'reverb'>({
+                broadcaster: 'reverb',
+                key: import.meta.env.VITE_REVERB_APP_KEY,
+                wsHost: import.meta.env.VITE_REVERB_HOST,
+                wsPort: import.meta.env.VITE_REVERB_PORT ?? 8080,
+                wssPort: import.meta.env.VITE_REVERB_PORT ?? 8080,
+                forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'http') === 'https',
+                enabledTransports: ['ws', 'wss'],
+                disableStats: true,
+                authEndpoint: '/broadcasting/auth',
+                auth: {
+                    headers: {
+                        'X-XSRF-TOKEN': decodeURIComponent(
+                            document.cookie
+                                .split('; ')
+                                .find((row) => row.startsWith('XSRF-TOKEN='))
+                                ?.split('=')[1] ?? '',
+                        ),
+                    },
                 },
-            },
-        });
+            });
 
-        echoRef.current.private('admin').listen('.program.stopped', (event: AdminNotification) => {
-            setNotifications((prev) => [event, ...prev].slice(0, 5));
-            setUnreadCount((prev) => prev + 1);
+            echoRef.current.private('admin').listen('.program.stopped', (event: AdminNotification) => {
+                setNotifications((prev) => [event, ...prev].slice(0, 5));
+                setUnreadCount((prev) => prev + 1);
 
-            if (event.type === 'emergency') {
-                toast.error(event.title, {
-                    description: event.body,
-                    duration: 8000,
-                });
-            } else {
-                toast.info(event.title, {
-                    description: event.body,
-                    duration: 5000,
-                });
-            }
-        });
+                if (event.type === 'emergency') {
+                    toast.error(event.title, {
+                        description: event.body,
+                        duration: 8000,
+                    });
+                } else {
+                    toast.info(event.title, {
+                        description: event.body,
+                        duration: 5000,
+                    });
+                }
+            });
+        } catch (error) {
+            console.error('[AdminNotifications] Failed to connect to WebSocket:', error);
+        }
 
         return () => {
             echoRef.current?.leave('admin');
