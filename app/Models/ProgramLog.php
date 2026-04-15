@@ -18,6 +18,8 @@ class ProgramLog extends Model
         'action',
         'program_started_at',
         'program_ended_at',
+        'program_error_message',
+        'emergency',
     ];
 
     /**
@@ -30,6 +32,7 @@ class ProgramLog extends Model
         return [
             'program_started_at' => 'datetime',
             'program_ended_at' => 'datetime',
+            'emergency' => 'boolean',
         ];
     }
 

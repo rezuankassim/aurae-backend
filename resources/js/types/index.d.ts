@@ -31,6 +31,8 @@ export interface SharedData {
     error: string;
     auth: Auth;
     sidebarOpen: boolean;
+    adminNotifications: AdminNotification[] | null;
+    adminUnreadCount: number;
     [key: string]: unknown;
 }
 
@@ -559,10 +561,23 @@ export interface ProgramLog {
     action: 'start' | 'stop';
     program_started_at: string | null;
     program_ended_at: string | null;
+    program_error_message: string | null;
+    emergency: boolean;
     created_at: string;
     updated_at: string;
     therapy?: Therapy;
     [key: string]: unknown;
+}
+
+export interface AdminNotification {
+    id: number;
+    type: 'normal' | 'emergency';
+    title: string;
+    body: string;
+    data: Record<string, unknown> | null;
+    read_at: string | null;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface Music {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\AdminNotification;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -44,6 +45,12 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'adminNotifications' => fn () => $request->user()?->is_admin
+                ? AdminNotification::orderByDesc('created_at')->limit(5)->get()
+                : null,
+            'adminUnreadCount' => fn () => $request->user()?->is_admin
+                ? AdminNotification::whereNull('read_at')->count()
+                : 0,
         ];
     }
 }

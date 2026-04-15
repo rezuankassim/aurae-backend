@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\ProgramStopped;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Jobs\SendPushNotification;
+use App\Models\AdminNotification;
 use App\Models\ProgramLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -62,7 +64,11 @@ class ProgramController extends Controller
             'program_name' => ['required', 'string', 'max:255'],
             'program_duration' => ['required', 'string', 'max:50'],
             'program_end_at' => ['required', 'string'],
+            'program_error_message' => ['nullable', 'string'],
+            'emergency' => ['nullable', 'boolean'],
         ]);
+
+        $emergency = (bool) $request->input('emergency', false);
 
         $programLog = ProgramLog::create([
             'user_id' => $request->user()->id,
@@ -70,6 +76,8 @@ class ProgramController extends Controller
             'program_duration' => $request->input('program_duration'),
             'action' => 'stop',
             'program_ended_at' => Carbon::createFromFormat('dmY H:i:s', $request->input('program_end_at')),
+            'program_error_message' => $request->input('program_error_message'),
+            'emergency' => $emergency,
         ]);
 
         $programLog->load('therapy');
@@ -85,6 +93,45 @@ class ProgramController extends Controller
             ],
             'program',
         );
+
+        $notificationType = $emergency ? 'emergency' : 'normal';
+        $notificationTitle = $emergency
+            ? "Emergency Stop: {$programLog->therapy->name}"
+            : "Program Stopped: {$programLog->therapy->name}";
+        $notificationBody = $emergency
+            ? "Emergency stop triggered for {$programLog->therapy->name} by {$programLog->user->name}. Duration: {$programLog->program_duration}."
+            : "{$programLog->therapy->name} was stopped by {$programLog->user->name}. Duration: {$programLog->program_duration}.";
+
+        if ($request->input('program_error_message')) {
+            $notificationBody .= " Error: {$request->input('program_error_message')}";
+        }
+
+        $programLog->load('user');
+
+        $adminNotification = AdminNotification::create([
+            'type' => $notificationType,
+            'title' => $notificationTitle,
+            'body' => $notificationBody,
+            'data' => [
+                'program_log_id' => $programLog->id,
+                'therapy_id' => $programLog->therapy_id,
+                'therapy_name' => $programLog->therapy->name,
+                'user_id' => $programLog->user_id,
+                'user_name' => $programLog->user->name,
+                'program_duration' => $programLog->program_duration,
+                'program_error_message' => $request->input('program_error_message'),
+                'emergency' => $emergency,
+            ],
+        ]);
+
+        broadcast(new ProgramStopped(
+            adminNotificationId: $adminNotification->id,
+            type: $notificationType,
+            title: $notificationTitle,
+            body: $notificationBody,
+            data: $adminNotification->data,
+            createdAt: $adminNotification->created_at->toIso8601String(),
+        ));
 
         return BaseResource::make($programLog)
             ->additional([

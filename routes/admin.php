@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\ChunkedUploadController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\EditorUploadController;
 use App\Http\Controllers\Admin\CollectionGroupCollectionController;
 use App\Http\Controllers\Admin\CollectionGroupController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DeviceLocationController;
 use App\Http\Controllers\Admin\DeviceMaintenanceController;
+use App\Http\Controllers\Admin\EditorUploadController;
 use App\Http\Controllers\Admin\FAQController;
 use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\FirebaseTestController;
@@ -38,6 +39,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+
+    // Admin notifications
+    Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [AdminNotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [AdminNotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 
     // Editor image upload
     Route::post('/editor-upload', [EditorUploadController::class, 'store'])->name('editor-upload.store');
