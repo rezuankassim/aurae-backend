@@ -1,6 +1,13 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAdminNotifications } from '@/hooks/use-admin-notifications';
 import { cn } from '@/lib/utils';
@@ -31,14 +38,10 @@ function NotificationItem({ notification }: { notification: AdminNotification })
             )}
         >
             <div className="mt-0.5 shrink-0">
-                {isEmergency ? (
-                    <ShieldAlert className="h-4 w-4 text-destructive" />
-                ) : (
-                    <Bell className="h-4 w-4 text-muted-foreground" />
-                )}
+                {isEmergency ? <ShieldAlert className="h-4 w-4 text-destructive" /> : <Bell className="h-4 w-4 text-muted-foreground" />}
             </div>
             <div className="min-w-0 flex-1">
-                <p className={cn('truncate text-sm font-medium leading-none', isEmergency && 'text-destructive')}>{notification.title}</p>
+                <p className={cn('truncate text-sm leading-none font-medium', isEmergency && 'text-destructive')}>{notification.title}</p>
                 {data && (
                     <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                         <User className="h-3 w-3" />
@@ -47,7 +50,7 @@ function NotificationItem({ notification }: { notification: AdminNotification })
                         </span>
                     </div>
                 )}
-                <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{notification.body}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{notification.body}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground/70">{timeAgo(notification.created_at)}</p>
             </div>
             {isUnread && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
@@ -70,7 +73,7 @@ export function NotificationBell() {
                     {unreadCount > 0 && (
                         <Badge
                             variant="destructive"
-                            className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full p-0 text-[10px]"
+                            className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full p-0 text-[10px]"
                         >
                             {unreadCount > 9 ? '9+' : unreadCount}
                         </Badge>
