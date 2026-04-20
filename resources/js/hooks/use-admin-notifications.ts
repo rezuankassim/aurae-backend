@@ -67,7 +67,7 @@ export function useAdminNotifications() {
                         duration: 8000,
                     });
                 } else {
-                    toast.info(event.title, {
+                    toast.error(event.title, {
                         description,
                         duration: 5000,
                     });
