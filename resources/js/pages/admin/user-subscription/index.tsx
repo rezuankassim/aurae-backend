@@ -1,8 +1,11 @@
 import Heading from '@/components/heading';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { index } from '@/routes/admin/user-subscriptions';
+import { create, index } from '@/routes/admin/user-subscriptions';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Plus } from 'lucide-react';
 import { columns } from './columns';
 import { DataTable } from './data-table';
 
@@ -55,13 +58,28 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function UserSubscriptions({ userSubscriptions, filters }: Props) {
+    const { flash } = usePage().props as any;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="User Subscriptions" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl px-4 py-6">
                 <div className="flex items-center justify-between">
                     <Heading title="User Subscriptions" description="View and manage user subscriptions" />
+                    <Button asChild>
+                        <Link href={create().url}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Create B2B Subscription
+                        </Link>
+                    </Button>
                 </div>
+
+                {flash?.success && (
+                    <Alert>
+                        <AlertTitle>Success</AlertTitle>
+                        <AlertDescription>{flash.success}</AlertDescription>
+                    </Alert>
+                )}
 
                 <DataTable columns={columns} data={userSubscriptions.data} filters={filters} />
             </div>

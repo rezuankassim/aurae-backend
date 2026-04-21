@@ -213,6 +213,9 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
 
     // User subscriptions
     Route::get('/user-subscriptions', [UserSubscriptionController::class, 'index'])->name('user-subscriptions.index');
+    Route::get('/user-subscriptions/create', [UserSubscriptionController::class, 'create'])->name('user-subscriptions.create');
+    Route::post('/user-subscriptions', [UserSubscriptionController::class, 'store'])->name('user-subscriptions.store');
+    Route::post('/user-subscriptions/bulk', [UserSubscriptionController::class, 'bulkStore'])->name('user-subscriptions.bulk');
     Route::get('/user-subscriptions/{userSubscription}', [UserSubscriptionController::class, 'show'])->name('user-subscriptions.show');
     Route::post('/user-subscriptions/{userSubscription}/cancel', [UserSubscriptionController::class, 'cancel'])->name('user-subscriptions.cancel');
     Route::post('/user-subscriptions/{userSubscription}/extend', [UserSubscriptionController::class, 'extend'])->name('user-subscriptions.extend');

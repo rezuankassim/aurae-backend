@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Subscription;
+use App\Models\User;
 use App\Models\UserSubscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class UserSubscriptionController extends Controller
@@ -41,6 +44,92 @@ class UserSubscriptionController extends Controller
             'userSubscriptions' => $userSubscriptions,
             'filters' => $request->only(['search', 'status', 'payment_status']),
         ]);
+    }
+
+    /**
+     * Show the form for creating a new B2B subscription.
+     */
+    public function create()
+    {
+        $subscriptions = Subscription::active()->orderBy('title')->get(['id', 'title', 'pricing_title', 'price']);
+        $users = User::where('is_admin', false)
+            ->orderBy('name')
+            ->get(['id', 'name', 'email', 'phone']);
+
+        return Inertia::render('admin/user-subscription/create', [
+            'subscriptions' => $subscriptions,
+            'users' => $users,
+        ]);
+    }
+
+    /**
+     * Store a newly created B2B subscription for a single user.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'subscription_id' => ['required', 'integer', 'exists:subscriptions,id'],
+            'starts_at' => ['required', 'date'],
+            'months' => ['required', 'integer', 'min:1', 'max:120'],
+        ]);
+
+        $startsAt = now()->parse($validated['starts_at'])->startOfDay();
+        $endsAt = $startsAt->copy()->addMonths($validated['months']);
+
+        UserSubscription::create([
+            'user_id' => $validated['user_id'],
+            'subscription_id' => $validated['subscription_id'],
+            'status' => 'active',
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
+            'payment_method' => 'b2b',
+            'payment_status' => 'completed',
+            'paid_at' => now(),
+            'is_recurring' => false,
+            'next_billing_at' => null,
+        ]);
+
+        return to_route('admin.user-subscriptions.index')->with('success', 'B2B subscription created successfully.');
+    }
+
+    /**
+     * Bulk-create B2B subscriptions for multiple users.
+     */
+    public function bulkStore(Request $request)
+    {
+        $validated = $request->validate([
+            'user_ids' => ['required', 'array', 'min:1'],
+            'user_ids.*' => ['integer', 'exists:users,id'],
+            'subscription_id' => ['required', 'integer', 'exists:subscriptions,id'],
+            'starts_at' => ['required', 'date'],
+            'months' => ['required', 'integer', 'min:1', 'max:120'],
+        ]);
+
+        $startsAt = now()->parse($validated['starts_at'])->startOfDay();
+        $endsAt = $startsAt->copy()->addMonths($validated['months']);
+        $now = now();
+
+        DB::transaction(function () use ($validated, $startsAt, $endsAt, $now) {
+            foreach ($validated['user_ids'] as $userId) {
+                UserSubscription::create([
+                    'user_id' => $userId,
+                    'subscription_id' => $validated['subscription_id'],
+                    'status' => 'active',
+                    'starts_at' => $startsAt,
+                    'ends_at' => $endsAt,
+                    'payment_method' => 'b2b',
+                    'payment_status' => 'completed',
+                    'paid_at' => $now,
+                    'is_recurring' => false,
+                    'next_billing_at' => null,
+                ]);
+            }
+        });
+
+        $count = count($validated['user_ids']);
+
+        return to_route('admin.user-subscriptions.index')->with('success', "B2B subscriptions created successfully for {$count} user(s).");
     }
 
     /**
