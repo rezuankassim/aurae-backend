@@ -184,6 +184,7 @@ class DeviceGuestController extends Controller
         $device = Device::where('uuid', $request->device_uuid)->firstOrFail();
 
         $guests = Guest::where('device_id', $device->id)
+            ->whereHas('user')
             ->orderBy('created_at', 'desc')
             ->get();
 
