@@ -241,7 +241,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
 
                                     {/* Duration */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="single-months">Duration (months) *</Label>
+                                        <Label htmlFor="single-months">Duration (months)</Label>
                                         <Input
                                             id="single-months"
                                             type="number"
@@ -316,7 +316,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
 
                                             {/* Duration */}
                                             <div className="space-y-2">
-                                                <Label htmlFor="bulk-months">Duration (months) *</Label>
+                                                <Label htmlFor="bulk-months">Duration (months)</Label>
                                                 <Input
                                                     id="bulk-months"
                                                     type="number"
