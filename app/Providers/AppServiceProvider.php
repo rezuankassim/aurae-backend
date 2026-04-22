@@ -38,6 +38,7 @@ use App\Lunar\Extensions\ShippingMethodEditExtension;
 use App\Lunar\Extensions\ShippingMethodListExtension;
 use App\Lunar\Extensions\ShippingMethodResourceExtension;
 use App\Lunar\Extensions\ShippingZoneResourceExtension;
+use App\Models\User;
 use App\PaymentTypes\SenangpayPayment;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Panel;
@@ -184,6 +185,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::define('viewPulse', function (User $user) {
+            return $user->email === 'admin@admin.com';
+        });
+
         \Lunar\Facades\Telemetry::optOut();
 
         \Lunar\Facades\ModelManifest::replace(
