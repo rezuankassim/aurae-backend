@@ -4,19 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { FieldDescription } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import { bulk, create, index, store } from '@/routes/admin/user-subscriptions';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Check, ChevronsUpDown, Users, X } from 'lucide-react';
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
 
 interface Subscription {
     id: number;
@@ -61,7 +62,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
         user_id: '',
         subscription_id: '',
         starts_at: todayIso,
-        months: '12',
+        months: '',
     });
 
     // ── Bulk form ────────────────────────────────────────────────────────────
@@ -74,7 +75,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
         user_ids: [],
         subscription_id: '',
         starts_at: todayIso,
-        months: '12',
+        months: '',
     });
 
     // ── User combobox state (single mode) ────────────────────────────────────
@@ -84,17 +85,12 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
     // ── Bulk user search/filter ──────────────────────────────────────────────
     const [bulkSearch, setBulkSearch] = useState('');
     const filteredUsers = users.filter(
-        (u) =>
-            u.name.toLowerCase().includes(bulkSearch.toLowerCase()) ||
-            u.email.toLowerCase().includes(bulkSearch.toLowerCase()),
+        (u) => u.name.toLowerCase().includes(bulkSearch.toLowerCase()) || u.email.toLowerCase().includes(bulkSearch.toLowerCase()),
     );
 
     const toggleBulkUser = (userId: number) => {
         const current = bulkForm.data.user_ids;
-        bulkForm.setData(
-            'user_ids',
-            current.includes(userId) ? current.filter((id) => id !== userId) : [...current, userId],
-        );
+        bulkForm.setData('user_ids', current.includes(userId) ? current.filter((id) => id !== userId) : [...current, userId]);
     };
 
     const selectAllFiltered = () => {
@@ -147,8 +143,8 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                 <CardHeader>
                                     <CardTitle>Subscription Details</CardTitle>
                                     <CardDescription>
-                                        Select a customer and configure the subscription. The subscription will be immediately active
-                                        with payment method set to <span className="font-semibold">B2B</span>.
+                                        Select a customer and configure the subscription. The subscription will be immediately active with payment
+                                        method set to <span className="font-semibold">B2B</span>.
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-5">
@@ -165,8 +161,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                                 >
                                                     {selectedUser ? (
                                                         <span>
-                                                            {selectedUser.name}{' '}
-                                                            <span className="text-muted-foreground">({selectedUser.email})</span>
+                                                            {selectedUser.name} <span className="text-muted-foreground">({selectedUser.email})</span>
                                                         </span>
                                                     ) : (
                                                         'Search customer...'
@@ -192,9 +187,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                                                     <Check
                                                                         className={cn(
                                                                             'mr-2 h-4 w-4',
-                                                                            singleForm.data.user_id === String(user.id)
-                                                                                ? 'opacity-100'
-                                                                                : 'opacity-0',
+                                                                            singleForm.data.user_id === String(user.id) ? 'opacity-100' : 'opacity-0',
                                                                         )}
                                                                     />
                                                                     <div>
@@ -208,9 +201,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                                 </Command>
                                             </PopoverContent>
                                         </Popover>
-                                        {singleForm.errors.user_id && (
-                                            <p className="text-sm text-red-600">{singleForm.errors.user_id}</p>
-                                        )}
+                                        {singleForm.errors.user_id && <p className="text-sm text-red-600">{singleForm.errors.user_id}</p>}
                                     </div>
 
                                     {/* Subscription Plan */}
@@ -245,9 +236,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                             value={singleForm.data.starts_at}
                                             onChange={(e) => singleForm.setData('starts_at', e.target.value)}
                                         />
-                                        {singleForm.errors.starts_at && (
-                                            <p className="text-sm text-red-600">{singleForm.errors.starts_at}</p>
-                                        )}
+                                        {singleForm.errors.starts_at && <p className="text-sm text-red-600">{singleForm.errors.starts_at}</p>}
                                     </div>
 
                                     {/* Duration */}
@@ -256,14 +245,13 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                         <Input
                                             id="single-months"
                                             type="number"
-                                            min={1}
+                                            min={0}
                                             max={120}
                                             value={singleForm.data.months}
                                             onChange={(e) => singleForm.setData('months', e.target.value)}
                                         />
-                                        {singleForm.errors.months && (
-                                            <p className="text-sm text-red-600">{singleForm.errors.months}</p>
-                                        )}
+                                        <FieldDescription>Leave blank for non-ending subscription</FieldDescription>
+                                        {singleForm.errors.months && <p className="text-sm text-red-600">{singleForm.errors.months}</p>}
                                     </div>
                                 </CardContent>
                             </Card>
@@ -323,9 +311,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                                     value={bulkForm.data.starts_at}
                                                     onChange={(e) => bulkForm.setData('starts_at', e.target.value)}
                                                 />
-                                                {bulkForm.errors.starts_at && (
-                                                    <p className="text-sm text-red-600">{bulkForm.errors.starts_at}</p>
-                                                )}
+                                                {bulkForm.errors.starts_at && <p className="text-sm text-red-600">{bulkForm.errors.starts_at}</p>}
                                             </div>
 
                                             {/* Duration */}
@@ -334,14 +320,13 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                                 <Input
                                                     id="bulk-months"
                                                     type="number"
-                                                    min={1}
+                                                    min={0}
                                                     max={120}
                                                     value={bulkForm.data.months}
                                                     onChange={(e) => bulkForm.setData('months', e.target.value)}
                                                 />
-                                                {bulkForm.errors.months && (
-                                                    <p className="text-sm text-red-600">{bulkForm.errors.months}</p>
-                                                )}
+                                                <FieldDescription>Leave blank for non-ending subscription</FieldDescription>
+                                                {bulkForm.errors.months && <p className="text-sm text-red-600">{bulkForm.errors.months}</p>}
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -362,11 +347,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                                         const u = users.find((u) => u.id === uid);
                                                         if (!u) return null;
                                                         return (
-                                                            <Badge
-                                                                key={uid}
-                                                                variant="secondary"
-                                                                className="flex items-center gap-1 pr-1"
-                                                            >
+                                                            <Badge key={uid} variant="secondary" className="flex items-center gap-1 pr-1">
                                                                 {u.name}
                                                                 <button
                                                                     type="button"
@@ -383,15 +364,10 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                         </Card>
                                     )}
 
-                                    {bulkForm.errors.user_ids && (
-                                        <p className="text-sm text-red-600">{bulkForm.errors.user_ids}</p>
-                                    )}
+                                    {bulkForm.errors.user_ids && <p className="text-sm text-red-600">{bulkForm.errors.user_ids}</p>}
 
                                     <div className="flex gap-2">
-                                        <Button
-                                            type="submit"
-                                            disabled={bulkForm.processing || bulkForm.data.user_ids.length === 0}
-                                        >
+                                        <Button type="submit" disabled={bulkForm.processing || bulkForm.data.user_ids.length === 0}>
                                             {bulkForm.processing
                                                 ? 'Creating...'
                                                 : `Create ${bulkForm.data.user_ids.length > 0 ? bulkForm.data.user_ids.length : ''} Subscription${bulkForm.data.user_ids.length !== 1 ? 's' : ''}`}

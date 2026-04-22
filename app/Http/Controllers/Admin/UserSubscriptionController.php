@@ -71,11 +71,11 @@ class UserSubscriptionController extends Controller
             'user_id' => ['required', 'integer', 'exists:users,id'],
             'subscription_id' => ['required', 'integer', 'exists:subscriptions,id'],
             'starts_at' => ['required', 'date'],
-            'months' => ['required', 'integer', 'min:1', 'max:120'],
+            'months' => ['nullable', 'integer', 'min:1', 'max:120'],
         ]);
 
         $startsAt = now()->parse($validated['starts_at'])->startOfDay();
-        $endsAt = $startsAt->copy()->addMonths($validated['months']);
+        $endsAt = isset($validated['months']) ? $startsAt->copy()->addMonths((int) $validated['months']) : null;
 
         UserSubscription::create([
             'user_id' => $validated['user_id'],
@@ -103,11 +103,11 @@ class UserSubscriptionController extends Controller
             'user_ids.*' => ['integer', 'exists:users,id'],
             'subscription_id' => ['required', 'integer', 'exists:subscriptions,id'],
             'starts_at' => ['required', 'date'],
-            'months' => ['required', 'integer', 'min:1', 'max:120'],
+            'months' => ['nullable', 'integer', 'min:1', 'max:120'],
         ]);
 
         $startsAt = now()->parse($validated['starts_at'])->startOfDay();
-        $endsAt = $startsAt->copy()->addMonths($validated['months']);
+        $endsAt = isset($validated['months']) ? $startsAt->copy()->addMonths((int) $validated['months']) : null;
         $now = now();
 
         DB::transaction(function () use ($validated, $startsAt, $endsAt, $now) {
