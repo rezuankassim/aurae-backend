@@ -126,6 +126,16 @@ class DeviceGuestController extends Controller
                 ->setStatusCode(403);
         }
 
+        if (! $guest->user) {
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 403,
+                    'message' => 'Guest user account not found or is deleted.',
+                ])
+                ->response()
+                ->setStatusCode(403);
+        }
+
         // Update last logged in timestamp for both guest and device
         $guest->update([
             'last_logged_in_at' => now(),
