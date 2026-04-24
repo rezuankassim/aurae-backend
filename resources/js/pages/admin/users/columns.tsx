@@ -27,16 +27,22 @@ export const columns: ColumnDef<User>[] = [
         accessorKey: 'type',
         header: 'Type',
         cell: ({ row }) => {
-            const is_admin = row.original.is_admin;
+            const { is_admin, guest } = row.original;
 
             if (is_admin) {
                 return <Badge variant="destructive">Admin</Badge>;
+            }
+
+            if (guest) {
+                return <Badge variant="secondary">Guest</Badge>;
             }
 
             return <Badge>Customer</Badge>;
         },
         filterFn: (row, columnId, filterValue) => {
             if (filterValue === '') return true;
+            if (filterValue === 'guest') return !row.original.is_admin && !!row.original.guest;
+            if (filterValue === '0') return !row.original.is_admin && !row.original.guest;
             return String(row.original.is_admin) === filterValue;
         },
     },

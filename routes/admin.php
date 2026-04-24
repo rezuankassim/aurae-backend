@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\ProductVariantController;
 use App\Http\Controllers\Admin\S3UploadController;
 use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\TherapyController;
+use App\Http\Controllers\Admin\UserAddressController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserLoginActivityController;
 use App\Http\Controllers\Admin\UserProgramLogController;
@@ -106,6 +107,11 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
 
     Route::get('/users/{user}/login-activities', [UserLoginActivityController::class, 'index'])->name('users.login-activities.index');
     Route::get('/users/{user}/program-logs', [UserProgramLogController::class, 'index'])->name('users.program-logs.index');
+
+    Route::get('/users/{user}/addresses', [UserAddressController::class, 'index'])->name('users.addresses.index');
+    Route::post('/users/{user}/addresses', [UserAddressController::class, 'store'])->name('users.addresses.store');
+    Route::put('/users/{user}/addresses/{address}', [UserAddressController::class, 'update'])->name('users.addresses.update');
+    Route::delete('/users/{user}/addresses/{address}', [UserAddressController::class, 'destroy'])->name('users.addresses.destroy');
 
     Route::get('/collection-groups', [CollectionGroupController::class, 'index'])->name('collection-groups.index');
     Route::post('/collection-groups', [CollectionGroupController::class, 'store'])->name('collection-groups.store');

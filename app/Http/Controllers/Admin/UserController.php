@@ -20,6 +20,7 @@ class UserController extends Controller
     {
         $users = User::query()
             ->where('id', '!=', auth()->id())
+            ->with('guest')
             ->get();
 
         return Inertia::render('admin/users/index', [

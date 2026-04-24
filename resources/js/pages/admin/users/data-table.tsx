@@ -51,6 +51,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                 >
                     <ToggleGroupItem value="all">All</ToggleGroupItem>
                     <ToggleGroupItem value="0">Customer</ToggleGroupItem>
+                    <ToggleGroupItem value="guest">Guest</ToggleGroupItem>
                     <ToggleGroupItem value="1">Admin</ToggleGroupItem>
                 </ToggleGroup>
             </div>

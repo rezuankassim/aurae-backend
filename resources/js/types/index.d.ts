@@ -47,6 +47,7 @@ export interface User {
     updated_at: string;
     is_admin: boolean;
     status: boolean;
+    guest?: { id: string } | null;
     [key: string]: unknown; // This allows for additional properties...
 }
 
@@ -64,6 +65,25 @@ export interface Therapy {
     image_url?: string | null;
     music_url?: string | null;
     [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface UserAddress {
+    id: number;
+    is_default: boolean;
+    type: 0 | 1 | 2; // 0 = Home, 1 = Work, 2 = Other
+    name: string;
+    phone: string;
+    line1: string;
+    line2: string | null;
+    line3: string | null;
+    city: string;
+    state: string | null;
+    postal_code: string;
+    country: string;
+    user_id: number;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
 }
 
 export interface Address {

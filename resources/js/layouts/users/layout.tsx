@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { show } from '@/routes/admin/users';
+import { index as addressesIndex } from '@/routes/admin/users/addresses';
 import { index } from '@/routes/admin/users/login-activities';
 import { index as programLogsIndex } from '@/routes/admin/users/program-logs';
 import { type NavItem } from '@/types';
@@ -34,6 +35,11 @@ export default function UsersLayout({
         {
             title: 'Program Logs',
             href: programLogsIndex(id_record),
+            icon: null,
+        },
+        {
+            title: 'Addresses',
+            href: addressesIndex(id_record),
             icon: null,
         },
     ];
