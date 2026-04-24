@@ -13,15 +13,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface PaginatedNotifications {
-    data: AdminNotification[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-}
-
-export default function AdminNotificationsIndex({ notifications }: { notifications: PaginatedNotifications }) {
+export default function AdminNotificationsIndex({ notifications }: { notifications: AdminNotification[] }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Notifications" />
@@ -30,7 +22,7 @@ export default function AdminNotificationsIndex({ notifications }: { notificatio
                     <Heading title="Notifications" description="View all admin notifications" />
                 </div>
 
-                <DataTable columns={columns} data={notifications.data} />
+                <DataTable columns={columns} data={notifications} />
             </div>
         </AppLayout>
     );
