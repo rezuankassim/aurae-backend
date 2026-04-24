@@ -84,7 +84,6 @@ class ProgramController extends Controller
 
         $emergency = (bool) $request->input('emergency', false);
 
-        dd($request->input('program_end_at'));
         $programLog = ProgramLog::create([
             'user_id' => $request->user()->id,
             'therapy_id' => $request->input('program_id'),
@@ -104,7 +103,7 @@ class ProgramController extends Controller
             ->first();
 
         // date format 24042026 14:42:57
-        $startedAt = Carbon::parse($usageHistory->content->started_at);
+        $startedAt = Carbon::createFromFormat('dmY H:i:s', $usageHistory->content->started_at);
         $endedAt = Carbon::createFromFormat('dmY H:i:s', $request->input('program_end_at'));
         $duration = $startedAt->diffInMinutes($endedAt);
         $content = [
