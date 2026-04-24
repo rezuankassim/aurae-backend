@@ -14,8 +14,7 @@ class AdminNotificationController extends Controller
      */
     public function index(Request $request)
     {
-        $notifications = AdminNotification::orderByDesc('created_at')
-            ->paginate(15);
+        $notifications = AdminNotification::orderByDesc('created_at')->get();
 
         return Inertia::render('admin/notifications/index', [
             'notifications' => $notifications,
