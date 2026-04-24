@@ -37,7 +37,7 @@ class ProgramController extends Controller
         $programLog->load('therapy');
 
         $content = [
-            'duration' => $request->input('program_duration'),
+            'duration' => 0,
             'force_stopped' => false,
             'started_at' => $request->input('program_start_at'),
             'ended_at' => null,
@@ -98,19 +98,19 @@ class ProgramController extends Controller
 
         $usageHistory = UsageHistory::where('user_id', $request->user()->id)
             ->where('therapy_id', $request->input('program_id'))
+            ->where('content->started_at', $request->input('program_start_at'))
+            ->where('content->ended_at', null)
             ->latest()
             ->first();
 
         $content = [
-            'duration' => $request->input('program_duration'),
+            'duration' => Carbon::parse($request->input('program_start_at'))->diffInMinutes(Carbon::parse($request->input('program_end_at'))),
             'force_stopped' => $emergency,
             'started_at' => $usageHistory ? $usageHistory->content->started_at : null,
             'ended_at' => $request->input('program_end_at'),
         ];
 
-        $usageHistory = UsageHistory::create([
-            'user_id' => $request->user()->id,
-            'therapy_id' => $request->input('program_id'),
+        $usageHistory->update([
             'content' => $content,
         ]);
 
