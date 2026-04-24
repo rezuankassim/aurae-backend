@@ -107,7 +107,7 @@ class ProgramController extends Controller
         $endedAt = Carbon::createFromFormat('dmY H:i:s', $request->input('program_end_at'));
         $duration = $startedAt->diffInMinutes($endedAt);
         $content = [
-            'duration' => $duration,
+            'duration' => round($duration, 2),
             'force_stopped' => $emergency,
             'started_at' => $usageHistory ? $usageHistory->content->started_at : null,
             'ended_at' => $request->input('program_end_at'),
