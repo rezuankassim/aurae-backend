@@ -103,8 +103,12 @@ class ProgramController extends Controller
             ->latest()
             ->first();
 
+        // date format 24042026 14:42:57
+        $startedAt = Carbon::createFromFormat('dmY H:i:s', $request->input('program_start_at'));
+        $endedAt = Carbon::createFromFormat('dmY H:i:s', $request->input('program_end_at'));
+        $duration = $startedAt->diffInMinutes($endedAt);
         $content = [
-            'duration' => Carbon::parse($request->input('program_start_at'))->diffInMinutes(Carbon::parse($request->input('program_end_at'))),
+            'duration' => $duration,
             'force_stopped' => $emergency,
             'started_at' => $usageHistory ? $usageHistory->content->started_at : null,
             'ended_at' => $request->input('program_end_at'),
