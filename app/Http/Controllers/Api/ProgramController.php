@@ -98,13 +98,12 @@ class ProgramController extends Controller
 
         $usageHistory = UsageHistory::where('user_id', $request->user()->id)
             ->where('therapy_id', $request->input('program_id'))
-            ->where('content->started_at', $request->input('program_start_at'))
             ->where('content->ended_at', null)
             ->latest()
             ->first();
 
         // date format 24042026 14:42:57
-        $startedAt = Carbon::createFromFormat('dmY H:i:s', $request->input('program_start_at'));
+        $startedAt = Carbon::parse($usageHistory->content->started_at);
         $endedAt = Carbon::createFromFormat('dmY H:i:s', $request->input('program_end_at'));
         $duration = $startedAt->diffInMinutes($endedAt);
         $content = [
