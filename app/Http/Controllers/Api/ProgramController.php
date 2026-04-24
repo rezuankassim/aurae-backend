@@ -84,6 +84,7 @@ class ProgramController extends Controller
 
         $emergency = (bool) $request->input('emergency', false);
 
+        dd($request->input('program_end_at'));
         $programLog = ProgramLog::create([
             'user_id' => $request->user()->id,
             'therapy_id' => $request->input('program_id'),
