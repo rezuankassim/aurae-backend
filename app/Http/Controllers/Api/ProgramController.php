@@ -8,6 +8,7 @@ use App\Http\Resources\BaseResource;
 use App\Jobs\SendPushNotification;
 use App\Models\AdminNotification;
 use App\Models\ProgramLog;
+use App\Models\UsageHistory;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -34,6 +35,19 @@ class ProgramController extends Controller
         ]);
 
         $programLog->load('therapy');
+
+        $content = [
+            'duration' => $request->input('program_duration'),
+            'force_stopped' => false,
+            'started_at' => $request->input('program_start_at'),
+            'ended_at' => null,
+        ];
+
+        UsageHistory::create([
+            'user_id' => $request->user()->id,
+            'therapy_id' => $request->input('program_id'),
+            'content' => $content,
+        ]);
 
         SendPushNotification::dispatch(
             [$request->user()->id],
@@ -81,6 +95,24 @@ class ProgramController extends Controller
         ]);
 
         $programLog->load('therapy');
+
+        $usageHistory = UsageHistory::where('user_id', $request->user()->id)
+            ->where('therapy_id', $request->input('program_id'))
+            ->latest()
+            ->first();
+
+        $content = [
+            'duration' => $request->input('program_duration'),
+            'force_stopped' => $emergency,
+            'started_at' => $usageHistory ? $usageHistory->content['started_at'] : null,
+            'ended_at' => $request->input('program_end_at'),
+        ];
+
+        $usageHistory = UsageHistory::create([
+            'user_id' => $request->user()->id,
+            'therapy_id' => $request->input('program_id'),
+            'content' => $content,
+        ]);
 
         SendPushNotification::dispatch(
             [$request->user()->id],
