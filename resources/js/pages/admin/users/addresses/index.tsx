@@ -188,9 +188,8 @@ export default function UserAddressesIndex({ user, addresses, countries }: { use
                                                         address.line_one,
                                                         address.line_two,
                                                         address.line_three,
-                                                        address.city,
+                                                        `${address.postcode} ${address.city}`,
                                                         address.stateData?.name ?? address.state,
-                                                        address.postcode,
                                                         address.country?.name,
                                                     ]
                                                         .filter(Boolean)
