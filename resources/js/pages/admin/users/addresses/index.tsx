@@ -70,24 +70,13 @@ const defaultFormData: AddressFormData = {
     is_billing_default: false,
 };
 
-export default function UserAddressesIndex({
-    user,
-    addresses,
-    countries,
-}: {
-    user: User;
-    addresses: Address[];
-    countries: CountryOption[];
-}) {
+export default function UserAddressesIndex({ user, addresses, countries }: { user: User; addresses: Address[]; countries: CountryOption[] }) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm<AddressFormData>(defaultFormData);
 
-    const selectedCountry = useMemo(
-        () => countries.find((c) => c.code === data.country),
-        [countries, data.country],
-    );
+    const selectedCountry = useMemo(() => countries.find((c) => c.code === data.country), [countries, data.country]);
     const states = selectedCountry?.states ?? [];
 
     const openCreate = () => {
@@ -173,10 +162,8 @@ export default function UserAddressesIndex({
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Title</TableHead>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Phone</TableHead>
+                                    <TableHead>Details</TableHead>
                                     <TableHead>Address</TableHead>
-                                    <TableHead>Defaults</TableHead>
                                     <TableHead className="w-[100px]"></TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -187,8 +174,14 @@ export default function UserAddressesIndex({
                                             <TableCell>{address.title ?? '-'}</TableCell>
                                             <TableCell>
                                                 {[address.first_name, address.last_name].filter(Boolean).join(' ')}
+                                                <br />
+                                                {address.contact_phone ?? '-'}
+                                                <br />
+                                                <div className="flex flex-wrap items-center gap-1">
+                                                    {address.shipping_default ? <Badge>Shipping</Badge> : null}
+                                                    {address.billing_default ? <Badge variant="secondary">Billing</Badge> : null}
+                                                </div>
                                             </TableCell>
-                                            <TableCell>{address.contact_phone ?? '-'}</TableCell>
                                             <TableCell>
                                                 <span className="text-sm">
                                                     {[
@@ -205,12 +198,6 @@ export default function UserAddressesIndex({
                                                 </span>
                                             </TableCell>
                                             <TableCell>
-                                                <div className="flex flex-wrap items-center gap-1">
-                                                    {address.shipping_default ? <Badge>Shipping</Badge> : null}
-                                                    {address.billing_default ? <Badge variant="secondary">Billing</Badge> : null}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
                                                 <div className="flex items-center gap-1">
                                                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(address)}>
                                                         <Pencil className="h-4 w-4" />
@@ -218,7 +205,7 @@ export default function UserAddressesIndex({
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="text-destructive hover:text-destructive h-8 w-8"
+                                                        className="h-8 w-8 text-destructive hover:text-destructive"
                                                         onClick={() => handleDelete(address)}
                                                     >
                                                         <Trash2 className="h-4 w-4" />
@@ -248,7 +235,12 @@ export default function UserAddressesIndex({
                         <form onSubmit={handleSubmit} className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
                             <div className="grid gap-2">
                                 <Label htmlFor="title">Title (optional)</Label>
-                                <Input id="title" value={data.title} onChange={(e) => setData('title', e.target.value)} placeholder="Home, Office, etc." />
+                                <Input
+                                    id="title"
+                                    value={data.title}
+                                    onChange={(e) => setData('title', e.target.value)}
+                                    placeholder="Home, Office, etc."
+                                />
                                 <InputError message={errors.title} />
                             </div>
 
@@ -261,7 +253,12 @@ export default function UserAddressesIndex({
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="phone">Phone</Label>
-                                    <Input id="phone" value={data.phone} onChange={(e) => setData('phone', e.target.value)} placeholder="Phone number" />
+                                    <Input
+                                        id="phone"
+                                        value={data.phone}
+                                        onChange={(e) => setData('phone', e.target.value)}
+                                        placeholder="Phone number"
+                                    />
                                     <InputError message={errors.phone} />
                                 </div>
                             </div>
@@ -280,19 +277,34 @@ export default function UserAddressesIndex({
 
                             <div className="grid gap-2">
                                 <Label htmlFor="line1">Address Line 1</Label>
-                                <Input id="line1" value={data.line1} onChange={(e) => setData('line1', e.target.value)} placeholder="Street address" />
+                                <Input
+                                    id="line1"
+                                    value={data.line1}
+                                    onChange={(e) => setData('line1', e.target.value)}
+                                    placeholder="Street address"
+                                />
                                 <InputError message={errors.line1} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="line2">Address Line 2 (optional)</Label>
-                                <Input id="line2" value={data.line2} onChange={(e) => setData('line2', e.target.value)} placeholder="Apt, suite, unit, etc." />
+                                <Input
+                                    id="line2"
+                                    value={data.line2}
+                                    onChange={(e) => setData('line2', e.target.value)}
+                                    placeholder="Apt, suite, unit, etc."
+                                />
                                 <InputError message={errors.line2} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="line3">Address Line 3 (optional)</Label>
-                                <Input id="line3" value={data.line3} onChange={(e) => setData('line3', e.target.value)} placeholder="Additional info" />
+                                <Input
+                                    id="line3"
+                                    value={data.line3}
+                                    onChange={(e) => setData('line3', e.target.value)}
+                                    placeholder="Additional info"
+                                />
                                 <InputError message={errors.line3} />
                             </div>
 
