@@ -603,6 +603,29 @@ export interface AdminNotificationData {
     [key: string]: unknown;
 }
 
+export interface LunarAddress {
+    id: number;
+    customer_id: number;
+    first_name: string;
+    last_name: string;
+    title: string | null;
+    line_one: string;
+    line_two: string | null;
+    line_three: string | null;
+    city: string;
+    state: string | null;
+    postcode: string | null;
+    contact_email: string | null;
+    contact_phone: string | null;
+    delivery_instructions: string | null;
+    shipping_default: boolean;
+    billing_default: boolean;
+    country: { id: number; name: string; iso2: string; iso3: string } | null;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
+}
+
 export interface AdminNotification {
     id: number;
     type: 'normal' | 'emergency';

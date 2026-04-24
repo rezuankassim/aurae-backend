@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdminNotification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -26,8 +27,30 @@ class AdminNotificationController extends Controller
      */
     public function show(AdminNotification $notification)
     {
+        $shippingAddress = null;
+        $billingAddress = null;
+
+        $userId = $notification->data['user_id'] ?? null;
+
+        if ($userId) {
+            $user = User::find($userId);
+
+            if ($user) {
+                $customer = $user->customers()->first();
+
+                if ($customer) {
+                    $addresses = $customer->addresses()->with('country')->get();
+
+                    $shippingAddress = $addresses->firstWhere('shipping_default', true);
+                    $billingAddress = $addresses->firstWhere('billing_default', true);
+                }
+            }
+        }
+
         return Inertia::render('admin/notifications/show', [
             'notification' => $notification,
+            'shippingAddress' => $shippingAddress,
+            'billingAddress' => $billingAddress,
         ]);
     }
 

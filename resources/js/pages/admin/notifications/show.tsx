@@ -2,7 +2,7 @@ import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/admin/notifications';
-import { AdminNotification, type BreadcrumbItem } from '@/types';
+import { AdminNotification, LunarAddress, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import dayjs from 'dayjs';
 
@@ -17,7 +17,46 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function AdminNotificationsShow({ notification }: { notification: AdminNotification }) {
+function AddressBlock({ address, label }: { address: LunarAddress | null; label: string }) {
+    return (
+        <div className="grid gap-2">
+            <h2 className="text-sm font-medium">{label}</h2>
+            {address ? (
+                <div className="text-sm space-y-0.5">
+                    <p className="font-medium">
+                        {address.first_name} {address.last_name}
+                    </p>
+                    <p>{address.line_one}</p>
+                    {address.line_two && <p>{address.line_two}</p>}
+                    {address.line_three && <p>{address.line_three}</p>}
+                    <p>
+                        {address.city}
+                        {address.state ? `, ${address.state}` : ''}
+                        {address.postcode ? ` ${address.postcode}` : ''}
+                    </p>
+                    {address.country && <p>{address.country.name}</p>}
+                    {address.contact_phone && <p className="text-muted-foreground">{address.contact_phone}</p>}
+                    {address.contact_email && <p className="text-muted-foreground">{address.contact_email}</p>}
+                    {address.delivery_instructions && (
+                        <p className="text-muted-foreground italic">{address.delivery_instructions}</p>
+                    )}
+                </div>
+            ) : (
+                <span className="text-sm text-muted-foreground">Not set</span>
+            )}
+        </div>
+    );
+}
+
+export default function AdminNotificationsShow({
+    notification,
+    shippingAddress,
+    billingAddress,
+}: {
+    notification: AdminNotification;
+    shippingAddress: LunarAddress | null;
+    billingAddress: LunarAddress | null;
+}) {
     const data = notification.data;
     const isEmergency = notification.type === 'emergency';
 
@@ -80,6 +119,13 @@ export default function AdminNotificationsShow({ notification }: { notification:
                                 <h2 className="text-sm font-medium">Phone</h2>
                                 <span>{data.user_phone}</span>
                             </div>
+
+                            <hr className="border-sidebar-border/50" />
+                            <h2 className="text-lg font-semibold">Address Information</h2>
+
+                            <AddressBlock address={shippingAddress} label="Shipping Address (Default)" />
+
+                            <AddressBlock address={billingAddress} label="Billing Address (Default)" />
 
                             <hr className="border-sidebar-border/50" />
                             <h2 className="text-lg font-semibold">Program Information</h2>

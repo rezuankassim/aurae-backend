@@ -22,17 +22,20 @@ class UserAddressUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'integer', 'in:0,1,2'], // 0: Home, 1: Work, 2: Other
+            'title' => ['nullable', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:20'],
+            'email' => ['nullable', 'email', 'max:255'],
             'line1' => ['required', 'string', 'max:255'],
             'line2' => ['nullable', 'string', 'max:255'],
             'line3' => ['nullable', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:255'],
-            'state' => ['nullable', 'string', 'max:255'],
-            'postal_code' => ['required', 'string', 'max:20'],
-            'country' => ['required', 'string', 'max:255'],
-            'is_default' => ['boolean'],
+            'state' => ['nullable', 'string', 'max:255', 'exists:lunar_states,code'],
+            'postal_code' => ['nullable', 'string', 'max:20'],
+            'country' => ['required', 'string', 'max:255', 'exists:lunar_countries,iso3'],
+            'delivery_instructions' => ['nullable', 'string', 'max:500'],
+            'is_default' => ['sometimes', 'boolean'],
+            'is_billing_default' => ['sometimes', 'boolean'],
         ];
     }
 }

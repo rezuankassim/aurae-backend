@@ -11,7 +11,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAdminNotifications } from '@/hooks/use-admin-notifications';
 import { cn } from '@/lib/utils';
-import { index } from '@/routes/admin/notifications';
+import { index, show } from '@/routes/admin/notifications';
 import { AdminNotification } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Bell, ShieldAlert, User } from 'lucide-react';
@@ -94,13 +94,13 @@ export function NotificationBell() {
                 {notifications.length === 0 ? (
                     <div className="py-6 text-center text-sm text-muted-foreground">No notifications yet</div>
                 ) : (
-                    <ScrollArea className="max-h-[360px] overflow-x-hidden">
+                <ScrollArea className="max-h-[360px] overflow-x-hidden">
                         <div className="space-y-0.5 p-1">
                             {notifications.map((notification) => (
                                 <DropdownMenuItem key={notification.id} className="p-0 focus:bg-transparent" asChild>
-                                    <div className="w-full min-w-0">
+                                    <Link href={show(notification.id).url} className="w-full min-w-0">
                                         <NotificationItem notification={notification} />
-                                    </div>
+                                    </Link>
                                 </DropdownMenuItem>
                             ))}
                         </div>

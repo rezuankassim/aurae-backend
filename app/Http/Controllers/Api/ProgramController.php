@@ -104,7 +104,7 @@ class ProgramController extends Controller
         $content = [
             'duration' => $request->input('program_duration'),
             'force_stopped' => $emergency,
-            'started_at' => $usageHistory ? $usageHistory->content['started_at'] : null,
+            'started_at' => $usageHistory ? $usageHistory->content->started_at : null,
             'ended_at' => $request->input('program_end_at'),
         ];
 
