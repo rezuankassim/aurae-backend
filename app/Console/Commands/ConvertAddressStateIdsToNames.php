@@ -27,6 +27,7 @@ class ConvertAddressStateIdsToNames extends Command
      */
     public function handle(): int
     {
+        dd(\Carbon\Carbon::createFromFormat('dmY H:i:s', '24042026 22:54:56'));
         $dryRun = $this->option('dry-run');
 
         if ($dryRun) {
