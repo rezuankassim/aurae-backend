@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Verification;
 use App\Services\ExabytesService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -72,10 +73,18 @@ class AuthenticationController extends Controller
 
     public function checkUniqueValues(Request $request)
     {
+        // If the phone belongs to an existing guest user, treat this as a
+        // guest-onboarding pre-flight and ignore that user's record so the
+        // placeholder guest values do not block the real ones.
+        $existingUser = $request->filled('phone')
+            ? User::where('phone', $request->phone)->first()
+            : null;
+        $uniqueIgnoreId = $existingUser?->isGuest() ? $existingUser->id : null;
+
         $request->validate([
-            'username' => ['nullable', 'string', 'max:255', Rule::unique('users', 'username')->whereNull('deleted_at')],
-            'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('users', 'email')->whereNull('deleted_at')],
-            'phone' => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone')->whereNull('deleted_at')],
+            'username' => ['nullable', 'string', 'max:255', Rule::unique('users', 'username')->ignore($uniqueIgnoreId)->whereNull('deleted_at')],
+            'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($uniqueIgnoreId)->whereNull('deleted_at')],
+            'phone' => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($uniqueIgnoreId)->whereNull('deleted_at')],
         ], [
             'phone.unique' => 'This phone number is already registered. Please login or use a different phone number.',
             'email.unique' => 'This email address is already registered. Please login or use a different email.',
@@ -91,32 +100,77 @@ class AuthenticationController extends Controller
 
     public function register(Request $request)
     {
+        // Detect guest onboarding: an existing user with the same phone is
+        // eligible for promotion only if they currently have a guest record.
+        $existingUser = User::where('phone', $request->phone)->first();
+        $isOnboarding = $existingUser?->isGuest() ?? false;
+
+        $uniqueIgnoreId = $isOnboarding ? $existingUser->id : null;
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', Rule::unique('users', 'username')->whereNull('deleted_at')],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->whereNull('deleted_at')],
+            'username' => ['required', 'string', 'max:255', Rule::unique('users', 'username')->ignore($uniqueIgnoreId)->whereNull('deleted_at')],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($uniqueIgnoreId)->whereNull('deleted_at')],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'phone' => ['required', 'string', 'max:20', Rule::unique('users', 'phone')->whereNull('deleted_at')],
+            'phone' => ['required', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($uniqueIgnoreId)->whereNull('deleted_at')],
         ], [
             'phone.unique' => 'This phone number is already registered. Please login or use a different phone number.',
             'email.unique' => 'This email address is already registered. Please login or use a different email.',
             'username.unique' => 'This username is already taken. Please choose a different username.',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone' => $request->phone,
-        ]);
+        if ($isOnboarding) {
+            $user = DB::transaction(function () use ($request, $existingUser) {
+                // Promote the existing guest user to a fully registered user.
+                $existingUser->update([
+                    'name' => $request->name,
+                    'username' => $request->username,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                    'phone' => $request->phone,
+                ]);
 
-        $customer = Customer::create([
-            'first_name' => Str::before($request->name, ' '),
-            'last_name' => Str::after($request->name, ' '),
-        ]);
+                // Update the linked Lunar customer profile to match the
+                // real name. Falls back to creating one if it is missing.
+                $customer = $existingUser->customers()->first();
+                $customerData = [
+                    'first_name' => Str::before($request->name, ' '),
+                    'last_name' => Str::after($request->name, ' '),
+                ];
 
-        $customer->users()->attach($user->id);
+                if ($customer) {
+                    $customer->update($customerData);
+                } else {
+                    $customer = Customer::create($customerData);
+                    $customer->users()->attach($existingUser->id);
+                }
+
+                // Remove the guest record so isGuest() returns false going
+                // forward. The user is now a fully registered account.
+                $existingUser->guest()->delete();
+
+                // Revoke any tokens issued during the guest session so the
+                // old guest token can no longer authenticate.
+                $existingUser->tokens()->delete();
+
+                return $existingUser->fresh();
+            });
+        } else {
+            $user = User::create([
+                'name' => $request->name,
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'phone' => $request->phone,
+            ]);
+
+            $customer = Customer::create([
+                'first_name' => Str::before($request->name, ' '),
+                'last_name' => Str::after($request->name, ' '),
+            ]);
+
+            $customer->users()->attach($user->id);
+        }
 
         Mail::to($user->email)->queue(new WelcomeMail($user));
 
@@ -130,7 +184,7 @@ class AuthenticationController extends Controller
         return BaseResource::make($user)
             ->additional([
                 'status' => 200,
-                'message' => 'Register successful.',
+                'message' => $isOnboarding ? 'Account upgraded successfully.' : 'Register successful.',
             ]);
     }
 

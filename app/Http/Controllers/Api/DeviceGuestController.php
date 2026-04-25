@@ -40,24 +40,28 @@ class DeviceGuestController extends Controller
             // Generate a unique username based on phone and random string
             $username = 'guest_'.Str::slug($request->phone).'_'.Str::random(6);
 
-            $user = User::create([
-                'username' => $username,
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'email' => $username.'@example.com', // Guests don't need email
-                'password' => bcrypt(Str::random(32)), // Random password, won't be used
-                'is_admin' => false,
-                'status' => 1,
-            ]);
+            if (User::where('phone', $request->phone)->exists()) {
+                $user = User::where('phone', $request->phone)->first();
+            } else {
+                $user = User::create([
+                    'username' => $username,
+                    'name' => $request->name,
+                    'phone' => $request->phone,
+                    'email' => $username.'@example.com', // Guests don't need email
+                    'password' => bcrypt(Str::random(32)), // Random password, won't be used
+                    'is_admin' => false,
+                    'status' => 1,
+                ]);
 
-            // Create Lunar customer profile for the guest
-            $customer = Customer::create([
-                'first_name' => $request->name,
-                'last_name' => '',
-            ]);
+                // Create Lunar customer profile for the guest
+                $customer = Customer::create([
+                    'first_name' => $request->name,
+                    'last_name' => '',
+                ]);
 
-            // Link customer to user
-            $customer->users()->attach($user);
+                // Link customer to user
+                $customer->users()->attach($user);
+            }
 
             // Create guest record
             $guest = Guest::create([
