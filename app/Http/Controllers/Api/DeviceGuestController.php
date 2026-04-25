@@ -42,6 +42,7 @@ class DeviceGuestController extends Controller
 
             if (User::where('phone', $request->phone)->exists()) {
                 $user = User::where('phone', $request->phone)->first();
+                $customer = $user->customers()->first();
             } else {
                 $user = User::create([
                     'username' => $username,
