@@ -101,10 +101,17 @@ class AuthenticationController extends Controller
 
     public function register(Request $request)
     {
+        Log::info('Registration request received', [
+            'all' => $request->all(),
+            'phone' => $request->phone,
+        ]);
         // Detect guest onboarding: an existing user with the same phone is
         // eligible for promotion only if they currently have a guest record.
-        $existingUser = User::where('phone', $request->phone)->first();
-        $isOnboarding = $existingUser?->isGuest() ?? false;
+        $existingUser = User::query()
+            ->where('phone', $request->phone)
+            ->where('is_guest', true)
+            ->first();
+        $isOnboarding = $existingUser ? true : false;
 
         $uniqueIgnoreId = $isOnboarding ? $existingUser->id : null;
 
@@ -148,11 +155,11 @@ class AuthenticationController extends Controller
 
                 // Remove the guest record so isGuest() returns false going
                 // forward. The user is now a fully registered account.
-                $existingUser->guest()->delete();
+                // $existingUser->guest()->delete();
 
                 // Revoke any tokens issued during the guest session so the
                 // old guest token can no longer authenticate.
-                $existingUser->tokens()->delete();
+                // $existingUser->tokens()->delete();
 
                 return $existingUser->fresh();
             });
