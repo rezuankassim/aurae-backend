@@ -102,6 +102,14 @@ class ProgramController extends Controller
             ->latest()
             ->first();
 
+        if (!$usageHistory) {
+            return BaseResource::make($programLog)
+                ->additional([
+                    'status' => 201,
+                    'message' => 'Program stopped successfully, but no matching usage history found.',
+                ]);
+        }
+
         // date format 24042026 14:42:57
         $startedAt = Carbon::createFromFormat('dmY H:i:s', $usageHistory->content->started_at);
         $endedAt = Carbon::createFromFormat('dmY H:i:s', $request->input('program_end_at'));
