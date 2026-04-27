@@ -77,6 +77,11 @@ class AuthenticationController extends Controller
         // If the phone belongs to an existing guest user, treat this as a
         // guest-onboarding pre-flight and ignore that user's record so the
         // placeholder guest values do not block the real ones.
+        Log::info('Registration attempt', [
+            'phone' => $request->phone,
+            'username' => $request->username,
+            'email' => $request->email,
+        ]);
         $existingUser = $request->filled('phone')
             ? User::where('phone', $request->phone)->first()
             : null;
@@ -103,9 +108,6 @@ class AuthenticationController extends Controller
     {
         // Detect guest onboarding: an existing user with the same phone is
         // eligible for promotion only if they currently have a guest record.
-        Log::info('Registration attempt', [
-            'phone' => $request->phone,
-        ]);
         $existingUser = User::where('phone', $request->phone)->first();
         $isOnboarding = $existingUser?->isGuest() ?? false;
 
