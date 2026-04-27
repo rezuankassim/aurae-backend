@@ -32,6 +32,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
     protected $fillable = [
         'username',
         'is_admin',
+        'is_guest',
         'name',
         'email',
         'password',
@@ -59,6 +60,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
     protected function casts(): array
     {
         return [
+            'is_admin' => 'boolean',
+            'is_guest' => 'boolean',
             'email_verified_at' => 'datetime',
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
@@ -113,7 +116,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
      */
     public function isGuest(): bool
     {
-        return $this->guest()->exists();
+        return $this->is_guest;
     }
 
     /**

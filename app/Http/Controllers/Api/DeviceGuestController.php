@@ -51,6 +51,7 @@ class DeviceGuestController extends Controller
                     'email' => $username.'@example.com', // Guests don't need email
                     'password' => bcrypt(Str::random(32)), // Random password, won't be used
                     'is_admin' => false,
+                    'is_guest' => true,
                     'status' => 1,
                 ]);
 
