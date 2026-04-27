@@ -233,6 +233,10 @@ class AuthenticationController extends Controller
 
     public function sendVerify(Request $request)
     {
+        Log::info('sendVerify called', [
+            'phone' => $request->phone,
+        ]);
+
         $request->validate([
             'phone' => ['required', 'string', 'max:20'],
         ]);
