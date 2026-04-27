@@ -77,18 +77,13 @@ class AuthenticationController extends Controller
         // If the phone belongs to an existing guest user, treat this as a
         // guest-onboarding pre-flight and ignore that user's record so the
         // placeholder guest values do not block the real ones.
-        Log::info('Registration attempt', [
-            'phone' => $request->phone,
-            'username' => $request->username,
-            'email' => $request->email,
-        ]);
         $existingUser = $request->filled('phone')
             ? User::where('phone', $request->phone)->first()
             : null;
         $uniqueIgnoreId = $existingUser?->isGuest() ? $existingUser->id : null;
 
         $request->validate([
-            'username' => ['nullable', 'string', 'max:255', Rule::unique('users', 'username')->ignore($uniqueIgnoreId)->whereNull('deleted_at')],
+            'username' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($uniqueIgnoreId)->whereNull('deleted_at')],
             'phone' => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($uniqueIgnoreId)->whereNull('deleted_at')],
         ], [
@@ -115,7 +110,7 @@ class AuthenticationController extends Controller
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', Rule::unique('users', 'username')->ignore($uniqueIgnoreId)->whereNull('deleted_at')],
+            'username' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($uniqueIgnoreId)->whereNull('deleted_at')],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['required', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($uniqueIgnoreId)->whereNull('deleted_at')],
