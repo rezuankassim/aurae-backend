@@ -12,6 +12,7 @@ export function useAdminNotifications() {
     const [unreadCount, setUnreadCount] = useState<number>(initialUnreadCount ?? 0);
 
     const echoRef = useRef<Echo<'reverb'> | null>(null);
+    const alertAudioRef = useRef<HTMLAudioElement | null>(null);
     // Capture the initial admin state once — subscriptions should only be set up once on mount
     const isAdminRef = useRef(initialNotifications !== null);
 
@@ -25,6 +26,13 @@ export function useAdminNotifications() {
             console.warn('[AdminNotifications] VITE_REVERB_APP_KEY is not set — skipping WebSocket connection.');
             return;
         }
+
+        // Preload the alert sound once and reuse the same Audio instance for every emergency event.
+        // This avoids re-fetching/decoding the file on each notification and keeps memory usage flat.
+        const audio = new Audio('/alert-notification.wav');
+        audio.preload = 'auto';
+        audio.volume = 0.7;
+        alertAudioRef.current = audio;
 
         try {
             // @ts-expect-error — Pusher must be on window for Echo's reverb broadcaster
@@ -66,6 +74,16 @@ export function useAdminNotifications() {
                         description,
                         duration: 8000,
                     });
+
+                    // Play the alert sound. Reset currentTime so rapid consecutive events still trigger playback.
+                    const alertAudio = alertAudioRef.current;
+                    if (alertAudio) {
+                        alertAudio.currentTime = 0;
+                        // play() returns a Promise that may reject due to browser autoplay policies — swallow it.
+                        void alertAudio.play().catch((err) => {
+                            console.warn('[AdminNotifications] Unable to play alert sound:', err);
+                        });
+                    }
                 } else {
                     toast.error(event.title, {
                         description,
@@ -81,6 +99,12 @@ export function useAdminNotifications() {
             echoRef.current?.leave('admin');
             echoRef.current?.disconnect();
             echoRef.current = null;
+
+            if (alertAudioRef.current) {
+                alertAudioRef.current.pause();
+                alertAudioRef.current.src = '';
+                alertAudioRef.current = null;
+            }
         };
     }, []);
 

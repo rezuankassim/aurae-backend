@@ -129,48 +129,46 @@ class ProgramController extends Controller
             'program',
         );
 
-        $notificationType = $emergency ? 'emergency' : 'normal';
-        $notificationTitle = $emergency
-            ? "Emergency Stop: {$programLog->therapy->name}"
-            : "Program Stopped: {$programLog->therapy->name}";
-        $notificationBody = $emergency
-            ? "Emergency stop triggered for {$programLog->therapy->name} by {$programLog->user->name}. Duration: {$programLog->program_duration}."
-            : "{$programLog->therapy->name} was stopped by {$programLog->user->name}. Duration: {$programLog->program_duration}.";
+        if ($emergency) {
+            $notificationType = 'emergency';
+            $notificationTitle = "Emergency Stop: {$programLog->therapy->name}";
+            $notificationBody = "Emergency stop triggered for {$programLog->therapy->name} by {$programLog->user->name}. Duration: {$programLog->program_duration}.";
 
-        if ($request->input('program_error_message')) {
-            $notificationBody .= " Error: {$request->input('program_error_message')}";
+            if ($request->input('program_error_message')) {
+                $notificationBody .= " Error: {$request->input('program_error_message')}";
+            }
+
+            $programLog->load('user.guest');
+
+            $isGuest = $programLog->user->isGuest();
+
+            $adminNotification = AdminNotification::create([
+                'type' => $notificationType,
+                'title' => $notificationTitle,
+                'body' => $notificationBody,
+                'data' => [
+                    'program_log_id' => $programLog->id,
+                    'therapy_id' => $programLog->therapy_id,
+                    'therapy_name' => $programLog->therapy->name,
+                    'user_id' => $programLog->user_id,
+                    'user_name' => $programLog->user->name,
+                    'user_phone' => $programLog->user->phone,
+                    'is_guest' => $isGuest,
+                    'program_duration' => $programLog->program_duration,
+                    'program_error_message' => $request->input('program_error_message'),
+                    'emergency' => $emergency,
+                ],
+            ]);
+
+            broadcast(new ProgramStopped(
+                adminNotificationId: $adminNotification->id,
+                type: $notificationType,
+                title: $notificationTitle,
+                body: $notificationBody,
+                data: $adminNotification->data,
+                createdAt: $adminNotification->created_at->toIso8601String(),
+            ));   
         }
-
-        $programLog->load('user.guest');
-
-        $isGuest = $programLog->user->isGuest();
-
-        $adminNotification = AdminNotification::create([
-            'type' => $notificationType,
-            'title' => $notificationTitle,
-            'body' => $notificationBody,
-            'data' => [
-                'program_log_id' => $programLog->id,
-                'therapy_id' => $programLog->therapy_id,
-                'therapy_name' => $programLog->therapy->name,
-                'user_id' => $programLog->user_id,
-                'user_name' => $programLog->user->name,
-                'user_phone' => $programLog->user->phone,
-                'is_guest' => $isGuest,
-                'program_duration' => $programLog->program_duration,
-                'program_error_message' => $request->input('program_error_message'),
-                'emergency' => $emergency,
-            ],
-        ]);
-
-        broadcast(new ProgramStopped(
-            adminNotificationId: $adminNotification->id,
-            type: $notificationType,
-            title: $notificationTitle,
-            body: $notificationBody,
-            data: $adminNotification->data,
-            createdAt: $adminNotification->created_at->toIso8601String(),
-        ));
 
         return BaseResource::make($programLog)
             ->additional([
