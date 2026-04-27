@@ -12,6 +12,7 @@ use App\Services\ExabytesService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -102,6 +103,9 @@ class AuthenticationController extends Controller
     {
         // Detect guest onboarding: an existing user with the same phone is
         // eligible for promotion only if they currently have a guest record.
+        Log::info('Registration attempt', [
+            'phone' => $request->phone,
+        ]);
         $existingUser = User::where('phone', $request->phone)->first();
         $isOnboarding = $existingUser?->isGuest() ?? false;
 
