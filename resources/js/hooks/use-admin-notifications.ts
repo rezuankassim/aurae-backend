@@ -34,6 +34,32 @@ export function useAdminNotifications() {
         audio.volume = 0.7;
         alertAudioRef.current = audio;
 
+        // Browsers block autoplay until the user has interacted with the page.
+        // "Unlock" the audio element on the first user gesture by playing it muted, then resetting it.
+        // After this one-time priming, subsequent .play() calls (triggered by WebSocket events) are allowed.
+        const unlockAudio = () => {
+            const a = alertAudioRef.current;
+            if (!a) return;
+            const wasMuted = a.muted;
+            a.muted = true;
+            a.play()
+                .then(() => {
+                    a.pause();
+                    a.currentTime = 0;
+                    a.muted = wasMuted;
+                })
+                .catch(() => {
+                    a.muted = wasMuted;
+                });
+        };
+
+        const unlockEvents: Array<keyof DocumentEventMap> = ['pointerdown', 'keydown', 'touchstart'];
+        const handleUnlock = () => {
+            unlockAudio();
+            unlockEvents.forEach((evt) => document.removeEventListener(evt, handleUnlock));
+        };
+        unlockEvents.forEach((evt) => document.addEventListener(evt, handleUnlock, { once: true, passive: true }));
+
         try {
             // @ts-expect-error — Pusher must be on window for Echo's reverb broadcaster
             window.Pusher = Pusher;
@@ -99,6 +125,8 @@ export function useAdminNotifications() {
             echoRef.current?.leave('admin');
             echoRef.current?.disconnect();
             echoRef.current = null;
+
+            unlockEvents.forEach((evt) => document.removeEventListener(evt, handleUnlock));
 
             if (alertAudioRef.current) {
                 alertAudioRef.current.pause();
