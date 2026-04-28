@@ -1,3 +1,4 @@
+import { RealtimeStatusIndicator } from '@/components/realtime-status-indicator';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -59,60 +60,63 @@ function NotificationItem({ notification }: { notification: AdminNotification })
 }
 
 export function NotificationBell() {
-    const { notifications, unreadCount, markAllAsRead } = useAdminNotifications();
+    const { notifications, unreadCount, markAllAsRead, connectionState } = useAdminNotifications();
 
     if (!notifications) {
         return null;
     }
 
     return (
-        <DropdownMenu onOpenChange={(open) => open && unreadCount > 0 && markAllAsRead()}>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative h-8 w-8">
-                    <Bell className="h-4 w-4" />
-                    {unreadCount > 0 && (
-                        <Badge
-                            variant="destructive"
-                            className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full p-0 text-[10px]"
-                        >
-                            {unreadCount > 9 ? '9+' : unreadCount}
-                        </Badge>
+        <div className="flex items-center gap-1">
+            <RealtimeStatusIndicator connectionState={connectionState} />
+            <DropdownMenu onOpenChange={(open) => open && unreadCount > 0 && markAllAsRead()}>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="relative h-8 w-8">
+                        <Bell className="h-4 w-4" />
+                        {unreadCount > 0 && (
+                            <Badge
+                                variant="destructive"
+                                className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full p-0 text-[10px]"
+                            >
+                                {unreadCount > 9 ? '9+' : unreadCount}
+                            </Badge>
+                        )}
+                        <span className="sr-only">Notifications</span>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-96">
+                    <DropdownMenuLabel className="flex items-center justify-between">
+                        <span>Notifications</span>
+                        {unreadCount > 0 && (
+                            <Badge variant="secondary" className="text-xs font-normal">
+                                {unreadCount} unread
+                            </Badge>
+                        )}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {notifications.length === 0 ? (
+                        <div className="py-6 text-center text-sm text-muted-foreground">No notifications yet</div>
+                    ) : (
+                        <ScrollArea className="max-h-[360px] overflow-x-hidden">
+                            <div className="space-y-0.5 p-1">
+                                {notifications.map((notification) => (
+                                    <DropdownMenuItem key={notification.id} className="p-0 focus:bg-transparent" asChild>
+                                        <Link href={show(notification.id).url} className="w-full min-w-0">
+                                            <NotificationItem notification={notification} />
+                                        </Link>
+                                    </DropdownMenuItem>
+                                ))}
+                            </div>
+                        </ScrollArea>
                     )}
-                    <span className="sr-only">Notifications</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-96">
-                <DropdownMenuLabel className="flex items-center justify-between">
-                    <span>Notifications</span>
-                    {unreadCount > 0 && (
-                        <Badge variant="secondary" className="text-xs font-normal">
-                            {unreadCount} unread
-                        </Badge>
-                    )}
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {notifications.length === 0 ? (
-                    <div className="py-6 text-center text-sm text-muted-foreground">No notifications yet</div>
-                ) : (
-                <ScrollArea className="max-h-[360px] overflow-x-hidden">
-                        <div className="space-y-0.5 p-1">
-                            {notifications.map((notification) => (
-                                <DropdownMenuItem key={notification.id} className="p-0 focus:bg-transparent" asChild>
-                                    <Link href={show(notification.id).url} className="w-full min-w-0">
-                                        <NotificationItem notification={notification} />
-                                    </Link>
-                                </DropdownMenuItem>
-                            ))}
-                        </div>
-                    </ScrollArea>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="justify-center p-0 focus:bg-transparent" asChild>
-                    <Link href={index().url} className="flex w-full justify-center py-2 text-xs font-medium text-primary hover:text-primary/80">
-                        View more
-                    </Link>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="justify-center p-0 focus:bg-transparent" asChild>
+                        <Link href={index().url} className="flex w-full justify-center py-2 text-xs font-medium text-primary hover:text-primary/80">
+                            View more
+                        </Link>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
     );
 }

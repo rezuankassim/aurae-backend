@@ -5,11 +5,14 @@ import Pusher from 'pusher-js';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
+export type ConnectionState = 'initialized' | 'connecting' | 'connected' | 'unavailable' | 'failed' | 'disconnected' | 'disabled';
+
 export function useAdminNotifications() {
     const { adminNotifications: initialNotifications, adminUnreadCount: initialUnreadCount } = usePage<SharedData>().props;
 
     const [notifications, setNotifications] = useState<AdminNotification[]>(initialNotifications ?? []);
     const [unreadCount, setUnreadCount] = useState<number>(initialUnreadCount ?? 0);
+    const [connectionState, setConnectionState] = useState<ConnectionState>('initialized');
 
     const echoRef = useRef<Echo<'reverb'> | null>(null);
     const alertAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -19,11 +22,13 @@ export function useAdminNotifications() {
     useEffect(() => {
         if (!isAdminRef.current) {
             // Not an admin — do not subscribe
+            setConnectionState('disabled');
             return;
         }
 
         if (!import.meta.env.VITE_REVERB_APP_KEY) {
             console.warn('[AdminNotifications] VITE_REVERB_APP_KEY is not set — skipping WebSocket connection.');
+            setConnectionState('disabled');
             return;
         }
 
@@ -86,6 +91,16 @@ export function useAdminNotifications() {
                 },
             });
 
+            // Track the underlying Pusher connection so the UI can show whether real-time alerts are active.
+            // Reverb speaks the Pusher protocol, so the standard state machine applies:
+            // initialized → connecting → connected, plus unavailable / failed / disconnected.
+            const pusherConnection = echoRef.current.connector.pusher.connection;
+            setConnectionState(pusherConnection.state as ConnectionState);
+            const handleStateChange = ({ current }: { current: ConnectionState }) => {
+                setConnectionState(current);
+            };
+            pusherConnection.bind('state_change', handleStateChange);
+
             echoRef.current.private('admin').listen('.program.stopped', (event: AdminNotification) => {
                 setNotifications((prev) => [event, ...prev].slice(0, 5));
                 setUnreadCount((prev) => prev + 1);
@@ -122,9 +137,11 @@ export function useAdminNotifications() {
         }
 
         return () => {
+            echoRef.current?.connector.pusher.connection.unbind('state_change');
             echoRef.current?.leave('admin');
             echoRef.current?.disconnect();
             echoRef.current = null;
+            setConnectionState('disconnected');
 
             unlockEvents.forEach((evt) => document.removeEventListener(evt, handleUnlock));
 
@@ -153,5 +170,5 @@ export function useAdminNotifications() {
         setUnreadCount(0);
     };
 
-    return { notifications, unreadCount, markAllAsRead };
+    return { notifications, unreadCount, markAllAsRead, connectionState };
 }
