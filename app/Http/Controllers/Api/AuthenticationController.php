@@ -101,10 +101,6 @@ class AuthenticationController extends Controller
 
     public function register(Request $request)
     {
-        Log::info('Registration request received', [
-            'all' => $request->all(),
-            'phone' => $request->phone,
-        ]);
         // Detect guest onboarding: an existing user with the same phone is
         // eligible for promotion only if they currently have a guest record.
         $existingUser = User::query()
@@ -136,6 +132,7 @@ class AuthenticationController extends Controller
                     'email' => $request->email,
                     'password' => Hash::make($request->password),
                     'phone' => $request->phone,
+                    'is_guest' => false,
                 ]);
 
                 // Update the linked Lunar customer profile to match the
@@ -233,10 +230,6 @@ class AuthenticationController extends Controller
 
     public function sendVerify(Request $request)
     {
-        Log::info('sendVerify called', [
-            'phone' => $request->phone,
-        ]);
-
         $request->validate([
             'phone' => ['required', 'string', 'max:20'],
         ]);
