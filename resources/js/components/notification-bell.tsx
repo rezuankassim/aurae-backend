@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { index, show } from '@/routes/admin/notifications';
 import { AdminNotification } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Bell, ShieldAlert, User } from 'lucide-react';
+import { Bell, User } from 'lucide-react';
 
 function timeAgo(dateStr: string): string {
     const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
@@ -26,23 +26,16 @@ function timeAgo(dateStr: string): string {
 }
 
 function NotificationItem({ notification }: { notification: AdminNotification }) {
-    const isEmergency = notification.type === 'emergency';
     const isUnread = !notification.read_at;
     const data = notification.data;
 
     return (
-        <div
-            className={cn(
-                'flex gap-3 rounded-md px-3 py-2.5 transition-colors',
-                isEmergency ? 'border-l-2 border-destructive bg-destructive/5' : 'border-l-2 border-transparent',
-                isUnread && !isEmergency && 'bg-muted/50',
-            )}
-        >
+        <div className={cn('flex gap-3 rounded-md px-3 py-2.5 transition-colors', 'border-l-2 border-transparent', isUnread && 'bg-muted/50')}>
             <div className="mt-0.5 shrink-0">
-                {isEmergency ? <ShieldAlert className="h-4 w-4 text-destructive" /> : <Bell className="h-4 w-4 text-muted-foreground" />}
+                <Bell className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="min-w-0 flex-1">
-                <p className={cn('truncate text-sm leading-none font-medium', isEmergency && 'text-destructive')}>{notification.title}</p>
+                <p className={cn('truncate text-sm leading-none font-medium')}>{notification.title}</p>
                 {data && (
                     <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                         <User className="h-3 w-3" />
