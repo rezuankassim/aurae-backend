@@ -12,7 +12,6 @@ use App\Services\ExabytesService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -190,6 +189,91 @@ class AuthenticationController extends Controller
             ->additional([
                 'status' => 200,
                 'message' => $isOnboarding ? 'Account upgraded successfully.' : 'Register successful.',
+            ]);
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $user = $request->user();
+
+        // Guests are managed via the device guest endpoint; reject here to keep flows separate.
+        if ($user->isGuest()) {
+            return BaseResource::make(null)
+                ->additional([
+                    'status' => 403,
+                    'message' => 'Guest accounts must be removed via the device guest endpoint.',
+                ])
+                ->response()
+                ->setStatusCode(403);
+        }
+
+        $request->validate([
+            'password' => ['required', 'string'],
+        ]);
+
+        if (! Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'password' => ['The provided password is incorrect.'],
+            ]);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Detach the current device from this user so subsequent requests on the
+            // same device cannot operate as the deleted account.
+            $request->device->update([
+                'deviceable_type' => null,
+                'deviceable_id' => null,
+            ]);
+
+            // Remove this user's morph user_devices rows (FCM tokens, OS info, etc.).
+            $user->userDevices()->delete();
+
+            // Detach the Lunar customer pivot link so the user record is no longer
+            // associated with any customer profile. Customer rows are preserved to
+            // keep historical orders/invoices intact.
+            DB::table('lunar_customer_user')
+                ->where('user_id', $user->id)
+                ->delete();
+
+            // Audit a final logout entry, mirroring the logout flow, before tokens go away.
+            LoginActivity::create([
+                'user_id' => $user->id,
+                'event' => 'logout',
+                'guard' => 'api',
+                'session_id' => $request->device->udid,
+                'ip_address' => $request->ip(),
+                'user_agent' => substr($request->userAgent() ?? '', 0, 500),
+                'succeeded' => true,
+                'occurred_at' => now(),
+                'logout_at' => now(),
+            ]);
+
+            // Revoke every Sanctum token so the account cannot be reused.
+            $user->tokens()->delete();
+
+            // Soft delete the user. The booted() hook in App\Models\User mangles the
+            // unique email/username/phone columns so the same values can be reused.
+            $user->delete();
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return BaseResource::make(null)
+                ->additional([
+                    'status' => 500,
+                    'message' => 'Failed to delete account: '.$e->getMessage(),
+                ])
+                ->response()
+                ->setStatusCode(500);
+        }
+
+        return BaseResource::make(null)
+            ->additional([
+                'status' => 200,
+                'message' => 'Account deleted successfully.',
             ]);
     }
 

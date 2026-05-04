@@ -95,6 +95,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         });
 
         Route::post('/logout', [AuthenticationController::class, 'logout'])->middleware(EnsureActiveSubscription::class)->name('api.logout');
+        Route::delete('/account', [AuthenticationController::class, 'deleteAccount'])->name('api.account.destroy');
 
         Route::get('/knowledge', [KnowledgeController::class, 'index'])->middleware(EnsureActiveSubscription::class)->name('api.knowledge.index');
         Route::get('/knowledge/{knowledge}', [KnowledgeController::class, 'show'])->name('api.knowledge.show');
