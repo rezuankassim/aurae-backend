@@ -5,12 +5,37 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Http\Resources\HealthReportResource;
+use App\Models\Guest;
 use App\Models\HealthReport;
+use App\Support\OwnerDeviceResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class HealthReportController extends Controller
 {
+    /**
+     * Determine if the request user may view this health report.
+     *
+     * Either the report belongs to them directly, OR the report belongs to
+     * a guest user that is registered on a device the request user owns.
+     */
+    protected function userCanAccess(Request $request, HealthReport $healthReport): bool
+    {
+        $user = $request->user();
+
+        if ($healthReport->user_id === $user->id) {
+            return true;
+        }
+
+        $guest = Guest::where('user_id', $healthReport->user_id)->first();
+
+        if (! $guest) {
+            return false;
+        }
+
+        return OwnerDeviceResolver::ownsDevice($user, $guest->device_id);
+    }
+
     /**
      * Display a listing of health reports for authenticated user.
      */
@@ -32,8 +57,7 @@ class HealthReportController extends Controller
      */
     public function show(Request $request, HealthReport $healthReport)
     {
-        // Verify health report belongs to authenticated user
-        if ($healthReport->user_id !== $request->user()->id) {
+        if (! $this->userCanAccess($request, $healthReport)) {
             return BaseResource::make([])
                 ->additional([
                     'status' => 403,
@@ -55,8 +79,7 @@ class HealthReportController extends Controller
      */
     public function file(Request $request, HealthReport $healthReport, string $type)
     {
-        // Verify health report belongs to authenticated user
-        if ($healthReport->user_id !== $request->user()->id) {
+        if (! $this->userCanAccess($request, $healthReport)) {
             return BaseResource::make([])
                 ->additional([
                     'status' => 403,

@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\MarketplaceBannerController;
 use App\Http\Controllers\Api\MusicController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\OwnerGuestController;
 use App\Http\Controllers\Api\PaymentHistoryController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ProgramController;
@@ -163,6 +164,11 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::get('/health-reports', [HealthReportController::class, 'index'])->name('api.health-reports.index');
         Route::get('/health-reports/{healthReport}', [HealthReportController::class, 'show'])->name('api.health-reports.show');
         Route::get('/health-reports/{healthReport}/file/{type}', [HealthReportController::class, 'file'])->name('api.health-reports.file');
+
+        // Owner-side guest routes (cross-device)
+        Route::get('/my-guests', [OwnerGuestController::class, 'index'])->middleware(EnsureActiveSubscription::class)->name('api.my-guests.index');
+        Route::get('/my-guests/{guest}/usage-histories', [OwnerGuestController::class, 'usageHistories'])->middleware(EnsureActiveSubscription::class)->name('api.my-guests.usage-histories');
+        Route::get('/my-guests/{guest}/health-reports', [OwnerGuestController::class, 'healthReports'])->middleware(EnsureActiveSubscription::class)->name('api.my-guests.health-reports');
 
         // Subscription routes
         Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('api.subscriptions.index');

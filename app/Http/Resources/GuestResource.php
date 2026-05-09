@@ -24,6 +24,13 @@ class GuestResource extends BaseResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'user' => $this->whenLoaded('user'),
+            'device' => $this->whenLoaded('device', function () {
+                return [
+                    'id' => $this->device?->id,
+                    'uuid' => $this->device?->uuid,
+                    'name' => $this->device?->name,
+                ];
+            }),
             'token' => $this->when(isset($this->token), $this->token),
         ];
     }
