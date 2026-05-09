@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ButtonGroup, ButtonGroupText } from '@/components/ui/button-group';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
@@ -158,7 +159,10 @@ export default function UsersCreate() {
                                     <div className="grid gap-2">
                                         <Label htmlFor="phone">Phone</Label>
 
-                                        <Input id="phone" name="phone" placeholder="Phone" />
+                                        <InputGroup>
+                                            <InputGroupInput id="phone" name="phone" placeholder="Phone" />
+                                            <InputGroupAddon>+60</InputGroupAddon>
+                                        </InputGroup>
 
                                         <InputError message={errors.phone} />
                                     </div>

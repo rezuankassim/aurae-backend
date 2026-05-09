@@ -43,6 +43,7 @@ class UserController extends Controller
     {
         $validated = $request->validated();
 
+        $validated['phone'] = '+60' . $validated['phone'];
         $validated['password'] = Hash::make($validated['password']);
         $validated['is_admin'] = $validated['type'] == 1 ? true : false;
 
