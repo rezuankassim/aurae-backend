@@ -99,8 +99,7 @@ class OwnerGuestController extends Controller
             $query->where('therapy_id', $request->input('therapy_id'));
         }
 
-        $perPage = (int) $request->input('per_page', 20);
-        $usageHistories = $query->latest()->paginate($perPage);
+        $usageHistories = $query->latest()->get();
 
         return UsageHistoryResource::collection($usageHistories)
             ->additional([
