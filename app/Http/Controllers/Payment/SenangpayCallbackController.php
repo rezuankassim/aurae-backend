@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Payment;
 use App\Events\PaymentCompleted;
 use App\Http\Controllers\Controller;
 use App\Mail\Orders\OrderInvoiceMail;
+use App\Mail\Orders\OrderReceivedAdminMail;
 use App\Models\SubscriptionTransaction;
 use App\Models\UserSubscription;
 use App\Services\SenangpaySignatureService;
@@ -306,6 +307,18 @@ class SenangpayCallbackController extends Controller
         } else {
             Log::warning('SenangPay capture: No customer email found, invoice not sent', [
                 'order_id' => $order->id,
+            ]);
+        }
+
+        // Send notification email to admin
+        $adminEmail = config('mail.admin_order_email');
+
+        if ($adminEmail) {
+            Mail::to($adminEmail)->queue(new OrderReceivedAdminMail($order));
+
+            Log::info('SenangPay capture: Admin notification email queued', [
+                'order_id' => $order->id,
+                'admin_email' => $adminEmail,
             ]);
         }
     }

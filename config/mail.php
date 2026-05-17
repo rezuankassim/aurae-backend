@@ -113,4 +113,16 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Order Notification Email
+    |--------------------------------------------------------------------------
+    |
+    | When set, the admin will receive an email notification whenever a
+    | customer completes payment for an order. Leave null to disable.
+    |
+    */
+
+    'admin_order_email' => env('ADMIN_ORDER_EMAIL'),
+
 ];
