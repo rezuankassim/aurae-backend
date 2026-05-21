@@ -48,7 +48,7 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\Events\ConnectionPruned;
 use Livewire\Livewire;
@@ -214,6 +214,12 @@ class AppServiceProvider extends ServiceProvider
 
         Livewire::component('app.lunar.widgets.product-options-widget', \App\Lunar\Widgets\ProductOptionsWidget::class);
         Livewire::component('app.lunar.pages.manage-shipping-rates-page', \App\Lunar\Pages\ManageShippingRatesPage::class);
+
+        \Lunar\Models\CollectionGroup::creating(function ($collectionGroup) {
+            if (empty($collectionGroup->handle)) {
+                $collectionGroup->handle = Str::slug($collectionGroup->name);
+            }
+        });
 
         Event::listen(Login::class, LogSuccessfulLogin::class);
         Event::listen(Logout::class, LogLogout::class);
