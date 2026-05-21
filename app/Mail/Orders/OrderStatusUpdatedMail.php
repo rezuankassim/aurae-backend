@@ -44,7 +44,7 @@ class OrderStatusUpdatedMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'mail.orders.status-updated',
+            markdown: 'mail.orders.status-updated',
         );
     }
 }
