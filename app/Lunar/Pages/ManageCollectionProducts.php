@@ -47,7 +47,7 @@ class ManageCollectionProducts extends BaseManageCollectionProducts
                         ->required()
                         ->searchable()
                         ->options(function (self $livewire): array {
-                            $existingIds = $livewire->getRelationship()->pluck('id')->toArray();
+                            $existingIds = $livewire->getRelationship()->pluck('lunar_products.id')->toArray();
 
                             return Product::whereNotIn('id', $existingIds)
                                 ->get()
