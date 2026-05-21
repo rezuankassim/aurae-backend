@@ -13,6 +13,7 @@ use App\Lunar\Extensions\BrandResourceExtension;
 use App\Lunar\Extensions\CollectionGroupCreateExtension;
 use App\Lunar\Extensions\CollectionGroupEditExtension;
 use App\Lunar\Extensions\CollectionGroupResourceExtension;
+use App\Lunar\Extensions\CollectionResourceExtension;
 use App\Lunar\Extensions\CurrencyResourceExtension;
 use App\Lunar\Extensions\CustomerListExtension;
 use App\Lunar\Extensions\CustomerResourceExtension;
@@ -26,18 +27,19 @@ use App\Lunar\Extensions\ManageProductPricingExtension;
 use App\Lunar\Extensions\ManageProductVariantsExtension;
 use App\Lunar\Extensions\ManageVariantInventoryExtension;
 use App\Lunar\Extensions\ManageVariantPricingExtension;
-use App\Lunar\Extensions\ProductVariantResourceExtension;
-use App\Lunar\Pages\ManageProductPricingPage;
-use App\Lunar\Pages\ManageVariantPricingPage;
 use App\Lunar\Extensions\ProductConditionRelationManagerExtension;
 use App\Lunar\Extensions\ProductLimitationRelationManagerExtension;
 use App\Lunar\Extensions\ProductResourceExtension;
 use App\Lunar\Extensions\ProductRewardRelationManagerExtension;
-use App\Lunar\Extensions\ShippingExclusionRelationManagerExtension;
+use App\Lunar\Extensions\ProductVariantResourceExtension;
+use App\Lunar\Extensions\ShippingExclusionListResourceExtension;
 use App\Lunar\Extensions\ShippingMethodEditExtension;
 use App\Lunar\Extensions\ShippingMethodListExtension;
 use App\Lunar\Extensions\ShippingMethodResourceExtension;
 use App\Lunar\Extensions\ShippingZoneResourceExtension;
+use App\Lunar\Extensions\UserRelationManagerExtension;
+use App\Lunar\Pages\ManageProductPricingPage;
+use App\Lunar\Pages\ManageVariantPricingPage;
 use App\Models\User;
 use App\PaymentTypes\SenangpayPayment;
 use Filament\Http\Middleware\Authenticate;
@@ -50,12 +52,15 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\Events\ConnectionPruned;
 use Livewire\Livewire;
+use Lunar\Admin\Filament\Resources\BrandResource;
 use Lunar\Admin\Filament\Resources\CollectionGroupResource;
 use Lunar\Admin\Filament\Resources\CollectionGroupResource\Pages\CreateCollectionGroup;
 use Lunar\Admin\Filament\Resources\CollectionGroupResource\Pages\EditCollectionGroup;
+use Lunar\Admin\Filament\Resources\CollectionResource;
 use Lunar\Admin\Filament\Resources\CurrencyResource;
 use Lunar\Admin\Filament\Resources\CustomerResource;
 use Lunar\Admin\Filament\Resources\CustomerResource\Pages\ListCustomers;
+use Lunar\Admin\Filament\Resources\CustomerResource\RelationManagers\UserRelationManager;
 use Lunar\Admin\Filament\Resources\DiscountResource;
 use Lunar\Admin\Filament\Resources\DiscountResource\Pages\EditDiscount;
 use Lunar\Admin\Filament\Resources\DiscountResource\Pages\ListDiscounts;
@@ -63,7 +68,6 @@ use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductCond
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductLimitationRelationManager;
 use Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers\ProductRewardRelationManager;
 use Lunar\Admin\Filament\Resources\OrderResource\Pages\ManageOrder;
-use Lunar\Admin\Filament\Resources\BrandResource;
 use Lunar\Admin\Filament\Resources\ProductResource;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ListProducts;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductInventory;
@@ -73,10 +77,10 @@ use Lunar\Admin\Filament\Resources\ProductVariantResource;
 use Lunar\Admin\Filament\Resources\ProductVariantResource\Pages\ManageVariantInventory;
 use Lunar\Admin\Filament\Resources\ProductVariantResource\Pages\ManageVariantPricing;
 use Lunar\Admin\Support\Facades\LunarPanel;
-use Lunar\Shipping\Filament\Resources\ShippingExclusionListResource\RelationManagers\ShippingExclusionRelationManager;
+use Lunar\Shipping\Filament\Resources\ShippingExclusionListResource;
+use Lunar\Shipping\Filament\Resources\ShippingMethodResource;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\EditShippingMethod;
 use Lunar\Shipping\Filament\Resources\ShippingMethodResource\Pages\ListShippingMethod;
-use Lunar\Shipping\Filament\Resources\ShippingMethodResource;
 use Lunar\Shipping\Filament\Resources\ShippingZoneResource;
 use Lunar\Shipping\ShippingPlugin;
 
@@ -128,6 +132,7 @@ class AppServiceProvider extends ServiceProvider
                 CreateCollectionGroup::class => CollectionGroupCreateExtension::class,
                 EditCollectionGroup::class => CollectionGroupEditExtension::class,
                 CollectionGroupResource::class => CollectionGroupResourceExtension::class,
+                CollectionResource::class => CollectionResourceExtension::class,
                 CustomerResource::class => CustomerResourceExtension::class,
                 ListCustomers::class => CustomerListExtension::class,
                 EditDiscount::class => DiscountEditExtension::class,
@@ -147,11 +152,12 @@ class AppServiceProvider extends ServiceProvider
                 ManageVariantPricingPage::class => ManageVariantPricingExtension::class,
                 ProductResource::class => ProductResourceExtension::class,
                 ProductVariantResource::class => ProductVariantResourceExtension::class,
-                ShippingExclusionRelationManager::class => ShippingExclusionRelationManagerExtension::class,
+                ShippingExclusionListResource::class => ShippingExclusionListResourceExtension::class,
                 EditShippingMethod::class => ShippingMethodEditExtension::class,
                 ListShippingMethod::class => ShippingMethodListExtension::class,
                 ShippingMethodResource::class => ShippingMethodResourceExtension::class,
                 ShippingZoneResource::class => ShippingZoneResourceExtension::class,
+                UserRelationManager::class => UserRelationManagerExtension::class,
             ])
             ->panel(function (Panel $panel) {
                 return $panel
@@ -199,6 +205,11 @@ class AppServiceProvider extends ServiceProvider
         \Lunar\Facades\ModelManifest::replace(
             \Lunar\Models\Contracts\ProductVariant::class,
             \App\Models\ProductVariant::class,
+        );
+
+        \Lunar\Facades\ModelManifest::replace(
+            \Lunar\Models\Contracts\OrderLine::class,
+            \App\Models\OrderLine::class,
         );
 
         Livewire::component('app.lunar.widgets.product-options-widget', \App\Lunar\Widgets\ProductOptionsWidget::class);

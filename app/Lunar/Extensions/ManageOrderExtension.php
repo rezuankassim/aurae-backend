@@ -4,6 +4,7 @@ namespace App\Lunar\Extensions;
 
 use App\Lunar\Actions\UpdateStatusAction;
 use Filament\Infolists\Components\Entry;
+use Filament\Infolists\Components\Section;
 use Lunar\Admin\Livewire\Components\ActivityLogFeed;
 use Lunar\Admin\Support\Actions\Orders\UpdateStatusAction as BaseUpdateStatusAction;
 use Lunar\Admin\Support\Extending\ViewPageExtension;
@@ -13,6 +14,11 @@ class ManageOrderExtension extends ViewPageExtension
     public function extendOrderSummaryChannelEntry(Entry $entry): Entry
     {
         return $entry->hidden();
+    }
+
+    public function extendTagsSection(Section $section): Section
+    {
+        return $section->hidden();
     }
 
     public function headerActions(array $actions): array

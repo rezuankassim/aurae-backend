@@ -1,30 +1,23 @@
 <?php
 
-namespace App\Lunar\Extensions;
+namespace App\Lunar\RelationManagers;
 
 use Filament\Forms;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
-use Lunar\Admin\Support\Extending\RelationManagerExtension;
+use Filament\Forms\Form;
 use Lunar\Models\Contracts\Product as ProductContract;
 use Lunar\Models\Product;
+use Lunar\Shipping\Filament\Resources\ShippingExclusionListResource\RelationManagers\ShippingExclusionRelationManager as BaseShippingExclusionRelationManager;
 
-class ShippingExclusionRelationManagerExtension extends RelationManagerExtension
+class ShippingExclusionRelationManager extends BaseShippingExclusionRelationManager
 {
-    public function extendTable(Table $table): Table
+    public function form(Form $form): Form
     {
-        return $table->headerActions([
-            Tables\Actions\CreateAction::make()->form([
+        return $form
+            ->schema([
                 Forms\Components\MorphToSelect::make('purchasable')
-                    ->searchable(true)
-                    ->preload()
                     ->types([
                         Forms\Components\MorphToSelect\Type::make(Product::modelClass())
                             ->titleAttribute('name.en')
-                            ->getOptionLabelUsing(
-                                fn (Model $record) => $record->purchasable->attr('name')
-                            )
                             ->getOptionsUsing(static function (): array {
                                 return Product::modelClass()::all()
                                     ->mapWithKeys(fn (ProductContract $record): array => [$record->getKey() => $record->attr('name')])
@@ -40,8 +33,9 @@ class ShippingExclusionRelationManagerExtension extends RelationManagerExtension
                     ->label(
                         __('lunarpanel.shipping::relationmanagers.exclusions.form.purchasable.label')
                     )
-                    ->required(),
-            ]),
-        ]);
+                    ->required()
+                    ->searchable(true)
+                    ->preload(),
+            ]);
     }
 }
