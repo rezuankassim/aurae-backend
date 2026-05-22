@@ -21,7 +21,7 @@ class CustomerResourceExtension extends ResourceExtension
             fn ($filter) => $filter->getName() !== 'customer_group'
         ));
 
-        return $table->columns($columns)->filters($filters)->bulkActions([]);
+        return $table->columns($columns)->filters($filters)->bulkActions([])->recordAction(null);
     }
 
     public function extendForm(Form $form): Form
