@@ -9,6 +9,6 @@ class UserRelationManagerExtension extends RelationManagerExtension
 {
     public function extendTable(Table $table): Table
     {
-        return $table->actions([]);
+        return $table->actions([])->recordAction(null);
     }
 }
