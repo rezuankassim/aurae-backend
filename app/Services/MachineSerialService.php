@@ -8,14 +8,13 @@ use App\Models\Machine;
 class MachineSerialService
 {
     /**
-     * Default format: {MMMM}{YYYY}{SSSS} {V}
-     * Example: A10120260001 1
+     * Default format: {MMMM}{YYYY}{SSSS}
+     * Example: A10120260001
      * - MMMM: Machine serial prefix/model (4 chars, e.g., A101)
      * - YYYY: Year (4 digits)
      * - SSSS: Product serial (4 digits, zero-padded)
-     * - V: Variation code (1 digit, separated by space)
      */
-    protected const DEFAULT_FORMAT = '{MMMM}{YYYY}{SSSS} {V}';
+    protected const DEFAULT_FORMAT = '{MMMM}{YYYY}{SSSS}';
 
     protected const DEFAULT_PREFIX = 'A101';
 
@@ -30,57 +29,7 @@ class MachineSerialService
             return false;
         }
 
-        // Note: {V} is now treated as a user-provided variation code, not a calculated check digit
-        // No additional validation needed beyond the regex pattern match
-
         return true;
-    }
-
-    /**
-     * Validate the check digit of a serial number.
-     */
-    public function validateCheckDigit(string $serialNumber): bool
-    {
-        if (strlen($serialNumber) < 2) {
-            return false;
-        }
-
-        $baseSerial = substr($serialNumber, 0, -1);
-        $providedCheckDigit = (int) substr($serialNumber, -1);
-        $calculatedCheckDigit = $this->calculateCheckDigit($baseSerial);
-
-        return $providedCheckDigit === $calculatedCheckDigit;
-    }
-
-    /**
-     * Calculate check digit using Luhn algorithm variant.
-     * This ensures serial number validity can be verified.
-     */
-    protected function calculateCheckDigit(string $baseSerial): int
-    {
-        $sum = 0;
-        $length = strlen($baseSerial);
-
-        for ($i = 0; $i < $length; $i++) {
-            $char = $baseSerial[$i];
-
-            // Convert letters to numbers (A=10, B=11, etc.)
-            if (ctype_alpha($char)) {
-                $value = ord(strtoupper($char)) - ord('A') + 10;
-            } else {
-                $value = (int) $char;
-            }
-
-            // Apply weight based on position (alternating 1, 2)
-            $weight = ($i % 2 === 0) ? 1 : 2;
-            $weighted = $value * $weight;
-
-            // Sum the digits if weighted value > 9
-            $sum += ($weighted > 9) ? $weighted - 9 : $weighted;
-        }
-
-        // Return check digit (0-9)
-        return (10 - ($sum % 10)) % 10;
     }
 
     /**
@@ -115,12 +64,10 @@ class MachineSerialService
      */
     protected function extractProductSerial(string $serialNumber): ?int
     {
-        // Format: A101YYYYSSSS V - extract SSSS (positions 8-11, 0-indexed)
-        // The serial is: PREFIX(4) + YEAR(4) + SERIAL(4) + SPACE(1) + VARIATION(1) = 14 chars
-        // Or without space: PREFIX(4) + YEAR(4) + SERIAL(4) + VARIATION(1) = 13 chars
-        $cleanSerial = str_replace(' ', '', $serialNumber);
-        if (strlen($cleanSerial) >= 12) {
-            $serialPart = substr($cleanSerial, 8, 4);
+        // Format: A101YYYYSSSS - extract SSSS (positions 8-11, 0-indexed)
+        // The serial is: PREFIX(4) + YEAR(4) + SERIAL(4) = 12 chars
+        if (strlen($serialNumber) >= 12) {
+            $serialPart = substr($serialNumber, 8, 4);
             if (is_numeric($serialPart)) {
                 return (int) $serialPart;
             }
@@ -131,12 +78,12 @@ class MachineSerialService
 
     /**
      * Generate regex pattern for validation.
-     * Accepts format: A10120260001 1 (with space) or A101202600011 (without space)
+     * Accepts format: A10120260001
      */
     protected function getValidationPattern(): string
     {
-        // Pattern: 4 alphanumeric (model) + 4 digits (year) + 4 digits (product code) + optional space + 1 digit (variation)
-        return '/^[A-Z0-9]{4}\d{4}\d{4} ?\d{1}$/';
+        // Pattern: 4 alphanumeric (model) + 4 digits (year) + 4 digits (product code)
+        return '/^[A-Z0-9]{4}\d{4}\d{4}$/';
     }
 
     /**
@@ -177,13 +124,6 @@ class MachineSerialService
             $formatted = str_replace('{NN}', str_pad($number, 2, '0', STR_PAD_LEFT), $formatted);
         }
 
-        // Calculate and append validation digit if format includes {V}
-        if (str_contains($formatted, '{V}')) {
-            $baseSerial = str_replace('{V}', '', $formatted);
-            $checkDigit = $this->calculateCheckDigit($baseSerial);
-            $formatted = str_replace('{V}', (string) $checkDigit, $formatted);
-        }
-
         return $formatted;
     }
 
@@ -206,7 +146,6 @@ class MachineSerialService
      * @param  string  $model  4-character model code (e.g., A101)
      * @param  string  $year  4-digit year
      * @param  int  $startProductCode  Starting product code (will increment)
-     * @param  string  $variationCode  1-digit variation code
      * @param  int  $status  Machine status (0 or 1)
      * @param  string|null  $thumbnail  S3 path for thumbnail image
      * @param  string|null  $detailImage  S3 path for detail image
@@ -217,7 +156,6 @@ class MachineSerialService
         string $model = 'A101',
         ?string $year = null,
         int $startProductCode = 1,
-        string $variationCode = '1',
         int $status = 1,
         ?string $thumbnail = null,
         ?string $detailImage = null
@@ -227,7 +165,7 @@ class MachineSerialService
 
         for ($i = 0; $i < $quantity; $i++) {
             $productCode = str_pad($startProductCode + $i, 4, '0', STR_PAD_LEFT);
-            $serialNumber = "{$model}{$year}{$productCode} {$variationCode}";
+            $serialNumber = "{$model}{$year}{$productCode}";
 
             $machines[] = Machine::create([
                 'serial_number' => $serialNumber,
@@ -250,7 +188,6 @@ class MachineSerialService
             'has_prefix' => str_contains($format, '{MMMM}') || str_contains($format, '{PREFIX}'),
             'has_year' => str_contains($format, '{YYYY}'),
             'has_month' => str_contains($format, '{MM}'),
-            'has_validation' => str_contains($format, '{V}'),
             'serial_length' => $this->getSerialLength($format),
             'pattern' => $this->getValidationPattern(),
         ];
@@ -282,20 +219,18 @@ class MachineSerialService
      */
     public function parseSerialNumber(string $serialNumber): array
     {
-        // Expected format: A10120260001 1 (14 chars with space) or A101202600011 (13 chars without space)
-        // MMMM(4) + YYYY(4) + SSSS(4) + SPACE?(1) + V(1)
-        $cleanSerial = str_replace(' ', '', $serialNumber);
-        if (strlen($cleanSerial) !== 13) {
+        // Expected format: A10120260001 (12 chars)
+        // MMMM(4) + YYYY(4) + SSSS(4)
+        if (strlen($serialNumber) !== 12) {
             return [
                 'valid' => false,
                 'error' => 'Invalid serial number length',
             ];
         }
 
-        $prefix = substr($cleanSerial, 0, 4);
-        $year = substr($cleanSerial, 4, 4);
-        $productSerial = substr($cleanSerial, 8, 4);
-        $variation = substr($cleanSerial, 12, 1);
+        $prefix = substr($serialNumber, 0, 4);
+        $year = substr($serialNumber, 4, 4);
+        $productSerial = substr($serialNumber, 8, 4);
 
         return [
             'valid' => true,
@@ -304,7 +239,6 @@ class MachineSerialService
             'year' => $year,
             'product_serial' => $productSerial,
             'product_code' => $productSerial,
-            'variation_code' => $variation,
             'full_serial' => $serialNumber,
         ];
     }

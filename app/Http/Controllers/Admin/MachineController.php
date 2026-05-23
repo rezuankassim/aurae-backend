@@ -78,7 +78,6 @@ class MachineController extends Controller
             'model' => ['nullable', 'string', 'size:4'],
             'year' => ['nullable', 'string', 'size:4'],
             'start_product_code' => ['nullable', 'integer', 'min:1', 'max:9999'],
-            'variation_code' => ['nullable', 'string', 'size:1'],
             'thumbnail' => ['nullable', 'image', 'max:5120'], // 5MB max
             'detail_image' => ['nullable', 'image', 'max:5120'], // 5MB max
         ]);
@@ -102,7 +101,6 @@ class MachineController extends Controller
                 model: $validated['model'] ?? 'A101',
                 year: $validated['year'] ?? date('Y'),
                 startProductCode: (int) ($validated['start_product_code'] ?? 1),
-                variationCode: $validated['variation_code'] ?? '1',
                 status: (int) $validated['status'],
                 thumbnail: $thumbnailPath,
                 detailImage: $detailImagePath

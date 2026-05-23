@@ -46,22 +46,14 @@ class MachineController extends Controller
                 ->setStatusCode(404);
         }
 
-        // 2. Normalize serial number - add space before last digit if not present
-        $serialNumber = $validated['serial_number'];
-        $serialNumber = trim($serialNumber);
+        // 2. Validate serial number format
+        $serialNumber = trim($validated['serial_number']);
 
-        // If serial is 13 chars without space, convert to format with space (14 chars)
-        // Format: A10120260001 1 (model + year + product_code + space + variation)
-        if (strlen($serialNumber) === 13 && ! str_contains($serialNumber, ' ')) {
-            $serialNumber = substr($serialNumber, 0, 12).' '.substr($serialNumber, 12, 1);
-        }
-
-        // Validate serial number format
         if (! $this->serialService->validateFormat($serialNumber)) {
             return BaseResource::make([])
                 ->additional([
                     'status' => 422,
-                    'message' => 'Invalid serial number format. Expected format: A10120260001 1 (Model + Year + Product Code + Validation)',
+                    'message' => 'Invalid serial number format. Expected format: A10120260001 (Model + Year + Product Code)',
                 ])
                 ->response()
                 ->setStatusCode(422);
@@ -160,14 +152,8 @@ class MachineController extends Controller
                 ->setStatusCode(403);
         }
 
-        // 5. Find Machine by serial_number (try both with and without space)
+        // 5. Find Machine by serial_number
         $machine = Machine::where('serial_number', $serialNumber)->first();
-
-        // Also try without space in case stored differently
-        if (! $machine) {
-            $serialWithoutSpace = str_replace(' ', '', $serialNumber);
-            $machine = Machine::where('serial_number', $serialWithoutSpace)->first();
-        }
 
         if (! $machine) {
             return BaseResource::make([])

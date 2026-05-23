@@ -111,11 +111,11 @@ export default function EditMachine({ machine }: Props) {
                                     id="serial_number"
                                     value={data.serial_number}
                                     onChange={(e) => setData('serial_number', e.target.value)}
-                                    placeholder="A10120260001 1"
+                                    placeholder="A10120260001"
                                     required
                                 />
                                 {errors.serial_number && <p className="text-sm text-red-600">{errors.serial_number}</p>}
-                                <p className="text-xs text-muted-foreground">Format: [Model][Year][Product Code] [Variation]</p>
+                                <p className="text-xs text-muted-foreground">Format: [Model][Year][Product Code]</p>
                             </div>
 
                             <div className="space-y-2">

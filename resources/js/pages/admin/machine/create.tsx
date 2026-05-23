@@ -33,7 +33,6 @@ export default function CreateMachine({ next_serial }: Props) {
         model: string;
         year: string;
         product_code: string;
-        variation_code: string;
         status: string;
         quantity: string;
         start_product_code: string;
@@ -45,7 +44,6 @@ export default function CreateMachine({ next_serial }: Props) {
         model: 'A101',
         year: new Date().getFullYear().toString(),
         product_code: '',
-        variation_code: '1',
         status: '1',
         quantity: '',
         start_product_code: '1',
@@ -78,14 +76,14 @@ export default function CreateMachine({ next_serial }: Props) {
 
     // Build serial number from components
     useEffect(() => {
-        if (data.model && data.year && data.product_code && data.variation_code) {
-            const serial = `${data.model}${data.year}${data.product_code.padStart(4, '0')} ${data.variation_code}`;
+        if (data.model && data.year && data.product_code) {
+            const serial = `${data.model}${data.year}${data.product_code.padStart(4, '0')}`;
             setData('serial_number', serial);
         } else if (!data.product_code) {
             setData('serial_number', '');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [data.model, data.year, data.product_code, data.variation_code]);
+    }, [data.model, data.year, data.product_code]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -155,58 +153,47 @@ export default function CreateMachine({ next_serial }: Props) {
                     </Card>
 
                     {!isBulk && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Serial Number</CardTitle>
-                                <CardDescription>Format: [Model][Year][Product Code] [Variation] — Example: A10120260001 1</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="grid grid-cols-4 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="model">Model (4 chars)</Label>
-                                        <Input
-                                            id="model"
-                                            value={data.model}
-                                            onChange={(e) => setData('model', e.target.value.toUpperCase().slice(0, 4))}
-                                            placeholder="A101"
-                                            maxLength={4}
-                                        />
-                                        <p className="text-xs text-muted-foreground">e.g., A101</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="year">Year (4 digits)</Label>
-                                        <Input
-                                            id="year"
-                                            value={data.year}
-                                            onChange={(e) => setData('year', e.target.value.replace(/\D/g, '').slice(0, 4))}
-                                            placeholder="2026"
-                                            maxLength={4}
-                                        />
-                                        <p className="text-xs text-muted-foreground">e.g., 2026</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="product_code">Product Code</Label>
-                                        <Input
-                                            id="product_code"
-                                            value={data.product_code}
-                                            onChange={(e) => setData('product_code', e.target.value.replace(/\D/g, '').slice(0, 4))}
-                                            placeholder="0001"
-                                            maxLength={4}
-                                        />
-                                        <p className="text-xs text-muted-foreground">4 digits, e.g., 0001</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="variation_code">Variation</Label>
-                                        <Input
-                                            id="variation_code"
-                                            value={data.variation_code}
-                                            onChange={(e) => setData('variation_code', e.target.value.replace(/\D/g, '').slice(0, 1))}
-                                            placeholder="1"
-                                            maxLength={1}
-                                        />
-                                        <p className="text-xs text-muted-foreground">1 digit</p>
-                                    </div>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Serial Number</CardTitle>
+                            <CardDescription>Format: [Model][Year][Product Code] — Example: A10120260001</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="model">Model (4 chars)</Label>
+                                    <Input
+                                        id="model"
+                                        value={data.model}
+                                        onChange={(e) => setData('model', e.target.value.toUpperCase().slice(0, 4))}
+                                        placeholder="A101"
+                                        maxLength={4}
+                                    />
+                                    <p className="text-xs text-muted-foreground">e.g., A101</p>
                                 </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="year">Year (4 digits)</Label>
+                                    <Input
+                                        id="year"
+                                        value={data.year}
+                                        onChange={(e) => setData('year', e.target.value.replace(/\D/g, '').slice(0, 4))}
+                                        placeholder="2026"
+                                        maxLength={4}
+                                    />
+                                    <p className="text-xs text-muted-foreground">e.g., 2026</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="product_code">Product Code</Label>
+                                    <Input
+                                        id="product_code"
+                                        value={data.product_code}
+                                        onChange={(e) => setData('product_code', e.target.value.replace(/\D/g, '').slice(0, 4))}
+                                        placeholder="0001"
+                                        maxLength={4}
+                                    />
+                                    <p className="text-xs text-muted-foreground">4 digits, e.g., 0001</p>
+                                </div>
+                            </div>
 
                                 <div className="rounded-lg bg-muted p-4">
                                     <Label className="text-muted-foreground">Generated Serial Number</Label>
@@ -224,14 +211,14 @@ export default function CreateMachine({ next_serial }: Props) {
 
                     {isBulk && (
                         <Card>
-                            <CardHeader>
+                        <CardHeader>
                                 <CardTitle>Bulk Serial Number Format</CardTitle>
                                 <CardDescription>
-                                    Format: [Model][Year][Product Code] [Variation] — Product code will increment for each machine
+                                    Format: [Model][Year][Product Code] — Product code will increment for each machine
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="grid grid-cols-4 gap-4">
+                                <div className="grid grid-cols-3 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="bulk_model">Model (4 chars)</Label>
                                         <Input
@@ -265,17 +252,6 @@ export default function CreateMachine({ next_serial }: Props) {
                                         />
                                         <p className="text-xs text-muted-foreground">Will increment</p>
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="bulk_variation">Variation</Label>
-                                        <Input
-                                            id="bulk_variation"
-                                            value={data.variation_code}
-                                            onChange={(e) => setData('variation_code', e.target.value.replace(/\D/g, '').slice(0, 1))}
-                                            placeholder="1"
-                                            maxLength={1}
-                                        />
-                                        <p className="text-xs text-muted-foreground">1 digit</p>
-                                    </div>
                                 </div>
 
                                 <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
@@ -288,7 +264,7 @@ export default function CreateMachine({ next_serial }: Props) {
                                                 <div key={i}>
                                                     {data.model}
                                                     {data.year}
-                                                    {productCode} {data.variation_code}
+                                                    {productCode}
                                                 </div>
                                             );
                                         })}
@@ -299,7 +275,6 @@ export default function CreateMachine({ next_serial }: Props) {
                                 {errors.model && <p className="text-sm text-red-600">{errors.model}</p>}
                                 {errors.year && <p className="text-sm text-red-600">{errors.year}</p>}
                                 {errors.start_product_code && <p className="text-sm text-red-600">{errors.start_product_code}</p>}
-                                {errors.variation_code && <p className="text-sm text-red-600">{errors.variation_code}</p>}
                             </CardContent>
                         </Card>
                     )}
