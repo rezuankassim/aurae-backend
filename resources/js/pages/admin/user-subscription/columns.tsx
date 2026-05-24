@@ -17,8 +17,8 @@ export const columns: ColumnDef<UserSubscription>[] = [
             const user = row.original.user;
             return (
                 <div>
-                    <p className="font-medium">{user.name ?? '-'}</p>
-                    <p className="text-xs text-muted-foreground">{user.email ?? '-'}</p>
+                    <p className="font-medium">{user?.name ?? '-'}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email ?? '-'}</p>
                 </div>
             );
         },

@@ -17,7 +17,7 @@ class UserSubscriptionController extends Controller
      */
     public function index(Request $request)
     {
-        $query = UserSubscription::with(['user', 'subscription']);
+        $query = UserSubscription::with(['user', 'subscription'])->whereHas('user');
 
         // Search filter
         if ($request->has('search')) {
