@@ -111,15 +111,27 @@ class ProgramController extends Controller
         }
 
         // date format 24042026 14:42:57
-        $startedAt = Carbon::createFromFormat('dmY H:i:s', $usageHistory->content->started_at);
-        $endedAt = Carbon::createFromFormat('dmY H:i:s', $request->input('program_end_at'));
-        $duration = $startedAt->diffInMinutes($endedAt);
-        $content = [
-            'duration' => round($duration, 2),
-            'force_stopped' => $emergency,
-            'started_at' => $usageHistory ? $usageHistory->content->started_at : null,
-            'ended_at' => $request->input('program_end_at'),
-        ];
+        if (!$usageHistory) {
+            $startedAt = null;
+            $endedAt = Carbon::createFromFormat('dmY H:i:s', $request->input('program_end_at'));
+            $duration = $programLog->program_duration;
+            $content = [
+                'duration' => round($duration, 2),
+                'force_stopped' => $emergency,
+                'started_at' => null,
+                'ended_at' => $request->input('program_end_at'),
+            ];
+        } else {
+            $startedAt = Carbon::createFromFormat('dmY H:i:s', $usageHistory->content->started_at);
+            $endedAt = Carbon::createFromFormat('dmY H:i:s', $request->input('program_end_at'));
+            $duration = $startedAt->diffInMinutes($endedAt);
+            $content = [
+                'duration' => round($duration, 2),
+                'force_stopped' => $emergency,
+                'started_at' => $usageHistory ? $usageHistory->content->started_at : null,
+                'ended_at' => $request->input('program_end_at'),
+            ];
+        }
 
         $usageHistory->update([
             'content' => $content,
