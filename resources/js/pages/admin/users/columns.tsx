@@ -47,6 +47,14 @@ export const columns: ColumnDef<User>[] = [
         },
     },
     {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => {
+            const status = row.original.status;
+            return <Badge variant={status ? 'default' : 'outline'}>{status ? 'Active' : 'Inactive'}</Badge>;
+        },
+    },
+    {
         accessorKey: 'name',
         header: 'Name',
     },

@@ -46,6 +46,16 @@ class AuthenticationController extends Controller
             ]);
         }
 
+        if ($user->status !== 1) {
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 403,
+                    'message' => 'Your user account is inactive. Please contact support.',
+                ])
+                ->response()
+                ->setStatusCode(403);
+        }
+
         $request->device->update([
             'deviceable_type' => User::class,
             'deviceable_id' => $user->id,

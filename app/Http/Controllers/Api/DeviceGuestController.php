@@ -132,7 +132,7 @@ class DeviceGuestController extends Controller
                 ->setStatusCode(403);
         }
 
-        if (! $guest->user) {
+        if (! $guest->user || $guest->user->status !== 1) {
             return BaseResource::make([])
                 ->additional([
                     'status' => 403,

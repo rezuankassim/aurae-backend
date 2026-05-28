@@ -164,6 +164,16 @@ class DeviceController extends Controller
                 ->setStatusCode(403);
         }
 
+        if ($user->status !== 1) {
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 403,
+                    'message' => 'Your user account is inactive. Please contact support.',
+                ])
+                ->response()
+                ->setStatusCode(403);
+        }
+
         // Update last logged in timestamp
         $device->update([
             'last_logged_in_at' => now(),
