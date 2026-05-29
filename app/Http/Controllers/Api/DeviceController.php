@@ -164,7 +164,7 @@ class DeviceController extends Controller
                 ->setStatusCode(403);
         }
 
-        if ($user->status !== 1) {
+        if ($request->user()->status !== 1) {
             return BaseResource::make([])
                 ->additional([
                     'status' => 403,
