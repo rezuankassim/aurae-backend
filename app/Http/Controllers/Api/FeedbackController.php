@@ -17,6 +17,7 @@ class FeedbackController extends Controller
         $request->validate([
             'description' => ['required', 'string'],
         ]);
+        dd($request->user());
         $userId = $request->user('sanctum')?->id;
 
         $feedback = Feedback::create([
