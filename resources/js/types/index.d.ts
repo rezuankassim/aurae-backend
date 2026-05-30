@@ -162,7 +162,7 @@ export interface Faq {
 
 export interface Feedback {
     id: number;
-    user_id: number;
+    user_id: number | null;
     user?: User;
     description: string;
     created_at: string;

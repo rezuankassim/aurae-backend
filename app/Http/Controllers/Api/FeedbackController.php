@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Models\Feedback;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class FeedbackController extends Controller
 {
@@ -18,10 +17,10 @@ class FeedbackController extends Controller
         $request->validate([
             'description' => ['required', 'string'],
         ]);
-        $user = Auth::guard('sanctum')->user();
+        $userId = $request->user('sanctum')?->id;
 
         $feedback = Feedback::create([
-            'user_id' => $user?->id,
+            'user_id' => $userId,
             'description' => $request->input('description'),
         ]);
 
