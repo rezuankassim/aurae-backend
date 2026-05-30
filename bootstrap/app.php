@@ -4,6 +4,7 @@ use App\Http\Middleware\CheckAppVersion;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\HandleLoginSessionIdLogger;
+use App\Http\Middleware\OptionalSanctumAuth;
 use App\Http\Resources\BaseResource;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -36,6 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'check.app.version' => CheckAppVersion::class,
+            'sanctum.optional' => OptionalSanctumAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
