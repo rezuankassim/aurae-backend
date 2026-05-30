@@ -59,7 +59,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
     Route::get('/terms-and-conditions', [LegalController::class, 'termsAndConditions'])->name('api.legal.terms');
     Route::get('/privacy-policy', [LegalController::class, 'privacyPolicy'])->name('api.legal.privacy');
 
-    Route::post('/feedback', [FeedbackController::class, 'store'])->name('api.feedback.store')->middleware('auth:sanctum');
+    Route::post('/feedback', [FeedbackController::class, 'store'])->name('api.feedback.store')->middleware('sanctum.optional');
 
     Route::post('/check-unique-values', [AuthenticationController::class, 'checkUniqueValues'])->name('api.check_unique_values');
     Route::post('/login', [AuthenticationController::class, 'login'])->name('api.login');
