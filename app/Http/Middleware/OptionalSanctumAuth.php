@@ -18,8 +18,6 @@ class OptionalSanctumAuth
     {
         if ($request->bearerToken() && Auth::guard('sanctum')->check()) {
             Auth::setUser(Auth::guard('sanctum')->user());
-
-            dd(auth('sanctum')->user());
         }
 
         return $next($request);
