@@ -93,7 +93,7 @@ class MigrateMusicToS3 extends Command
         $bar->finish();
         $this->newLine(2);
 
-        $this->info("Migration complete!");
+        $this->info('Migration complete!');
         $this->table(
             ['Status', 'Count'],
             [

@@ -53,7 +53,7 @@ class MachineController extends Controller
             return BaseResource::make([])
                 ->additional([
                     'status' => 422,
-                    'message' => 'Invalid serial number format. Expected format: A10120260001 (Model + Year + Product Code)',
+                    'message' => 'Invalid serial number format. Expected format: ABC20260001 or A10120260001 (Model + Year + Product Code)',
                 ])
                 ->response()
                 ->setStatusCode(422);

@@ -22,7 +22,7 @@ class DashboardDateFilterWidget extends Widget implements HasForms
 
     protected static ?int $sort = -1;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public array $data = [];
 
@@ -33,9 +33,9 @@ class DashboardDateFilterWidget extends Widget implements HasForms
     public function mount(): void
     {
         $this->form->fill([
-            'range'    => '30d',
+            'range' => '30d',
             'dateFrom' => null,
-            'dateTo'   => null,
+            'dateTo' => null,
         ]);
 
         $this->refreshStats();
@@ -50,9 +50,9 @@ class DashboardDateFilterWidget extends Widget implements HasForms
                         Select::make('range')
                             ->label('Date Range')
                             ->options([
-                                '7d'     => 'Last 7 days',
-                                '30d'    => 'Last 30 days',
-                                '90d'    => 'Last 3 months',
+                                '7d' => 'Last 7 days',
+                                '30d' => 'Last 30 days',
+                                '90d' => 'Last 3 months',
                                 'custom' => 'Custom date range',
                             ])
                             ->default('30d')
@@ -94,9 +94,9 @@ class DashboardDateFilterWidget extends Widget implements HasForms
 
     private function resolveDateRange(): array
     {
-        $range    = $this->data['range'] ?? '30d';
+        $range = $this->data['range'] ?? '30d';
         $dateFrom = $this->data['dateFrom'] ?? null;
-        $dateTo   = $this->data['dateTo'] ?? null;
+        $dateTo = $this->data['dateTo'] ?? null;
 
         if ($range === 'custom' && $dateFrom && $dateTo) {
             return [
@@ -106,8 +106,8 @@ class DashboardDateFilterWidget extends Widget implements HasForms
         }
 
         $days = match ($range) {
-            '7d'    => 7,
-            '90d'   => 90,
+            '7d' => 7,
+            '90d' => 90,
             default => 30,
         };
 
@@ -127,7 +127,7 @@ class DashboardDateFilterWidget extends Widget implements HasForms
             ->orderBy('placed_at', 'desc')
             ->get();
 
-        $filename = 'order-stats-' . now()->format('Y-m-d') . '.csv';
+        $filename = 'order-stats-'.now()->format('Y-m-d').'.csv';
 
         return response()->streamDownload(function () use ($orders) {
             $handle = fopen('php://output', 'w');
@@ -167,17 +167,17 @@ class DashboardDateFilterWidget extends Widget implements HasForms
 
     public function getLabel(): string
     {
-        $range    = $this->data['range'] ?? '30d';
+        $range = $this->data['range'] ?? '30d';
         $dateFrom = $this->data['dateFrom'] ?? null;
-        $dateTo   = $this->data['dateTo'] ?? null;
+        $dateTo = $this->data['dateTo'] ?? null;
 
         if ($range === 'custom' && $dateFrom && $dateTo) {
             return Carbon::parse($dateFrom)->format('d M Y').' – '.Carbon::parse($dateTo)->format('d M Y');
         }
 
         return match ($range) {
-            '7d'    => 'Last 7 days',
-            '90d'   => 'Last 3 months',
+            '7d' => 'Last 7 days',
+            '90d' => 'Last 3 months',
             default => 'Last 30 days',
         };
     }

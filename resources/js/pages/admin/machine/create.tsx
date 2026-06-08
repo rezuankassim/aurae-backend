@@ -156,12 +156,12 @@ export default function CreateMachine({ next_serial }: Props) {
                     <Card>
                         <CardHeader>
                             <CardTitle>Serial Number</CardTitle>
-                            <CardDescription>Format: [Model][Year][Product Code] — Example: A10120260001</CardDescription>
+                            <CardDescription>Format: [Model(3-4 chars)][Year][Product Code] — Examples: ABC20260001, A10120260001</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="model">Model (4 chars)</Label>
+                                    <Label htmlFor="model">Model (3-4 chars)</Label>
                                     <Input
                                         id="model"
                                         value={data.model}
@@ -169,7 +169,7 @@ export default function CreateMachine({ next_serial }: Props) {
                                         placeholder="A101"
                                         maxLength={4}
                                     />
-                                    <p className="text-xs text-muted-foreground">e.g., A101</p>
+                                        <p className="text-xs text-muted-foreground">e.g., ABC or A101</p>
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="year">Year (4 digits)</Label>
@@ -220,7 +220,7 @@ export default function CreateMachine({ next_serial }: Props) {
                             <CardContent className="space-y-4">
                                 <div className="grid grid-cols-3 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="bulk_model">Model (4 chars)</Label>
+                                        <Label htmlFor="bulk_model">Model (3-4 chars)</Label>
                                         <Input
                                             id="bulk_model"
                                             value={data.model}
@@ -228,7 +228,7 @@ export default function CreateMachine({ next_serial }: Props) {
                                             placeholder="A101"
                                             maxLength={4}
                                         />
-                                        <p className="text-xs text-muted-foreground">e.g., A101</p>
+                                        <p className="text-xs text-muted-foreground">e.g., ABC or A101</p>
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="bulk_year">Year (4 digits)</Label>

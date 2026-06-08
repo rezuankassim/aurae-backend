@@ -103,7 +103,7 @@ class ProgramController extends Controller
             ->first();
 
         // date format 24042026 14:42:57
-        if (!$usageHistory) {
+        if (! $usageHistory) {
             $usageHistory = UsageHistory::create([
                 'user_id' => $request->user()->id,
                 'therapy_id' => $request->input('program_id'),
@@ -190,7 +190,7 @@ class ProgramController extends Controller
                 body: $notificationBody,
                 data: $adminNotification->data,
                 createdAt: $adminNotification->created_at->toIso8601String(),
-            ));   
+            ));
         }
 
         return BaseResource::make($programLog)

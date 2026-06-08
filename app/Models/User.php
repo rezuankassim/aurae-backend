@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Lunar\Base\LunarUser as LunarUserInterface;
 use Lunar\Base\Traits\LunarUser;
@@ -221,9 +221,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
     {
         static::softDeleted(function (User $user) {
             $user->updateQuietly([
-                'email' => $user->email . '_deleted_' . $user->id,
-                'username' => $user->username . '_deleted_' . $user->id,
-                'phone' => $user->phone . '_deleted_' . $user->id,
+                'email' => $user->email.'_deleted_'.$user->id,
+                'username' => $user->username.'_deleted_'.$user->id,
+                'phone' => $user->phone.'_deleted_'.$user->id,
             ]);
         });
 

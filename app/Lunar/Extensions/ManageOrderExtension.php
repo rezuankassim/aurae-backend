@@ -35,7 +35,7 @@ class ManageOrderExtension extends ViewPageExtension
                     });
             }
 
-        // Always hide "Refund" button
+            // Always hide "Refund" button
             if ($action->getName() === 'refund') {
                 return $action->visible(false);
             }

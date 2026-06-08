@@ -22,7 +22,7 @@ class UserSubscriptionFactory extends Factory
             'starts_at' => now(),
             'ends_at' => now()->addMonth(),
             'status' => 'active',
-            'transaction_id' => 'TXN-' . $this->faker->uuid(),
+            'transaction_id' => 'TXN-'.$this->faker->uuid(),
             'payment_method' => 'senangpay',
             'payment_status' => 'completed',
             'paid_at' => now(),

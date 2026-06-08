@@ -12,7 +12,7 @@ beforeEach(function () {
     GeneralSetting::updateOrCreate(
         ['id' => 1],
         [
-            'machine_serial_format' => 'AUR-{NNNN}',
+            'machine_serial_format' => '{MMMM}{YYYY}{SSSS}',
             'machine_serial_prefix' => 'AUR',
         ]
     );
@@ -36,7 +36,7 @@ test('user can bind machine with valid subscription', function () {
     ]);
 
     $machine = Machine::create([
-        'serial_number' => 'AUR-0001',
+        'serial_number' => 'AUR20260001',
         'name' => 'Test Machine',
         'status' => 1,
     ]);
@@ -46,7 +46,7 @@ test('user can bind machine with valid subscription', function () {
         ->postJson('/api/machine/bind', [
             'device_id' => $device->id,
             'device_uuid' => $device->uuid,
-            'serial_number' => 'AUR-0001',
+            'serial_number' => 'AUR20260001',
         ]);
 
     $response->assertStatus(200)
@@ -69,7 +69,7 @@ test('user cannot bind machine without subscription', function () {
     ]);
 
     $machine = Machine::create([
-        'serial_number' => 'AUR-0001',
+        'serial_number' => 'AUR20260001',
         'name' => 'Test Machine',
         'status' => 1,
     ]);
@@ -79,13 +79,13 @@ test('user cannot bind machine without subscription', function () {
         ->postJson('/api/machine/bind', [
             'device_id' => $device->id,
             'device_uuid' => $device->uuid,
-            'serial_number' => 'AUR-0001',
+            'serial_number' => 'AUR20260001',
         ]);
 
     // Should return 403 when no subscription exists
     $response->assertStatus(403);
     expect($response->json('message'))->toContain('subscribe to a plan');
-    
+
     // Verify machine was not bound
     $machine->refresh();
     expect($machine->user_id)->toBeNull();
@@ -109,14 +109,14 @@ test('user cannot exceed machine limit', function () {
     ]);
 
     Machine::create([
-        'serial_number' => 'AUR-0001',
+        'serial_number' => 'AUR20260001',
         'name' => 'Machine 1',
         'status' => 1,
         'user_id' => $user->id,
     ]);
 
     Machine::create([
-        'serial_number' => 'AUR-0002',
+        'serial_number' => 'AUR20260002',
         'name' => 'Machine 2',
         'status' => 1,
     ]);
@@ -126,7 +126,7 @@ test('user cannot exceed machine limit', function () {
         ->postJson('/api/machine/bind', [
             'device_id' => $device->id,
             'device_uuid' => $device->uuid,
-            'serial_number' => 'AUR-0002',
+            'serial_number' => 'AUR20260002',
         ]);
 
     $response->assertStatus(403);
@@ -135,12 +135,12 @@ test('user cannot exceed machine limit', function () {
 
 test('user with multiple subscriptions can bind multiple machines', function () {
     $user = User::factory()->create();
-    
+
     // Create 3 subscriptions for the user
     $subscription1 = Subscription::factory()->create();
     $subscription2 = Subscription::factory()->create();
     $subscription3 = Subscription::factory()->create();
-    
+
     UserSubscription::factory()->create([
         'user_id' => $user->id,
         'subscription_id' => $subscription1->id,
@@ -148,7 +148,7 @@ test('user with multiple subscriptions can bind multiple machines', function () 
         'starts_at' => now(),
         'ends_at' => now()->addMonth(),
     ]);
-    
+
     UserSubscription::factory()->create([
         'user_id' => $user->id,
         'subscription_id' => $subscription2->id,
@@ -156,7 +156,7 @@ test('user with multiple subscriptions can bind multiple machines', function () 
         'starts_at' => now(),
         'ends_at' => now()->addMonth(),
     ]);
-    
+
     UserSubscription::factory()->create([
         'user_id' => $user->id,
         'subscription_id' => $subscription3->id,
@@ -173,19 +173,19 @@ test('user with multiple subscriptions can bind multiple machines', function () 
 
     // Create 3 machines
     $machine1 = Machine::create([
-        'serial_number' => 'AUR-0001',
+        'serial_number' => 'AUR20260001',
         'name' => 'Machine 1',
         'status' => 1,
     ]);
-    
+
     $machine2 = Machine::create([
-        'serial_number' => 'AUR-0002',
+        'serial_number' => 'AUR20260002',
         'name' => 'Machine 2',
         'status' => 1,
     ]);
-    
+
     $machine3 = Machine::create([
-        'serial_number' => 'AUR-0003',
+        'serial_number' => 'AUR20260003',
         'name' => 'Machine 3',
         'status' => 1,
     ]);
@@ -196,9 +196,9 @@ test('user with multiple subscriptions can bind multiple machines', function () 
         ->postJson('/api/machine/bind', [
             'device_id' => $device->id,
             'device_uuid' => $device->uuid,
-            'serial_number' => 'AUR-0001',
+            'serial_number' => 'AUR20260001',
         ]);
-    
+
     $response1->assertStatus(200);
 
     // Bind second machine
@@ -207,9 +207,9 @@ test('user with multiple subscriptions can bind multiple machines', function () 
         ->postJson('/api/machine/bind', [
             'device_id' => $device->id,
             'device_uuid' => $device->uuid,
-            'serial_number' => 'AUR-0002',
+            'serial_number' => 'AUR20260002',
         ]);
-    
+
     $response2->assertStatus(200);
 
     // Bind third machine
@@ -218,16 +218,16 @@ test('user with multiple subscriptions can bind multiple machines', function () 
         ->postJson('/api/machine/bind', [
             'device_id' => $device->id,
             'device_uuid' => $device->uuid,
-            'serial_number' => 'AUR-0003',
+            'serial_number' => 'AUR20260003',
         ]);
-    
+
     $response3->assertStatus(200);
 
     // Verify all machines are bound
     $machine1->refresh();
     $machine2->refresh();
     $machine3->refresh();
-    
+
     expect($machine1->user_id)->toBe($user->id);
     expect($machine2->user_id)->toBe($user->id);
     expect($machine3->user_id)->toBe($user->id);

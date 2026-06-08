@@ -24,7 +24,7 @@ class ShippingZoneResourceExtension extends ResourceExtension
                 '/{record}/rates',
                 ManageShippingRatesPage::class
             )->middleware(ManageShippingRatesPage::getRouteMiddleware($panel))
-             ->withoutMiddleware(ManageShippingRatesPage::getWithoutRouteMiddleware($panel)),
+                ->withoutMiddleware(ManageShippingRatesPage::getWithoutRouteMiddleware($panel)),
         );
 
         return $pages;

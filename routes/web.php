@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomTherapyController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceMaintenanceController;
 use App\Http\Controllers\HealthReportController;
@@ -13,9 +13,7 @@ use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\Payment\SenangpayCallbackController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UsageHistoryController;
-use App\Models\Device;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::redirect('/', '/login')->name('home');
 

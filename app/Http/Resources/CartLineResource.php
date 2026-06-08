@@ -38,25 +38,25 @@ class CartLineResource extends BaseResource
                         })
                         ->values()
                         ->map(fn ($variant) => [
-                        'id' => $variant->id,
-                        'sku' => $variant->sku,
-                        'thumbnail' => [
-                            'url' => $variant->getThumbnail()?->getUrl(),
-                        ],
-                        'price' => Pricing::for($variant)->get()->matched?->price->formatted(),
-                        'description' => $variant->getDescription(),
-                        'values' => $variant->values->map(fn ($value) => [
-                            'id' => $value->id,
-                            'product_option_id' => $value->product_option_id,
-                            'name' => $value->translate('name'),
-                            'position' => $value->position,
-                            'option' => [
-                                'id' => $value->option->id,
-                                'name' => $value->option->translate('name'),
+                            'id' => $variant->id,
+                            'sku' => $variant->sku,
+                            'thumbnail' => [
+                                'url' => $variant->getThumbnail()?->getUrl(),
                             ],
-                        ]),
-                        'values_ids' => $variant->values->pluck('id'),
-                    ]);
+                            'price' => Pricing::for($variant)->get()->matched?->price->formatted(),
+                            'description' => $variant->getDescription(),
+                            'values' => $variant->values->map(fn ($value) => [
+                                'id' => $value->id,
+                                'product_option_id' => $value->product_option_id,
+                                'name' => $value->translate('name'),
+                                'position' => $value->position,
+                                'option' => [
+                                    'id' => $value->option->id,
+                                    'name' => $value->option->translate('name'),
+                                ],
+                            ]),
+                            'values_ids' => $variant->values->pluck('id'),
+                        ]);
                 }
 
                 return $data;

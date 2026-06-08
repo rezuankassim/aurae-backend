@@ -17,6 +17,7 @@ class MusicController extends Controller
     {
         return app()->environment('production') ? 's3' : 'public';
     }
+
     /**
      * Display a listing of the resource.
      */

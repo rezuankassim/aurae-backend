@@ -241,6 +241,6 @@ return [
 
         ReverbMessages::class => [
             'sample_rate' => 1,
-        ]
+        ],
     ],
 ];

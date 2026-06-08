@@ -15,6 +15,7 @@ class Discount extends LunarDiscount
             }
         });
     }
+
     const DRAFT = 'draft';
 
     protected $casts = [

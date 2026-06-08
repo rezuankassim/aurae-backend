@@ -10,7 +10,7 @@ class MachineSerialService
     /**
      * Default format: {MMMM}{YYYY}{SSSS}
      * Example: A10120260001
-     * - MMMM: Machine serial prefix/model (4 chars, e.g., A101)
+     * - MMMM: Machine serial prefix/model (3-4 chars, e.g., ABC or A101)
      * - YYYY: Year (4 digits)
      * - SSSS: Product serial (4 digits, zero-padded)
      */
@@ -64,13 +64,9 @@ class MachineSerialService
      */
     protected function extractProductSerial(string $serialNumber): ?int
     {
-        // Format: A101YYYYSSSS - extract SSSS (positions 8-11, 0-indexed)
-        // The serial is: PREFIX(4) + YEAR(4) + SERIAL(4) = 12 chars
-        if (strlen($serialNumber) >= 12) {
-            $serialPart = substr($serialNumber, 8, 4);
-            if (is_numeric($serialPart)) {
-                return (int) $serialPart;
-            }
+        // Format: MODEL(3-4) + YEAR(4) + SERIAL(4)
+        if (preg_match('/^[A-Z0-9]{3,4}\d{4}(\d{4})$/', $serialNumber, $matches) === 1) {
+            return (int) $matches[1];
         }
 
         return null;
@@ -78,12 +74,12 @@ class MachineSerialService
 
     /**
      * Generate regex pattern for validation.
-     * Accepts format: A10120260001
+     * Accepts formats like: ABC20260001 or A10120260001
      */
     protected function getValidationPattern(): string
     {
-        // Pattern: 4 alphanumeric (model) + 4 digits (year) + 4 digits (product code)
-        return '/^[A-Z0-9]{4}\d{4}\d{4}$/';
+        // Pattern: 3-4 alphanumeric (model) + 4 digits (year) + 4 digits (product code)
+        return '/^[A-Z0-9]{3,4}\d{4}\d{4}$/';
     }
 
     /**
@@ -143,7 +139,7 @@ class MachineSerialService
      *
      * @param  int  $quantity  Number of machines to generate
      * @param  string  $baseName  Base name for machines
-     * @param  string  $model  4-character model code (e.g., A101)
+     * @param  string  $model  3-4 character model code (e.g., ABC or A101)
      * @param  string  $year  4-digit year
      * @param  int  $startProductCode  Starting product code (will increment)
      * @param  int  $status  Machine status (0 or 1)
@@ -219,18 +215,16 @@ class MachineSerialService
      */
     public function parseSerialNumber(string $serialNumber): array
     {
-        // Expected format: A10120260001 (12 chars)
-        // MMMM(4) + YYYY(4) + SSSS(4)
-        if (strlen($serialNumber) !== 12) {
+        // Expected format: MODEL(3-4) + YYYY(4) + SSSS(4)
+        if (preg_match('/^([A-Z0-9]{3,4})(\d{4})(\d{4})$/', $serialNumber, $matches) !== 1) {
             return [
                 'valid' => false,
-                'error' => 'Invalid serial number length',
+                'error' => 'Invalid serial number format',
             ];
         }
-
-        $prefix = substr($serialNumber, 0, 4);
-        $year = substr($serialNumber, 4, 4);
-        $productSerial = substr($serialNumber, 8, 4);
+        $prefix = $matches[1];
+        $year = $matches[2];
+        $productSerial = $matches[3];
 
         return [
             'valid' => true,

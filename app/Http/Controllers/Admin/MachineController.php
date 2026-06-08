@@ -75,7 +75,7 @@ class MachineController extends Controller
             'serial_number' => ['nullable', 'string', 'unique:machines,serial_number'],
             'status' => ['required', 'integer', 'in:0,1'],
             'quantity' => ['nullable', 'integer', 'min:1', 'max:1000'],
-            'model' => ['nullable', 'string', 'size:4'],
+            'model' => ['nullable', 'string', 'alpha_num', 'min:3', 'max:4'],
             'year' => ['nullable', 'string', 'size:4'],
             'start_product_code' => ['nullable', 'integer', 'min:1', 'max:9999'],
             'thumbnail' => ['nullable', 'image', 'max:5120'], // 5MB max

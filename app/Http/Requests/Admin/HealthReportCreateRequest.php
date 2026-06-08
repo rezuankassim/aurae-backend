@@ -45,5 +45,4 @@ class HealthReportCreateRequest extends FormRequest
             'multidimensional_file.max' => 'Multidimensional health report must not exceed 50MB.',
         ];
     }
-
 }

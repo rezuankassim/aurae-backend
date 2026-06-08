@@ -6,7 +6,6 @@ use App\Models\Device;
 use App\Models\Subscription;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DashboardController extends Controller

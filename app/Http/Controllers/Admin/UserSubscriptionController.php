@@ -186,15 +186,15 @@ class UserSubscriptionController extends Controller
             : $startsAt->copy()->addMonth();
 
         $userSubscription->update([
-            'status'          => 'active',
-            'payment_status'  => 'completed',
-            'payment_method'  => 'manual',
-            'paid_at'         => now(),
-            'starts_at'       => $startsAt,
-            'ends_at'         => $endsAt,
-            'is_recurring'    => false,
+            'status' => 'active',
+            'payment_status' => 'completed',
+            'payment_method' => 'manual',
+            'paid_at' => now(),
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
+            'is_recurring' => false,
             'next_billing_at' => null,
-            'cancelled_at'    => null,
+            'cancelled_at' => null,
         ]);
 
         return back()->with('success', 'Subscription activated manually. Payment method set to manual and recurring billing disabled.');

@@ -152,7 +152,7 @@ class CleanupOrphanedMusicFiles extends Command
         $bar->finish();
         $this->newLine(2);
 
-        $this->info("Cleanup complete!");
+        $this->info('Cleanup complete!');
         $this->table(
             ['Status', 'Count'],
             [
