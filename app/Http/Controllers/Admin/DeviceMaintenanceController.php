@@ -15,6 +15,9 @@ class DeviceMaintenanceController extends Controller
     public function index(Request $request)
     {
         $query = DeviceMaintenance::with(['user', 'device'])
+            ->whereHas('user', function ($query) {
+                $query->where('deleted_at', null);
+            })
             ->latest();
 
         // Apply filters if provided

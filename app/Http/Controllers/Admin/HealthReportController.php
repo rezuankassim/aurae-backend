@@ -17,6 +17,9 @@ class HealthReportController extends Controller
     public function index()
     {
         $healthReports = HealthReport::with('user:id,name,email')
+            ->whereHas('user', function ($query) {
+                $query->where('deleted_at', null);
+            })
             ->latest()
             ->get()
             ->map(function ($report) {
