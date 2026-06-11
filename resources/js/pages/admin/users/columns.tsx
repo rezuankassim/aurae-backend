@@ -14,8 +14,7 @@ import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
 import { MoreHorizontal } from 'lucide-react';
-
-export const columns: ColumnDef<User>[] = [
+export const columns = (showDeleted: boolean): ColumnDef<User>[] => [
     {
         id: 'no',
         header: '#',
@@ -39,11 +38,12 @@ export const columns: ColumnDef<User>[] = [
 
             return <Badge>Customer</Badge>;
         },
-        filterFn: (row, columnId, filterValue) => {
+        filterFn: (row, _columnId, filterValue) => {
             if (filterValue === '') return true;
             if (filterValue === 'guest') return !row.original.is_admin && !!row.original.guest;
             if (filterValue === '0') return !row.original.is_admin && !row.original.guest;
-            return String(row.original.is_admin) === filterValue;
+            if (filterValue === '1') return row.original.is_admin;
+            return true;
         },
     },
     {
@@ -69,9 +69,17 @@ export const columns: ColumnDef<User>[] = [
     {
         id: 'actions',
         cell: ({ row }) => {
+            const querySuffix = showDeleted ? '?show_deleted=1' : '';
+            const isDeleted = Boolean(row.original.deleted_at);
             const handleDelete = () => {
                 if (confirm('Are you sure you want to delete this user?')) {
-                    router.delete(destroy(row.original.id).url);
+                    router.delete(`${destroy(row.original.id).url}${querySuffix}`);
+                }
+            };
+
+            const handleRecover = () => {
+                if (confirm('Are you sure you want to recover this user?')) {
+                    router.put(`/admin/users/${row.original.id}/restore${querySuffix}`);
                 }
             };
 
@@ -85,20 +93,30 @@ export const columns: ColumnDef<User>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                            <Link className="hover:cursor-pointer" href={show(row.original.id).url}>
-                                View
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link className="hover:cursor-pointer" href={edit(row.original.id).url}>
-                                Edit
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive hover:cursor-pointer focus:text-destructive" onClick={handleDelete}>
-                            Delete
-                        </DropdownMenuItem>
+                        {!isDeleted && (
+                            <>
+                                <DropdownMenuItem asChild>
+                                    <Link className="hover:cursor-pointer" href={show(row.original.id).url}>
+                                        View
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link className="hover:cursor-pointer" href={edit(row.original.id).url}>
+                                        Edit
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                            </>
+                        )}
+                        {isDeleted ? (
+                            <DropdownMenuItem className="hover:cursor-pointer" onClick={handleRecover}>
+                                Recover
+                            </DropdownMenuItem>
+                        ) : (
+                            <DropdownMenuItem className="text-destructive hover:cursor-pointer focus:text-destructive" onClick={handleDelete}>
+                                Delete
+                            </DropdownMenuItem>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

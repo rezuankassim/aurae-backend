@@ -45,6 +45,7 @@ export interface User {
     phone: string;
     created_at: string;
     updated_at: string;
+    deleted_at: string | null;
     is_admin: boolean;
     status: boolean;
     guest?: { id: string } | null;

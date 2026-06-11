@@ -14,8 +14,11 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: index().url,
     },
 ];
+type UsersFilters = {
+    show_deleted?: boolean;
+};
 
-export default function UsersIndex({ users }: { users: User[] }) {
+export default function UsersIndex({ users, filters }: { users: User[]; filters?: UsersFilters }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
@@ -28,7 +31,7 @@ export default function UsersIndex({ users }: { users: User[] }) {
                     </Button>
                 </div>
 
-                <DataTable columns={columns} data={users} />
+                <DataTable columns={columns(Boolean(filters?.show_deleted))} data={users} showDeleted={Boolean(filters?.show_deleted)} />
             </div>
         </AppLayout>
     );

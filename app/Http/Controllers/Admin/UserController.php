@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserCreateRequest;
 use App\Http\Requests\Admin\UserUpdateRequest;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -16,15 +17,25 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::query()
+        $showDeleted = $request->boolean('show_deleted');
+
+        $query = User::query()
             ->where('id', '!=', auth()->id())
-            ->with('guest')
-            ->get();
+            ->with('guest');
+
+        if ($showDeleted) {
+            $query->withTrashed();
+        }
+
+        $users = $query->get();
 
         return Inertia::render('admin/users/index', [
             'users' => $users,
+            'filters' => [
+                'show_deleted' => $showDeleted,
+            ],
         ]);
     }
 
@@ -101,10 +112,33 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
         $user->delete();
+        $params = [];
+        if ($request->boolean('show_deleted')) {
+            $params['show_deleted'] = 1;
+        }
 
-        return to_route('admin.users.index')->with('success', 'User deleted successfully.');
+        return to_route('admin.users.index', $params)->with('success', 'User deleted successfully.');
+    }
+
+    /**
+     * Restore the specified soft-deleted resource.
+     */
+    public function restore(Request $request, int $user)
+    {
+        $userRecord = User::withTrashed()->findOrFail($user);
+
+        if ($userRecord->trashed()) {
+            $userRecord->restore();
+        }
+
+        $params = [];
+        if ($request->boolean('show_deleted')) {
+            $params['show_deleted'] = 1;
+        }
+
+        return to_route('admin.users.index', $params)->with('success', 'User recovered successfully.');
     }
 }
