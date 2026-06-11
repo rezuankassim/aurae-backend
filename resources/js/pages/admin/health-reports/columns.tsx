@@ -38,6 +38,8 @@ export const columns: ColumnDef<HealthReport>[] = [
         accessorKey: 'user.name',
         header: 'User',
         cell: ({ row }) => {
+            if (!row.original.user) return <span className="text-muted-foreground">-</span>;
+
             return (
                 <div className="flex flex-col">
                     <span className="font-medium">{row.original.user.name}</span>
