@@ -58,6 +58,8 @@ export const columns: ColumnDef<DeviceMaintenance>[] = [
         accessorKey: 'user.name',
         header: 'User',
         cell: ({ row }) => {
+            if (!row.original.user) return <span className="text-muted-foreground">-</span>;
+
             return (
                 <div>
                     <p className="font-medium">{row.original.user.name}</p>
