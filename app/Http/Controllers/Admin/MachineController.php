@@ -7,6 +7,7 @@ use App\Models\Machine;
 use App\Services\MachineSerialService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class MachineController extends Controller
@@ -95,26 +96,30 @@ class MachineController extends Controller
                 $detailImagePath = $request->file('detail_image')->store('machines/details', 's3');
             }
 
-            $this->serialService->bulkGenerate(
-                quantity: (int) $request->quantity,
-                baseName: $validated['name'],
-                model: $validated['model'] ?? 'A101',
-                year: $validated['year'] ?? date('Y'),
-                startProductCode: (int) ($validated['start_product_code'] ?? 1),
-                status: (int) $validated['status'],
-                thumbnail: $thumbnailPath,
-                detailImage: $detailImagePath
-            );
+            try {
+                $this->serialService->bulkGenerate(
+                    quantity: (int) $request->quantity,
+                    baseName: $validated['name'],
+                    model: $validated['model'] ?? 'A101',
+                    year: $validated['year'] ?? date('Y'),
+                    startProductCode: (int) ($validated['start_product_code'] ?? 1),
+                    status: (int) $validated['status'],
+                    thumbnail: $thumbnailPath,
+                    detailImage: $detailImagePath
+                );
+            } catch (\RuntimeException $e) {
+                throw ValidationException::withMessages([
+                    'serial_number' => $e->getMessage(),
+                ]);
+            }
 
             return to_route('admin.machines.index')
                 ->with('success', "Successfully generated {$request->quantity} machines.");
         }
 
         // Single machine creation
-        $serialNumber = $validated['serial_number'] ?? $this->serialService->generateNextSerialNumber();
 
         $machineData = [
-            'serial_number' => $serialNumber,
             'name' => $validated['name'],
             'status' => $validated['status'],
         ];
@@ -126,7 +131,20 @@ class MachineController extends Controller
             $machineData['detail_image'] = $request->file('detail_image')->store('machines/details', 's3');
         }
 
-        Machine::create($machineData);
+        if (filled($validated['serial_number'] ?? null)) {
+            Machine::create([
+                ...$machineData,
+                'serial_number' => $validated['serial_number'],
+            ]);
+        } else {
+            try {
+                $this->serialService->createMachineWithAutoSerial($machineData);
+            } catch (\RuntimeException $e) {
+                throw ValidationException::withMessages([
+                    'serial_number' => $e->getMessage(),
+                ]);
+            }
+        }
 
         return to_route('admin.machines.index')
             ->with('success', 'Machine created successfully.');

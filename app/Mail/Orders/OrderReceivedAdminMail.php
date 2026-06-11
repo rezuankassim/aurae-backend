@@ -35,7 +35,7 @@ class OrderReceivedAdminMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'mail.orders.admin-order-received',
+            markdown: 'mail.orders.admin-order-received',
         );
     }
 }

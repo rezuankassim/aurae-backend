@@ -35,7 +35,7 @@ class OrderInvoiceMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'mail.orders.invoice',
+            markdown: 'mail.orders.invoice',
         );
     }
 }

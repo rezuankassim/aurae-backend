@@ -84,11 +84,18 @@ class ProgramController extends Controller
 
         $emergency = (bool) $request->input('emergency', false);
 
+        $program_stared_at = ProgramLog::where('user_id', $request->user()->id)
+            ->where('therapy_id', $request->input('program_id'))
+            ->where('action', 'start')
+            ->latest()
+            ->value('program_started_at');
+
         $programLog = ProgramLog::create([
             'user_id' => $request->user()->id,
             'therapy_id' => $request->input('program_id'),
             'program_duration' => $request->input('program_duration'),
             'action' => 'stop',
+            'program_started_at' => $program_stared_at ? Carbon::parse($program_stared_at) : null,
             'program_ended_at' => Carbon::createFromFormat('dmY H:i:s', $request->input('program_end_at')),
             'program_error_message' => $request->input('program_error_message'),
             'emergency' => $emergency,
@@ -115,21 +122,15 @@ class ProgramController extends Controller
                 ],
             ]);
 
-            $startedAt = null;
-            $endedAt = Carbon::createFromFormat('dmY H:i:s', $request->input('program_end_at'));
-            $duration = $programLog->program_duration;
             $content = [
-                'duration' => round($duration, 2),
+                'duration' => $programLog->program_duration,
                 'force_stopped' => $emergency,
                 'started_at' => null,
                 'ended_at' => $request->input('program_end_at'),
             ];
         } else {
-            $startedAt = Carbon::createFromFormat('dmY H:i:s', $usageHistory->content->started_at);
-            $endedAt = Carbon::createFromFormat('dmY H:i:s', $request->input('program_end_at'));
-            $duration = $startedAt->diffInMinutes($endedAt);
             $content = [
-                'duration' => round($duration, 2),
+                'duration' => $programLog->program_duration,
                 'force_stopped' => $emergency,
                 'started_at' => $usageHistory ? $usageHistory->content->started_at : null,
                 'ended_at' => $request->input('program_end_at'),

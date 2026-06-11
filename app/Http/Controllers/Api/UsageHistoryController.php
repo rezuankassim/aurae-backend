@@ -58,7 +58,8 @@ class UsageHistoryController extends Controller
         $to = $request->input('to');
 
         // Build base query
-        $query = UsageHistory::where('user_id', $userId);
+        $query = UsageHistory::where('user_id', $userId)
+            ->whereNotNull('content->started_at');
 
         // Apply date filters if provided
         if ($from) {

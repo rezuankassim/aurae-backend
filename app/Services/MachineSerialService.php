@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\GeneralSetting;
 use App\Models\Machine;
+use Illuminate\Database\QueryException;
 
 class MachineSerialService
 {
@@ -39,24 +40,35 @@ class MachineSerialService
     {
         $settings = GeneralSetting::first();
         $format = $settings->machine_serial_format ?? self::DEFAULT_FORMAT;
+        $prefix = strtoupper($settings->machine_serial_prefix ?? self::DEFAULT_PREFIX);
         $year = date('Y');
+        $nextNumber = $this->getHighestProductSerial($prefix, $year) + 1;
 
-        // Get the last machine for the current year to determine next number
-        $lastMachine = Machine::where('serial_number', 'like', '%'.$year.'%')
-            ->orderBy('created_at', 'desc')
-            ->first();
+        return $this->formatSerialNumber($format, $nextNumber, $settings);
+    }
 
-        $nextNumber = 1;
+    /**
+     * Create a machine with an auto-generated serial number and retry on duplicates.
+     */
+    public function createMachineWithAutoSerial(array $machineData, int $maxAttempts = 5): Machine
+    {
+        $attempt = 0;
 
-        if ($lastMachine) {
-            // Extract the product serial (4 digits after year)
-            $productSerial = $this->extractProductSerial($lastMachine->serial_number);
-            if ($productSerial !== null) {
-                $nextNumber = $productSerial + 1;
+        while ($attempt < $maxAttempts) {
+            $machineData['serial_number'] = $this->generateNextSerialNumber();
+
+            try {
+                return Machine::create($machineData);
+            } catch (QueryException $e) {
+                if (! $this->isSerialNumberDuplicateException($e)) {
+                    throw $e;
+                }
+
+                $attempt++;
             }
         }
 
-        return $this->formatSerialNumber($format, $nextNumber, $settings);
+        throw new \RuntimeException('Unable to allocate a unique machine serial number. Please try again.');
     }
 
     /**
@@ -70,6 +82,23 @@ class MachineSerialService
         }
 
         return null;
+    }
+
+    /**
+     * Get highest used product serial number for prefix and year.
+     */
+    protected function getHighestProductSerial(string $prefix, string $year): int
+    {
+        $serialPrefix = strtoupper($prefix.$year);
+
+        return Machine::query()
+            ->whereRaw('UPPER(serial_number) LIKE ?', [$serialPrefix.'%'])
+            ->pluck('serial_number')
+            ->map(function ($serialNumber) {
+                return $this->extractProductSerial(strtoupper((string) $serialNumber));
+            })
+            ->filter(fn ($productSerial) => $productSerial !== null)
+            ->max() ?? 0;
     }
 
     /**
@@ -157,22 +186,60 @@ class MachineSerialService
         ?string $detailImage = null
     ): array {
         $machines = [];
+        $model = strtoupper($model);
         $year = $year ?? date('Y');
+        $currentProductCode = $startProductCode;
 
         for ($i = 0; $i < $quantity; $i++) {
-            $productCode = str_pad($startProductCode + $i, 4, '0', STR_PAD_LEFT);
-            $serialNumber = "{$model}{$year}{$productCode}";
+            $attempt = 0;
+            $maxAttempts = 10000;
 
-            $machines[] = Machine::create([
-                'serial_number' => $serialNumber,
-                'name' => $baseName.' #'.($i + 1),
-                'status' => $status,
-                'thumbnail' => $thumbnail,
-                'detail_image' => $detailImage,
-            ]);
+            while (true) {
+                $productCode = str_pad($currentProductCode, 4, '0', STR_PAD_LEFT);
+                $serialNumber = "{$model}{$year}{$productCode}";
+
+                try {
+                    $machines[] = Machine::create([
+                        'serial_number' => $serialNumber,
+                        'name' => $baseName.' #'.($i + 1),
+                        'status' => $status,
+                        'thumbnail' => $thumbnail,
+                        'detail_image' => $detailImage,
+                    ]);
+
+                    $currentProductCode++;
+                    break;
+                } catch (QueryException $e) {
+                    if (! $this->isSerialNumberDuplicateException($e)) {
+                        throw $e;
+                    }
+
+                    $attempt++;
+                    $currentProductCode++;
+
+                    if ($attempt >= $maxAttempts) {
+                        throw new \RuntimeException('Unable to generate unique machine serial numbers for the requested quantity.');
+                    }
+                }
+            }
         }
 
         return $machines;
+    }
+
+    /**
+     * Determine whether a query exception is caused by a duplicate machine serial.
+     */
+    protected function isSerialNumberDuplicateException(QueryException $e): bool
+    {
+        $errorCode = (int) ($e->errorInfo[1] ?? 0);
+        $sqlState = (string) ($e->errorInfo[0] ?? $e->getCode());
+        $message = strtolower($e->getMessage());
+
+        return in_array($sqlState, ['23000', '23505'], true)
+            || in_array($errorCode, [19, 1062], true)
+            || str_contains($message, 'machines_serial_number_unique')
+            || str_contains($message, 'machines.serial_number');
     }
 
     /**

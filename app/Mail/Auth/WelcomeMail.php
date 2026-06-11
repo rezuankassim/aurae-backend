@@ -26,7 +26,7 @@ class WelcomeMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'mail.auth.welcome',
+            markdown: 'mail.auth.welcome',
         );
     }
 }
