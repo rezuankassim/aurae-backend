@@ -1,5 +1,5 @@
 import { AdminNotification, SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import { useEffect, useRef, useState } from 'react';
@@ -114,6 +114,17 @@ export function useAdminNotifications() {
                     toast.error(event.title, {
                         description,
                         duration: 8000,
+                        action: {
+                            label: event.id ? 'View Notification' : 'View Notifications',
+                            onClick: () => {
+                                if (event.id) {
+                                    router.visit(`/admin/notifications/${event.id}`);
+                                    return;
+                                }
+
+                                router.visit('/admin/notifications');
+                            },
+                        },
                     });
 
                     // Play the alert sound. Reset currentTime so rapid consecutive events still trigger playback.

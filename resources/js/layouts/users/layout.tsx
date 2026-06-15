@@ -42,6 +42,11 @@ export default function UsersLayout({
             href: addressesIndex(id_record),
             icon: null,
         },
+        {
+            title: 'Emergency Contacts',
+            href: `/admin/users/${id_record}/emergency-contacts`,
+            icon: null,
+        },
     ];
 
     const currentPath = window.location.pathname;

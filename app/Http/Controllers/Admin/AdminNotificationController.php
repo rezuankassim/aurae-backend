@@ -29,8 +29,11 @@ class AdminNotificationController extends Controller
     {
         $shippingAddress = null;
         $billingAddress = null;
+        $emergencyContacts = [];
 
-        $userId = $notification->data['user_id'] ?? null;
+        $userId = is_array($notification->data)
+            ? ($notification->data['user_id'] ?? null)
+            : null;
 
         if ($userId) {
             $user = User::find($userId);
@@ -44,6 +47,10 @@ class AdminNotificationController extends Controller
                     $shippingAddress = $addresses->firstWhere('shipping_default', true);
                     $billingAddress = $addresses->firstWhere('billing_default', true);
                 }
+
+                $emergencyContacts = $user->emergencyContacts()
+                    ->orderBy('created_at')
+                    ->get();
             }
         }
 
@@ -51,6 +58,7 @@ class AdminNotificationController extends Controller
             'notification' => $notification,
             'shippingAddress' => $shippingAddress,
             'billingAddress' => $billingAddress,
+            'emergencyContacts' => $emergencyContacts,
         ]);
     }
 

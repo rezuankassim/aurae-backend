@@ -36,6 +36,16 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
+export interface EmergencyContact {
+    id: number;
+    user_id: number;
+    name: string;
+    phone: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
+}
+
 export interface User {
     id: number;
     name: string;

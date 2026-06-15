@@ -77,6 +77,14 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
     }
 
     /**
+     * Get the emergency contacts associated with the user.
+     */
+    public function emergencyContacts(): HasMany
+    {
+        return $this->hasMany(EmergencyContact::class);
+    }
+
+    /**
      * Get the health reportss associated with the user.
      */
     public function healthReports(): HasMany

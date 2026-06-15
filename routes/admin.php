@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\TherapyController;
 use App\Http\Controllers\Admin\UserAddressController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserEmergencyContactController;
 use App\Http\Controllers\Admin\UserLoginActivityController;
 use App\Http\Controllers\Admin\UserProgramLogController;
 use App\Http\Controllers\Admin\UserSubscriptionController;
@@ -113,6 +114,15 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::post('/users/{user}/addresses', [UserAddressController::class, 'store'])->name('users.addresses.store');
     Route::put('/users/{user}/addresses/{address}', [UserAddressController::class, 'update'])->name('users.addresses.update');
     Route::delete('/users/{user}/addresses/{address}', [UserAddressController::class, 'destroy'])->name('users.addresses.destroy');
+
+    Route::get('/users/{user}/emergency-contacts', [UserEmergencyContactController::class, 'index'])->name('users.emergency-contacts.index');
+    Route::post('/users/{user}/emergency-contacts', [UserEmergencyContactController::class, 'store'])->name('users.emergency-contacts.store');
+    Route::put('/users/{user}/emergency-contacts/{emergencyContact}', [UserEmergencyContactController::class, 'update'])->name(
+        'users.emergency-contacts.update'
+    );
+    Route::delete('/users/{user}/emergency-contacts/{emergencyContact}', [UserEmergencyContactController::class, 'destroy'])->name(
+        'users.emergency-contacts.destroy'
+    );
 
     Route::get('/collection-groups', [CollectionGroupController::class, 'index'])->name('collection-groups.index');
     Route::post('/collection-groups', [CollectionGroupController::class, 'store'])->name('collection-groups.store');
