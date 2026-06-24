@@ -184,6 +184,7 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::get('/machines', [MachineController::class, 'index'])->name('api.machines.index');
         Route::post('/machine/{machine}/unbind', [MachineController::class, 'unbind'])->name('api.machine.unbind');
         Route::post('/machine/{machine}/change-subscription', [MachineController::class, 'changeSubscription'])->name('api.machine.change-subscription');
+        Route::post('/machine/{machine}/essence-low', [MachineController::class, 'essenceLow'])->name('api.machine.essence-low');
 
         // Profile routes
         Route::get('/profile', [ProfileController::class, 'show'])->name('api.profile.show');

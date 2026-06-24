@@ -4,17 +4,25 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\NotificationResource;
 use App\Models\Device;
 use App\Models\Machine;
+use App\Models\Notification;
 use App\Models\UserSubscription;
+use App\Services\FirebaseService;
 use App\Services\MachineSerialService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class MachineController extends Controller
 {
+    private const ESSENCE_LOW_TYPE = 'essence_low';
+
+    private const ESSENCE_LOW_COOLDOWN_HOURS = 0;
+
     public function __construct(
-        protected MachineSerialService $serialService
+        protected MachineSerialService $serialService,
+        protected FirebaseService $firebaseService
     ) {}
 
     /**
@@ -364,5 +372,111 @@ class MachineController extends Controller
                 'status' => 200,
                 'message' => 'Machine subscription changed successfully.',
             ]);
+    }
+
+    /**
+     * Notify the machine owner that the essential oil (essence) is running low.
+     *
+     * Triggered by the machine's bound tablet (authenticated with the owner's token).
+     * Always stores a notification record (visible in history) and best-effort sends a push.
+     */
+    public function essenceLow(Request $request, string $machine)
+    {
+        $validated = $request->validate([
+            'essence_level' => ['nullable', 'numeric', 'min:0', 'max:100'],
+        ]);
+
+        $user = $request->user();
+
+        $machine = Machine::find($machine);
+
+        if (! $machine) {
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 404,
+                    'message' => 'Machine not found.',
+                ])
+                ->response()
+                ->setStatusCode(404);
+        }
+
+        // Verify machine belongs to current user
+        if ($machine->user_id !== $user->id) {
+            return BaseResource::make([])
+                ->additional([
+                    'status' => 403,
+                    'message' => 'You do not own this machine.',
+                ])
+                ->response()
+                ->setStatusCode(403);
+        }
+
+        // Anti-spam: skip if we already alerted for this machine within the cooldown window.
+        // A cooldown of 0 disables throttling entirely (machine may notify without limit).
+        if (self::ESSENCE_LOW_COOLDOWN_HOURS > 0) {
+            $recent = Notification::where('user_id', $user->id)
+                ->where('type', self::ESSENCE_LOW_TYPE)
+                ->where('created_at', '>=', now()->subHours(self::ESSENCE_LOW_COOLDOWN_HOURS))
+                ->orderByDesc('created_at')
+                ->get()
+                ->first(fn (Notification $notification) => ($notification->data['machine_id'] ?? null) === $machine->id);
+
+            if ($recent) {
+                return NotificationResource::make($recent)
+                    ->additional([
+                        'status' => 200,
+                        'message' => 'Owner was recently notified of low essence.',
+                        'throttled' => true,
+                    ]);
+            }
+        }
+
+        $machineName = $machine->name ?: $machine->serial_number;
+        $title = 'Low essential oil';
+        $body = isset($validated['essence_level'])
+            ? "Your machine \"{$machineName}\" is low on essential oil ({$validated['essence_level']}% remaining). Please refill soon."
+            : "Your machine \"{$machineName}\" is low on essential oil. Please refill soon.";
+
+        $data = [
+            'type' => self::ESSENCE_LOW_TYPE,
+            'machine_id' => $machine->id,
+            'serial_number' => $machine->serial_number,
+        ];
+
+        if (isset($validated['essence_level'])) {
+            $data['essence_level'] = $validated['essence_level'];
+        }
+
+        // Best-effort push (does not create a record).
+        $push = $this->firebaseService->pushToUser($user, $title, $body, $data);
+
+        // Always persist a visible history record, even if the push was skipped/failed.
+        $notification = Notification::create([
+            'user_id' => $user->id,
+            'title' => $title,
+            'body' => $body,
+            'data' => $data,
+            'type' => self::ESSENCE_LOW_TYPE,
+            'is_sent' => true,
+            'sent_at' => now(),
+            'error_message' => $push['sent'] ? null : $push['error'],
+        ]);
+
+        Log::info('Low essence notification triggered', [
+            'user_id' => $user->id,
+            'machine_id' => $machine->id,
+            'serial_number' => $machine->serial_number,
+            'push_sent' => $push['sent'],
+            'push_skipped' => $push['skipped'],
+        ]);
+
+        return NotificationResource::make($notification)
+            ->additional([
+                'status' => 200,
+                'message' => 'Owner notified of low essence.',
+                'push_sent' => $push['sent'],
+            ])
+            ->response()
+            ->setStatusCode(200);
     }
 }

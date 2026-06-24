@@ -74,6 +74,45 @@ class FirebaseService
     }
 
     /**
+     * Send a push notification to a user's devices WITHOUT creating a notification record.
+     *
+     * The caller is responsible for persisting the Notification record. Respects the
+     * user's allow_app_notification setting (returns a skipped result without sending).
+     *
+     * @return array{sent: bool, skipped: bool, error: string|null, results: array}
+     */
+    public function pushToUser(User $user, string $title, string $body, array $data = []): array
+    {
+        // Respect the user's notification preference.
+        $setting = $user->setting;
+        if ($setting && ! $setting->allow_app_notification) {
+            return [
+                'sent' => false,
+                'skipped' => true,
+                'error' => 'User has disabled app notifications',
+                'results' => [],
+            ];
+        }
+
+        $devices = UserDevice::where('deviceable_type', User::class)
+            ->where('deviceable_id', $user->id)
+            ->whereNotNull('fcm_token')
+            ->get();
+
+        $results = [];
+        foreach ($devices as $device) {
+            $results[] = $this->sendToDevice($device->fcm_token, $title, $body, $data);
+        }
+
+        return [
+            'sent' => collect($results)->contains('success', true),
+            'skipped' => false,
+            'error' => collect($results)->where('success', false)->pluck('error')->filter()->implode(', ') ?: null,
+            'results' => $results,
+        ];
+    }
+
+    /**
      * Send notification to multiple users
      */
     public function sendToUsers(array $userIds, string $title, string $body, array $data = [], string $type = 'general')
