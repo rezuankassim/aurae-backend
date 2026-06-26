@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Models\GeneralSetting;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class ApkController extends Controller
 {
@@ -26,7 +27,8 @@ class ApkController extends Controller
                 ->setStatusCode(404);
         }
 
-        $downloadUrl = url('storage/'.$generalSetting->apk_file_path);
+        // Short-lived signed URL so the APK is not exposed at a permanent public URL.
+        $downloadUrl = URL::temporarySignedRoute('api.apk.download', now()->addMinutes(30));
 
         return BaseResource::make([
             'version' => $generalSetting->apk_version,
@@ -60,7 +62,12 @@ class ApkController extends Controller
 
         $filePath = $generalSetting->apk_file_path;
 
-        if (! Storage::disk('public')->exists($filePath)) {
+        // New uploads live on the private "local" disk; fall back to "public" for
+        // files uploaded before the move so existing installs keep working.
+        $disk = Storage::disk('local')->exists($filePath) ? 'local'
+            : (Storage::disk('public')->exists($filePath) ? 'public' : null);
+
+        if ($disk === null) {
             return BaseResource::make(null)
                 ->additional([
                     'status' => 404,
@@ -70,7 +77,7 @@ class ApkController extends Controller
                 ->setStatusCode(404);
         }
 
-        return Storage::disk('public')->download($filePath, 'app-'.$generalSetting->apk_version.'.apk');
+        return Storage::disk($disk)->download($filePath, 'app-'.$generalSetting->apk_version.'.apk');
     }
 
     /**
@@ -90,7 +97,8 @@ class ApkController extends Controller
                 ->setStatusCode(404);
         }
 
-        $downloadUrl = url('storage/'.$generalSetting->tablet_apk_file_path);
+        // Short-lived signed URL so the APK is not exposed at a permanent public URL.
+        $downloadUrl = URL::temporarySignedRoute('api.apk.tablet.download', now()->addMinutes(30));
 
         return BaseResource::make([
             'version' => $generalSetting->tablet_apk_version,
@@ -124,7 +132,12 @@ class ApkController extends Controller
 
         $filePath = $generalSetting->tablet_apk_file_path;
 
-        if (! Storage::disk('public')->exists($filePath)) {
+        // New uploads live on the private "local" disk; fall back to "public" for
+        // files uploaded before the move so existing installs keep working.
+        $disk = Storage::disk('local')->exists($filePath) ? 'local'
+            : (Storage::disk('public')->exists($filePath) ? 'public' : null);
+
+        if ($disk === null) {
             return BaseResource::make(null)
                 ->additional([
                     'status' => 404,
@@ -134,6 +147,6 @@ class ApkController extends Controller
                 ->setStatusCode(404);
         }
 
-        return Storage::disk('public')->download($filePath, 'app-tablet-'.$generalSetting->tablet_apk_version.'.apk');
+        return Storage::disk($disk)->download($filePath, 'app-tablet-'.$generalSetting->tablet_apk_version.'.apk');
     }
 }

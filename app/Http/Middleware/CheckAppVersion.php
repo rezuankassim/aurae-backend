@@ -7,6 +7,7 @@ use App\Models\GeneralSetting;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckAppVersion
@@ -29,7 +30,7 @@ class CheckAppVersion
             // Compare versions
             if (version_compare($mobileAppVersion, $requiredVersion, '<')) {
                 $downloadUrl = $generalSetting->apk_file_path
-                    ? url('storage/'.$generalSetting->apk_file_path)
+                    ? URL::temporarySignedRoute('api.apk.download', now()->addMinutes(30))
                     : '';
 
                 $data = [
@@ -57,7 +58,7 @@ class CheckAppVersion
             // Compare versions
             if (version_compare($tabletAppVersion, $requiredVersion, '<')) {
                 $downloadUrl = $generalSetting->tablet_apk_file_path
-                    ? url('storage/'.$generalSetting->tablet_apk_file_path)
+                    ? URL::temporarySignedRoute('api.apk.tablet.download', now()->addMinutes(30))
                     : '';
 
                 $data = [

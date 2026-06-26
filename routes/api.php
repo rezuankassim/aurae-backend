@@ -39,14 +39,19 @@ use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], function () {
-    // Mobile APK routes
-    Route::get('/apk/info', [ApkController::class, 'info'])->name('api.apk.info');
+// APK downloads are opened by Android's DownloadManager / browser, which do not send
+// device headers, so they are protected by a temporary signed URL instead of EnsureDevice.
+Route::middleware('signed')->group(function () {
     Route::get('/apk/download', [ApkController::class, 'download'])->name('api.apk.download');
-
-    // Tablet APK routes
-    Route::get('/apk/tablet/info', [ApkController::class, 'tabletInfo'])->name('api.apk.tablet.info');
     Route::get('/apk/tablet/download', [ApkController::class, 'tabletDownload'])->name('api.apk.tablet.download');
+});
+
+Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], function () {
+    // Mobile APK info route
+    Route::get('/apk/info', [ApkController::class, 'info'])->name('api.apk.info');
+
+    // Tablet APK info route
+    Route::get('/apk/tablet/info', [ApkController::class, 'tabletInfo'])->name('api.apk.tablet.info');
 
     // Unprotected routes
     Route::get('/general-settings', [GeneralSettingController::class, 'index'])->name('api.general-settings.index');

@@ -42,15 +42,19 @@ class GeneralSettingController extends Controller
 
         // Handle APK file upload
         if ($request->hasFile('apk_file')) {
-            // Delete old APK file if exists
-            if ($generalSetting->apk_file_path && Storage::disk('public')->exists($generalSetting->apk_file_path)) {
-                Storage::disk('public')->delete($generalSetting->apk_file_path);
+            // Delete old APK file if it exists (check both disks for backward compatibility)
+            if ($generalSetting->apk_file_path) {
+                foreach (['local', 'public'] as $oldDisk) {
+                    if (Storage::disk($oldDisk)->exists($generalSetting->apk_file_path)) {
+                        Storage::disk($oldDisk)->delete($generalSetting->apk_file_path);
+                    }
+                }
             }
 
-            // Store new APK file with original extension
+            // Store new APK file on the private disk so it is only reachable via signed URLs
             $file = $request->file('apk_file');
             $filename = time().'_'.$file->getClientOriginalName();
-            $path = $file->storeAs('apk', $filename, 'public');
+            $path = $file->storeAs('apk', $filename, 'local');
 
             $generalSetting->apk_file_path = $path;
             $generalSetting->apk_file_size = $file->getSize();
@@ -67,15 +71,19 @@ class GeneralSettingController extends Controller
 
         // Handle Tablet APK file upload
         if ($request->hasFile('tablet_apk_file')) {
-            // Delete old tablet APK file if exists
-            if ($generalSetting->tablet_apk_file_path && Storage::disk('public')->exists($generalSetting->tablet_apk_file_path)) {
-                Storage::disk('public')->delete($generalSetting->tablet_apk_file_path);
+            // Delete old tablet APK file if it exists (check both disks for backward compatibility)
+            if ($generalSetting->tablet_apk_file_path) {
+                foreach (['local', 'public'] as $oldDisk) {
+                    if (Storage::disk($oldDisk)->exists($generalSetting->tablet_apk_file_path)) {
+                        Storage::disk($oldDisk)->delete($generalSetting->tablet_apk_file_path);
+                    }
+                }
             }
 
-            // Store new tablet APK file with original extension
+            // Store new tablet APK file on the private disk so it is only reachable via signed URLs
             $file = $request->file('tablet_apk_file');
             $filename = time().'_tablet_'.$file->getClientOriginalName();
-            $path = $file->storeAs('apk/tablet', $filename, 'public');
+            $path = $file->storeAs('apk/tablet', $filename, 'local');
 
             $generalSetting->tablet_apk_file_path = $path;
             $generalSetting->tablet_apk_file_size = $file->getSize();
