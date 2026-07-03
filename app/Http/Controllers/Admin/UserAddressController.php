@@ -28,7 +28,7 @@ class UserAddressController extends Controller
             ->get();
 
         $addresses->map(function ($address) {
-            $address->stateData = State::where('code', $address->state)
+            $address->stateData = State::where('id', $address->state)
                 ->where('country_id', $address->country_id)
                 ->first();
 
@@ -76,6 +76,14 @@ class UserAddressController extends Controller
             $customer->addresses()->update(['billing_default' => false]);
         }
 
+        $country_id = Country::where('iso3', $validated['country'])->value('id');
+
+        if ($validated['state']) {
+            $state = State::where('code', $validated['state'])->where('country_id', $country_id)->value('id');
+        } else {
+            $state = null;
+        }
+
         $customer->addresses()->create([
             'title' => $validated['title'] ?? null,
             'first_name' => Str::before($validated['name'], ' '),
@@ -84,9 +92,9 @@ class UserAddressController extends Controller
             'line_two' => $validated['line2'] ?? null,
             'line_three' => $validated['line3'] ?? null,
             'city' => $validated['city'],
-            'state' => $validated['state'] ?? null,
+            'state' => $state,
             'postcode' => $validated['postal_code'] ?? null,
-            'country_id' => Country::where('iso3', $validated['country'])->value('id'),
+            'country_id' => $country_id,
             'delivery_instructions' => $validated['delivery_instructions'] ?? null,
             'contact_email' => $validated['email'] ?? $user->email,
             'contact_phone' => $validated['phone'],
