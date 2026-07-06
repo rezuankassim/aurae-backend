@@ -130,6 +130,14 @@ class UserAddressController extends Controller
                 ->update(['billing_default' => false]);
         }
 
+        $country_id = Country::where('iso3', $validated['country'])->value('id');
+
+        if (! empty($validated['state'])) {
+            $state = State::where('code', $validated['state'])->where('country_id', $country_id)->value('id');
+        } else {
+            $state = null;
+        }
+
         $address->update([
             'title' => $validated['title'] ?? null,
             'first_name' => Str::before($validated['name'], ' '),
@@ -138,9 +146,9 @@ class UserAddressController extends Controller
             'line_two' => $validated['line2'] ?? null,
             'line_three' => $validated['line3'] ?? null,
             'city' => $validated['city'],
-            'state' => $validated['state'] ?? null,
+            'state' => $state,
             'postcode' => $validated['postal_code'] ?? null,
-            'country_id' => Country::where('iso3', $validated['country'])->value('id'),
+            'country_id' => $country_id,
             'delivery_instructions' => $validated['delivery_instructions'] ?? null,
             'contact_email' => $validated['email'] ?? $user->email,
             'contact_phone' => $validated['phone'],

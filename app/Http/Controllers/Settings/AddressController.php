@@ -36,7 +36,7 @@ class AddressController extends Controller
         $addresses = auth()->user()->customers()->first()?->addresses()->with('country')->get() ?? collect();
 
         $addresses->map(function ($address) {
-            $address->stateData = State::where('code', $address->state)->where('country_id', $address->country_id)->first();
+            $address->stateData = State::where('id', $address->state)->where('country_id', $address->country_id)->first();
 
             return $address;
         });
@@ -56,6 +56,14 @@ class AddressController extends Controller
 
         $customer = auth()->user()->customers()->first();
 
+        $country_id = Country::where('iso3', $validated['country'])->value('id');
+
+        if (! empty($validated['state'])) {
+            $state = State::where('code', $validated['state'])->where('country_id', $country_id)->value('id');
+        } else {
+            $state = null;
+        }
+
         $customer->addresses()->create([
             'title' => $validated['title'] ?? null,
             'first_name' => Str::before($validated['name'], ' '),
@@ -64,9 +72,9 @@ class AddressController extends Controller
             'line_two' => $validated['line2'] ?? null,
             'line_three' => $validated['line3'] ?? null,
             'city' => $validated['city'],
-            'state' => $validated['state'] ?? null,
+            'state' => $state,
             'postcode' => $validated['postal_code'] ?? null,
-            'country_id' => Country::where('iso3', $validated['country'])->first()->id,
+            'country_id' => $country_id,
             'delivery_instructions' => $validated['delivery_instructions'] ?? '',
             'contact_email' => $validated['email'] ?? auth()->user()->email,
             'contact_phone' => $validated['phone'],
@@ -111,6 +119,14 @@ class AddressController extends Controller
     {
         $validated = $request->validated();
 
+        $country_id = Country::where('iso3', $validated['country'])->value('id');
+
+        if (! empty($validated['state'])) {
+            $state = State::where('code', $validated['state'])->where('country_id', $country_id)->value('id');
+        } else {
+            $state = null;
+        }
+
         $address->update([
             'title' => $validated['title'] ?? null,
             'first_name' => Str::before($validated['name'], ' '),
@@ -119,9 +135,9 @@ class AddressController extends Controller
             'line_two' => $validated['line2'] ?? null,
             'line_three' => $validated['line3'] ?? null,
             'city' => $validated['city'],
-            'state' => $validated['state'] ?? null,
+            'state' => $state,
             'postcode' => $validated['postal_code'] ?? null,
-            'country_id' => Country::where('iso3', $validated['country'])->first()->id,
+            'country_id' => $country_id,
             'delivery_instructions' => $validated['delivery_instructions'] ?? '',
             'contact_email' => $validated['email'] ?? auth()->user()->email,
             'contact_phone' => $validated['phone'],
