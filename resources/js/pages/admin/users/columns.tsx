@@ -66,6 +66,31 @@ export const columns = (showDeleted: boolean): ColumnDef<User>[] => [
             return dayjs(createdAt).format('DD MMM YYYY, HH:mm');
         },
     },
+    ...(showDeleted
+        ? [
+              {
+                  id: 'deleted_by',
+                  header: 'Deleted by',
+                  cell: ({ row }) => {
+                      if (!row.original.deleted_at) {
+                          return '-';
+                      }
+
+                      const audit = row.original.deletion_audit;
+
+                      if (!audit) {
+                          return 'Unknown';
+                      }
+
+                      if (audit.type === 'self') {
+                          return 'Self';
+                      }
+
+                      return audit.actor ? `${audit.actor.name} (${audit.type})` : audit.type;
+                  },
+              } as ColumnDef<User>,
+          ]
+        : []),
     {
         id: 'actions',
         cell: ({ row }) => {
@@ -93,13 +118,13 @@ export const columns = (showDeleted: boolean): ColumnDef<User>[] => [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem asChild>
+                            <Link className="hover:cursor-pointer" href={show(row.original.id).url}>
+                                View
+                            </Link>
+                        </DropdownMenuItem>
                         {!isDeleted && (
                             <>
-                                <DropdownMenuItem asChild>
-                                    <Link className="hover:cursor-pointer" href={show(row.original.id).url}>
-                                        View
-                                    </Link>
-                                </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
                                     <Link className="hover:cursor-pointer" href={edit(row.original.id).url}>
                                         Edit

@@ -59,6 +59,16 @@ export interface User {
     is_admin: boolean;
     status: boolean;
     guest?: { id: string } | null;
+    deletion_audit?: {
+        type: 'self' | 'admin' | 'user' | 'system';
+        deleted_at: string | null;
+        actor: {
+            id: number;
+            name: string;
+            email: string;
+            is_admin: boolean;
+        } | null;
+    } | null;
     [key: string]: unknown; // This allows for additional properties...
 }
 

@@ -8,6 +8,7 @@ import UsersLayout from '@/layouts/users/layout';
 import { edit, index } from '@/routes/admin/users';
 import { BreadcrumbItem, User } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import dayjs from 'dayjs';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,6 +22,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function UsersShow({ user }: { user: User }) {
+    const deletionAudit = user.deletion_audit;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Manage user information" />
@@ -30,9 +33,11 @@ export default function UsersShow({ user }: { user: User }) {
                     <div className="flex items-center justify-between">
                         <HeadingSmall title="User information" description="Manage user infromation" />
 
-                        <Button asChild>
-                            <Link href={edit(user.id)}>Edit user</Link>
-                        </Button>
+                        {!user.deleted_at && (
+                            <Button asChild>
+                                <Link href={edit(user.id)}>Edit user</Link>
+                            </Button>
+                        )}
                     </div>
 
                     <div className="space-y-6">
@@ -65,8 +70,33 @@ export default function UsersShow({ user }: { user: User }) {
                                 <div className="grid gap-2">
                                     <Label htmlFor="status">Status</Label>
 
-                                    <p>{user.status ? <Badge>Active</Badge> : <Badge variant="destructive">Inactive</Badge>}</p>
+                                    <p>
+                                        {user.deleted_at ? (
+                                            <Badge variant="destructive">Deleted</Badge>
+                                        ) : user.status ? (
+                                            <Badge>Active</Badge>
+                                        ) : (
+                                            <Badge variant="destructive">Inactive</Badge>
+                                        )}
+                                    </p>
                                 </div>
+
+                                {user.deleted_at && (
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="deleted_by">Deleted by</Label>
+
+                                        <p>
+                                            {deletionAudit?.type === 'self'
+                                                ? 'Self'
+                                                : deletionAudit?.actor
+                                                  ? `${deletionAudit.actor.name} (${deletionAudit.actor.email})`
+                                                  : 'Unknown/system'}
+                                        </p>
+                                        <p className="text-sm text-muted-foreground">
+                                            {deletionAudit?.deleted_at ? dayjs(deletionAudit.deleted_at).format('DD MMM YYYY, HH:mm') : '-'}
+                                        </p>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>

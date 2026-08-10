@@ -29,7 +29,7 @@ class UserController extends Controller
             $query->withTrashed();
         }
 
-        $users = $query->get();
+        $users = $query->get()->map(fn (User $user) => $this->userPayload($user));
 
         return Inertia::render('admin/users/index', [
             'users' => $users,
@@ -73,10 +73,12 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show(int $user)
     {
+        $user = User::withTrashed()->findOrFail($user);
+
         return Inertia::render('admin/users/show', [
-            'user' => $user,
+            'user' => $this->userPayload($user),
         ]);
     }
 
@@ -88,6 +90,19 @@ class UserController extends Controller
         return Inertia::render('admin/users/edit', [
             'user' => $user,
         ]);
+    }
+
+    /**
+     * Format the user payload for admin Inertia pages.
+     *
+     * @return array<string, mixed>
+     */
+    protected function userPayload(User $user): array
+    {
+        return [
+            ...$user->toArray(),
+            'deletion_audit' => $user->deletionAudit(),
+        ];
     }
 
     /**

@@ -17,6 +17,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Lunar\Base\LunarUser as LunarUserInterface;
 use Lunar\Base\Traits\LunarUser;
 use Lunar\Models\Customer;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUserInterface
@@ -124,7 +125,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
      */
     public function isGuest(): bool
     {
-        return $this->is_guest;
+        return (bool) $this->is_guest;
     }
 
     /**
@@ -228,6 +229,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
     protected static function booted(): void
     {
         static::softDeleted(function (User $user) {
+            $user->unlinkMachines();
+            $user->recordDeletionActivity();
+
             $user->updateQuietly([
                 'email' => $user->email.'_deleted_'.$user->id,
                 'username' => $user->username.'_deleted_'.$user->id,
@@ -240,6 +244,114 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
             $user->username = preg_replace('/_deleted_\d+$/', '', $user->username);
             $user->phone = preg_replace('/_deleted_\d+$/', '', $user->phone);
         });
+    }
+
+    /**
+     * Unlink machines owned by this user so they can be bound again.
+     */
+    public function unlinkMachines(): void
+    {
+        $deviceIds = $this->machines()
+            ->whereNotNull('device_id')
+            ->pluck('device_id')
+            ->filter()
+            ->unique();
+
+        if ($deviceIds->isNotEmpty()) {
+            Device::whereIn('id', $deviceIds)->update([
+                'user_id' => null,
+            ]);
+        }
+
+        $this->machines()->update([
+            'user_id' => null,
+            'device_id' => null,
+            'user_subscription_id' => null,
+        ]);
+    }
+
+    /**
+     * Get the latest deletion audit entry for this user.
+     */
+    public function latestDeletionActivity(): ?Activity
+    {
+        return Activity::query()
+            ->where('subject_type', self::class)
+            ->where('subject_id', $this->getKey())
+            ->where('event', 'user-deleted')
+            ->with('causer')
+            ->latest()
+            ->first();
+    }
+
+    /**
+     * Format the latest deletion audit entry for Inertia responses.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function deletionAudit(): ?array
+    {
+        $activity = $this->latestDeletionActivity();
+
+        if (! $activity) {
+            return null;
+        }
+
+        $properties = $activity->properties ?? collect();
+        $causer = $activity->causer;
+
+        return [
+            'type' => $properties->get('deletion_type', 'system'),
+            'deleted_at' => $activity->created_at?->toISOString(),
+            'actor' => $causer ? [
+                'id' => $causer->getKey(),
+                'name' => $causer->name,
+                'email' => $causer->email,
+                'is_admin' => (bool) $causer->is_admin,
+            ] : null,
+        ];
+    }
+
+    /**
+     * Record who deleted this user.
+     */
+    protected function recordDeletionActivity(): void
+    {
+        $actor = auth()->user();
+
+        activity()
+            ->useLog('users')
+            ->performedOn($this)
+            ->when($actor, fn ($logger) => $logger->causedBy($actor))
+            ->event('user-deleted')
+            ->withProperties([
+                'deletion_type' => $this->deletionType($actor),
+                'deleted_user_id' => $this->getKey(),
+                'deleted_user_email' => $this->email,
+                'actor_user_id' => $actor?->getKey(),
+                'actor_is_admin' => (bool) ($actor?->is_admin ?? false),
+            ])
+            ->log('user-deleted');
+    }
+
+    /**
+     * Determine how this user deletion was initiated.
+     */
+    protected function deletionType(?User $actor): string
+    {
+        if (! $actor) {
+            return 'system';
+        }
+
+        if ((int) $actor->getKey() === (int) $this->getKey()) {
+            return 'self';
+        }
+
+        if ($actor->is_admin) {
+            return 'admin';
+        }
+
+        return 'user';
     }
 
     /**
