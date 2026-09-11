@@ -7,11 +7,6 @@ use Illuminate\Support\Facades\Storage;
 
 class Music extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'title',
         'thumbnail',
@@ -20,11 +15,6 @@ class Music extends Model
         'is_active',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -33,17 +23,11 @@ class Music extends Model
         ];
     }
 
-    /**
-     * Get the storage disk based on environment.
-     */
     protected function storageDisk(): string
     {
         return app()->environment('production') ? 's3' : 'public';
     }
 
-    /**
-     * Get the music URL
-     */
     public function getUrlAttribute(): ?string
     {
         if (! $this->path) {
@@ -59,9 +43,6 @@ class Music extends Model
         return Storage::disk('s3')->url($this->path);
     }
 
-    /**
-     * Get the thumbnail URL
-     */
     public function getThumbnailUrlAttribute(): ?string
     {
         if (! $this->thumbnail) {

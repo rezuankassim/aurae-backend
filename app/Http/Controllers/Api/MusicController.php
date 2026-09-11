@@ -8,9 +8,6 @@ use App\Models\Music;
 
 class MusicController extends Controller
 {
-    /**
-     * Display a listing of active music.
-     */
     public function index()
     {
         $music = Music::where('is_active', true)

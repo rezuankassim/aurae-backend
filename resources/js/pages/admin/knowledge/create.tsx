@@ -79,7 +79,7 @@ export default function KnowledgeCreate() {
             const url = URL.createObjectURL(file);
             setVideoPreview(url);
 
-            // Start chunked upload immediately
+
             try {
                 await uploadFile(file);
             } catch (error) {
@@ -173,79 +173,7 @@ export default function KnowledgeCreate() {
                                             {errors.video_url ? <FieldError>{errors.video_url}</FieldError> : null}
                                         </Field>
 
-                                        {/* <Field>
-                                            <FieldLabel htmlFor="video">Upload Video</FieldLabel>
-                                            <input
-                                                ref={videoInputRef}
-                                                type="file"
-                                                id="video"
-                                                accept="video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/x-flv,video/x-matroska,video/webm"
-                                                className="hidden"
-                                                onChange={handleVideoChange}
-                                                disabled={uploadState.uploading}
-                                            />
-
-                                            {!videoFile && (
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    onClick={() => videoInputRef.current?.click()}
-                                                    className="w-full"
-                                                    disabled={uploadState.uploading}
-                                                >
-                                                    Choose Video File (Max 5GB)
-                                                </Button>
-                                            )}
-
-                                            {uploadState.uploading && (
-                                                <div className="space-y-2">
-                                                    <div className="flex items-center justify-between text-sm">
-                                                        <span className="flex items-center gap-2">
-                                                            <Loader2 className="size-4 animate-spin" />
-                                                            Uploading video...
-                                                        </span>
-                                                        <span className="font-medium">{uploadState.progress.toFixed(1)}%</span>
-                                                    </div>
-                                                    <Progress value={uploadState.progress} />
-                                                </div>
-                                            )}
-
-                                            {uploadState.error && (
-                                                <div className="rounded-md bg-destructive p-3 text-sm text-white">{uploadState.error}</div>
-                                            )}
-
-                                            {videoFile && videoPreview && (
-                                                <div className="space-y-2">
-                                                    <div className="relative">
-                                                        <video src={videoPreview} controls className="w-full rounded-lg" />
-                                                        <Button
-                                                            type="button"
-                                                            variant="destructive"
-                                                            size="icon"
-                                                            className="absolute top-2 right-2"
-                                                            onClick={() => {
-                                                                setVideoFile(null);
-                                                                setVideoPreview(null);
-                                                                if (videoInputRef.current) {
-                                                                    videoInputRef.current.value = '';
-                                                                }
-                                                            }}
-                                                        >
-                                                            <X className="size-4" />
-                                                        </Button>
-                                                    </div>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            <FieldDescription>
-                                                Upload a video file (MP4, MOV, AVI, WMV, FLV, MKV, WebM). Maximum size: 5GB. If video is uploaded,
-                                                video URL will be ignored.
-                                            </FieldDescription>
-                                            {errors.video ? <FieldError>{errors.video}</FieldError> : null}
-                                        </Field> */}
+                                        {}
 
                                         <div className="grid grid-flow-col gap-2">
                                             <Field>

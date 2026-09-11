@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\URL;
 
 class ApkController extends Controller
 {
-    /**
-     * Get APK file information
-     */
     public function info()
     {
         $generalSetting = GeneralSetting::first();
@@ -27,7 +24,6 @@ class ApkController extends Controller
                 ->setStatusCode(404);
         }
 
-        // Short-lived signed URL so the APK is not exposed at a permanent public URL.
         $downloadUrl = URL::temporarySignedRoute('api.apk.download', now()->addMinutes(30));
 
         return BaseResource::make([
@@ -43,9 +39,6 @@ class ApkController extends Controller
             ]);
     }
 
-    /**
-     * Download APK file
-     */
     public function download()
     {
         $generalSetting = GeneralSetting::first();
@@ -62,8 +55,6 @@ class ApkController extends Controller
 
         $filePath = $generalSetting->apk_file_path;
 
-        // New uploads live on the private "local" disk; fall back to "public" for
-        // files uploaded before the move so existing installs keep working.
         $disk = Storage::disk('local')->exists($filePath) ? 'local'
             : (Storage::disk('public')->exists($filePath) ? 'public' : null);
 
@@ -80,9 +71,6 @@ class ApkController extends Controller
         return Storage::disk($disk)->download($filePath, 'app-'.$generalSetting->apk_version.'.apk');
     }
 
-    /**
-     * Get Tablet APK file information
-     */
     public function tabletInfo()
     {
         $generalSetting = GeneralSetting::first();
@@ -97,7 +85,6 @@ class ApkController extends Controller
                 ->setStatusCode(404);
         }
 
-        // Short-lived signed URL so the APK is not exposed at a permanent public URL.
         $downloadUrl = URL::temporarySignedRoute('api.apk.tablet.download', now()->addMinutes(30));
 
         return BaseResource::make([
@@ -113,9 +100,6 @@ class ApkController extends Controller
             ]);
     }
 
-    /**
-     * Download Tablet APK file
-     */
     public function tabletDownload()
     {
         $generalSetting = GeneralSetting::first();
@@ -132,8 +116,6 @@ class ApkController extends Controller
 
         $filePath = $generalSetting->tablet_apk_file_path;
 
-        // New uploads live on the private "local" disk; fall back to "public" for
-        // files uploaded before the move so existing installs keep working.
         $disk = Storage::disk('local')->exists($filePath) ? 'local'
             : (Storage::disk('public')->exists($filePath) ? 'public' : null);
 

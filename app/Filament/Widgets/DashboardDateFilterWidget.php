@@ -132,7 +132,6 @@ class DashboardDateFilterWidget extends Widget implements HasForms
         return response()->streamDownload(function () use ($orders) {
             $handle = fopen('php://output', 'w');
 
-            // UTF-8 BOM for Excel compatibility
             fwrite($handle, "\xEF\xBB\xBF");
 
             fputcsv($handle, [

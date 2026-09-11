@@ -2,15 +2,6 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Measurements
-    |--------------------------------------------------------------------------
-    |
-    | You can use any measurements available at
-    | https://github.com/cartalyst/converter/edit/master/src/config/config.php
-    |
-    */
     'measurements' => [
 
         'length' => [

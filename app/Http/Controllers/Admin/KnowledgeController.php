@@ -12,9 +12,6 @@ use Inertia\Inertia;
 
 class KnowledgeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $knowledge = Knowledge::orderBy('order', 'asc')->get();
@@ -28,34 +25,18 @@ class KnowledgeController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return Inertia::render('admin/knowledge/create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(KnowledgeCreateRequest $request)
     {
         $validated = $request->validated();
 
-        // Handle cover image upload
         if ($request->hasFile('cover_image')) {
             $validated['cover_image'] = $request->file('cover_image')->store('knowledge/covers', 'public');
         }
-
-        // // Handle video upload (traditional)
-        // if ($request->hasFile('video')) {
-        //     $validated['video_path'] = $request->file('video')->store('knowledge/videos', 'public');
-        // }
-        // // Handle chunked upload path
-        // elseif ($request->has('video_path')) {
-        //     $validated['video_path'] = $request->input('video_path');
-        // }
 
         $validated['published_at'] = isset($validated['published_date']) && isset($validated['published_time']) ? Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']) : null;
 
@@ -70,9 +51,6 @@ class KnowledgeController extends Controller
         return to_route('admin.knowledge.index')->with('success', 'Tutorial created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Knowledge $knowledge)
     {
         return Inertia::render('admin/knowledge/show', [
@@ -80,9 +58,6 @@ class KnowledgeController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Knowledge $knowledge)
     {
         $knowledge->published_date = $knowledge->published_at ? $knowledge->published_at->format('d-m-Y') : null;
@@ -93,41 +68,18 @@ class KnowledgeController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(KnowledgeUpdateRequest $request, Knowledge $knowledge)
     {
         $validated = $request->validated();
 
-        // Handle cover image upload
         if ($request->hasFile('cover_image')) {
-            // Delete old cover image if exists
+
             if ($knowledge->cover_image && Storage::disk('public')->exists($knowledge->cover_image)) {
                 Storage::disk('public')->delete($knowledge->cover_image);
             }
 
             $validated['cover_image'] = $request->file('cover_image')->store('knowledge/covers', 'public');
         }
-
-        // // Handle video upload (traditional)
-        // if ($request->hasFile('video')) {
-        //     // Delete old video if exists
-        //     if ($knowledge->video_path && Storage::disk('public')->exists($knowledge->video_path)) {
-        //         Storage::disk('public')->delete($knowledge->video_path);
-        //     }
-
-        //     $validated['video_path'] = $request->file('video')->store('knowledge/videos', 'public');
-        // }
-        // // Handle chunked upload path
-        // elseif ($request->has('video_path')) {
-        //     // Delete old video if exists
-        //     if ($knowledge->video_path && Storage::disk('public')->exists($knowledge->video_path)) {
-        //         Storage::disk('public')->delete($knowledge->video_path);
-        //     }
-
-        //     $validated['video_path'] = $request->input('video_path');
-        // }
 
         $validated['published_at'] = isset($validated['published_date']) && isset($validated['published_time']) ? Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']) : null;
 
@@ -142,9 +94,6 @@ class KnowledgeController extends Controller
         return to_route('admin.knowledge.index')->with('success', 'Tutorial updated successfully.');
     }
 
-    /**
-     * Update the order of knowledge entries.
-     */
     public function reorder()
     {
         $knowledgeEntries = request()->validate([
@@ -160,9 +109,6 @@ class KnowledgeController extends Controller
         return back()->with('success', 'Tutorials reordered successfully.');
     }
 
-    /**
-     * Unpublish the specified knowledge entry.
-     */
     public function unpublish(Knowledge $knowledge)
     {
         $knowledge->update([
@@ -173,17 +119,13 @@ class KnowledgeController extends Controller
         return back()->with('success', 'Tutorial unpublished successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Knowledge $knowledge)
     {
-        // Delete cover image if exists
+
         if ($knowledge->cover_image && Storage::disk('public')->exists($knowledge->cover_image)) {
             Storage::disk('public')->delete($knowledge->cover_image);
         }
 
-        // Delete video file if exists
         if ($knowledge->video_path && Storage::disk('public')->exists($knowledge->video_path)) {
             Storage::disk('public')->delete($knowledge->video_path);
         }

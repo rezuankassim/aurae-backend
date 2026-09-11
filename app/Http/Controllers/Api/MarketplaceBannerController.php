@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 
 class MarketplaceBannerController extends Controller
 {
-    /**
-     * Get all active marketplace banners for mobile app.
-     */
     public function index(Request $request)
     {
         $banners = MarketplaceBanner::where('is_active', true)

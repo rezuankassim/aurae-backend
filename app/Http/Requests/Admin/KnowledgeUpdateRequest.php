@@ -6,31 +6,22 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class KnowledgeUpdateRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return auth()->user()->is_admin;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'cover_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:10240'], // 10MB
+            'cover_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:10240'],
             'content' => ['required', 'string'],
             'html_content' => ['required', 'string'],
             'published_date' => ['nullable', 'date'],
             'published_time' => ['nullable', 'string'],
             'video_url' => ['nullable', 'url', 'max:255'],
-            // 'video' => ['nullable', 'file', 'mimes:mp4,mov,avi,wmv,flv,mkv,webm', 'max:5242880'], // 5GB = 5242880 KB
-            // 'video_path' => ['nullable', 'string', 'max:500'], // For chunked upload path
+
         ];
     }
 }

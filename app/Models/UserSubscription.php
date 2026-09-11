@@ -34,33 +34,21 @@ class UserSubscription extends Model
         'cancelled_at' => 'datetime',
     ];
 
-    /**
-     * Get the user that owns the subscription.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the subscription plan.
-     */
     public function subscription(): BelongsTo
     {
         return $this->belongsTo(Subscription::class);
     }
 
-    /**
-     * Get the machine bound to this subscription.
-     */
     public function machine(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Machine::class);
     }
 
-    /**
-     * Scope a query to only include active subscriptions.
-     */
     public function scopeActive($query)
     {
         return $query->where('status', 'active')
@@ -70,9 +58,6 @@ class UserSubscription extends Model
             });
     }
 
-    /**
-     * Check if subscription is currently active.
-     */
     public function isActive(): bool
     {
         return $this->status === 'active' &&

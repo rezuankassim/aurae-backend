@@ -26,35 +26,24 @@ class Subscription extends Model
         'max_machines' => 'integer',
     ];
 
-    /**
-     * Boot the model.
-     */
     protected static function boot()
     {
         parent::boot();
 
-        // Always set max_machines to 1 when creating
         static::creating(function ($subscription) {
             $subscription->max_machines = 1;
         });
 
-        // Prevent updating max_machines
         static::updating(function ($subscription) {
             $subscription->max_machines = 1;
         });
     }
 
-    /**
-     * Get the user subscriptions for this plan.
-     */
     public function userSubscriptions(): HasMany
     {
         return $this->hasMany(UserSubscription::class);
     }
 
-    /**
-     * Scope a query to only include active subscriptions.
-     */
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

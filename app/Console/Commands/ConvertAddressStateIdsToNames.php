@@ -8,23 +8,10 @@ use Lunar\Models\State;
 
 class ConvertAddressStateIdsToNames extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'addresses:convert-state-ids {--dry-run : Preview changes without applying them}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Convert state IDs to state name strings in the lunar_addresses table';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
         dd(\Carbon\Carbon::createFromFormat('dmY H:i:s', '24042026 22:54:56'));
@@ -45,7 +32,7 @@ class ConvertAddressStateIdsToNames extends Command
         $notFound = 0;
 
         foreach ($addresses as $address) {
-            // Skip if state is already a non-numeric string (already converted)
+
             if (! is_numeric($address->state)) {
                 $skipped++;
 

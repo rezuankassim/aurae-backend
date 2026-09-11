@@ -27,15 +27,15 @@ export default function GeneralSettingsEdit({ generalSetting }: { generalSetting
         const input = e.currentTarget;
         let value = input.value.replace(/[^0-9.]/g, '');
 
-        // Prevent multiple consecutive dots
+
         value = value.replace(/\.{2,}/g, '.');
 
-        // Ensure it starts with a number
+
         if (value.startsWith('.')) {
             value = value.substring(1);
         }
 
-        // Limit to x.y.z format (major.minor.patch)
+
         const parts = value.split('.');
         if (parts.length > 3) {
             value = parts.slice(0, 3).join('.');

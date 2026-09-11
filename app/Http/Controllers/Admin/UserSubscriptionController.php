@@ -12,14 +12,10 @@ use Inertia\Inertia;
 
 class UserSubscriptionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $query = UserSubscription::with(['user', 'subscription'])->whereHas('user');
 
-        // Search filter
         if ($request->has('search')) {
             $search = $request->search;
             $query->whereHas('user', function ($q) use ($search) {
@@ -28,12 +24,10 @@ class UserSubscriptionController extends Controller
             });
         }
 
-        // Status filter
         if ($request->has('status') && $request->status !== '') {
             $query->where('status', $request->status);
         }
 
-        // Payment status filter
         if ($request->has('payment_status') && $request->payment_status !== '') {
             $query->where('payment_status', $request->payment_status);
         }
@@ -46,9 +40,6 @@ class UserSubscriptionController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new B2B subscription.
-     */
     public function create()
     {
         $subscriptions = Subscription::active()->orderBy('title')->get(['id', 'title', 'pricing_title', 'price']);
@@ -62,9 +53,6 @@ class UserSubscriptionController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created B2B subscription for a single user.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -93,9 +81,6 @@ class UserSubscriptionController extends Controller
         return to_route('admin.user-subscriptions.index')->with('success', 'B2B subscription created successfully.');
     }
 
-    /**
-     * Bulk-create B2B subscriptions for multiple users.
-     */
     public function bulkStore(Request $request)
     {
         $validated = $request->validate([
@@ -132,9 +117,6 @@ class UserSubscriptionController extends Controller
         return to_route('admin.user-subscriptions.index')->with('success', "B2B subscriptions created successfully for {$count} user(s).");
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(UserSubscription $userSubscription)
     {
         $userSubscription->load(['user', 'subscription', 'user.machines']);
@@ -144,9 +126,6 @@ class UserSubscriptionController extends Controller
         ]);
     }
 
-    /**
-     * Cancel user subscription.
-     */
     public function cancel(UserSubscription $userSubscription)
     {
         if ($userSubscription->status === 'cancelled') {
@@ -159,7 +138,6 @@ class UserSubscriptionController extends Controller
             'ends_at' => now(),
         ]);
 
-        // Check if this is a recurring subscription - admin needs to cancel in SenangPay
         if ($userSubscription->is_recurring) {
             return back()->with([
                 'success' => 'Subscription cancelled in the system.',
@@ -170,10 +148,6 @@ class UserSubscriptionController extends Controller
         return back()->with('success', 'Subscription cancelled successfully.');
     }
 
-    /**
-     * Manually activate a user subscription.
-     * Detaches from SenangPay by setting payment_method to 'manual' and disabling recurring.
-     */
     public function activate(UserSubscription $userSubscription)
     {
         if ($userSubscription->status === 'active') {
@@ -200,9 +174,6 @@ class UserSubscriptionController extends Controller
         return back()->with('success', 'Subscription activated manually. Payment method set to manual and recurring billing disabled.');
     }
 
-    /**
-     * Extend user subscription.
-     */
     public function extend(Request $request, UserSubscription $userSubscription)
     {
         $validated = $request->validate([

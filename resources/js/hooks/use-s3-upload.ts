@@ -24,7 +24,7 @@ export function useS3Upload(): UseS3UploadReturn {
         setError(null);
 
         try {
-            // Get pre-signed URL from server
+
             const response = await fetch(presignedUrl().url, {
                 method: 'POST',
                 headers: {
@@ -45,13 +45,13 @@ export function useS3Upload(): UseS3UploadReturn {
 
             const data = await response.json();
 
-            // If local upload (development), return null to signal using normal upload
+
             if (data.use_local) {
                 setIsUploading(false);
                 return null;
             }
 
-            // Upload directly to S3
+
             await new Promise<void>((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
 
@@ -79,7 +79,7 @@ export function useS3Upload(): UseS3UploadReturn {
                 xhr.send(file);
             });
 
-            // Return the S3 key for storing in database
+
             const s3Url = `https://${data.bucket}.s3.${data.region}.amazonaws.com/${data.key}`;
 
             return {

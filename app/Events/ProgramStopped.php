@@ -12,9 +12,6 @@ class ProgramStopped implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
     public function __construct(
         public int $adminNotificationId,
         public string $type,
@@ -22,15 +19,8 @@ class ProgramStopped implements ShouldBroadcast
         public string $body,
         public array $data,
         public string $createdAt,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): array
     {
         return [
@@ -38,19 +28,11 @@ class ProgramStopped implements ShouldBroadcast
         ];
     }
 
-    /**
-     * The event's broadcast name.
-     */
     public function broadcastAs(): string
     {
         return 'program.stopped';
     }
 
-    /**
-     * Get the data to broadcast.
-     *
-     * @return array<string, mixed>
-     */
     public function broadcastWith(): array
     {
         return [

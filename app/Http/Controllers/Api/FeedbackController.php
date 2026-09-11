@@ -9,9 +9,6 @@ use Illuminate\Http\Request;
 
 class FeedbackController extends Controller
 {
-    /**
-     * Store a newly created feedback in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([

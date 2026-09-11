@@ -48,7 +48,7 @@ export function Plugins({ hideToolbar = false }: { hideToolbar?: boolean }) {
 
     return (
         <div className="relative">
-            {/* toolbar plugins */}
+            {}
             {!hideToolbar && (
                 <ToolbarPlugin>
                     {({ blockType }) => (
@@ -100,7 +100,7 @@ export function Plugins({ hideToolbar = false }: { hideToolbar?: boolean }) {
                     }
                     ErrorBoundary={LexicalErrorBoundary}
                 />
-                {/* editor plugins */}
+                {}
                 <TabIndentationPlugin />
                 <ClickableLinkPlugin />
                 <AutoLinkPlugin />
@@ -110,14 +110,14 @@ export function Plugins({ hideToolbar = false }: { hideToolbar?: boolean }) {
 
                 <FloatingLinkEditorPlugin anchorElem={floatingAnchorElem} isLinkEditMode={isLinkEditMode} setIsLinkEditMode={setIsLinkEditMode} />
             </div>
-            {/* actions plugins */}
+            {}
             {!hideToolbar && (
                 <ActionsPlugin>
                     <div className="clear-both flex items-center justify-between gap-2 overflow-auto border-t p-1">
-                        <div className="flex flex-1 justify-start">{/* left side action buttons */}</div>
-                        <div>{/* center action buttons */}</div>
+                        <div className="flex flex-1 justify-start">{}</div>
+                        <div>{}</div>
                         <div className="flex flex-1 justify-end">
-                            {/* right side action buttons */}
+                            {}
                             <>
                                 <ClearEditorActionPlugin />
                                 <ClearEditorPlugin />

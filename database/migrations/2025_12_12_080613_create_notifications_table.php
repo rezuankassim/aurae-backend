@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('notifications', function (Blueprint $table) {
@@ -17,7 +14,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('body');
             $table->json('data')->nullable();
-            $table->string('type')->default('general'); // general, maintenance, promotion, etc.
+            $table->string('type')->default('general');
             $table->timestamp('sent_at')->nullable();
             $table->boolean('is_sent')->default(false);
             $table->text('error_message')->nullable();
@@ -25,9 +22,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('notifications');

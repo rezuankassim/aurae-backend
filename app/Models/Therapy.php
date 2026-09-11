@@ -6,29 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Therapy extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'user_id',
         'music_id',
         'image',
         'name',
         'description',
-        'music', // Kept for backward compatibility if needed, or to be removed later
+        'music',
         'configuration',
         'is_active',
         'is_custom',
         'order',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -38,17 +28,11 @@ class Therapy extends Model
         ];
     }
 
-    /**
-     * Get the image URL
-     */
     public function getImageUrlAttribute(): ?string
     {
         return $this->image ? asset('storage/'.$this->image) : null;
     }
 
-    /**
-     * Get the music URL
-     */
     public function getMusicUrlAttribute(): string
     {
         if ($this->music_id && $this->musicRelation) {
@@ -58,25 +42,16 @@ class Therapy extends Model
         return $this->music ? asset('storage/'.$this->music) : '';
     }
 
-    /**
-     * Get the music associated with the therapy
-     */
     public function musicRelation()
     {
         return $this->belongsTo(Music::class, 'music_id');
     }
 
-    /**
-     * Get the user that owns the therapy
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the program logs for the therapy.
-     */
     public function programLogs()
     {
         return $this->hasMany(ProgramLog::class);

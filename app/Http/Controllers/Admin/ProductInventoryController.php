@@ -9,9 +9,6 @@ use Lunar\Models\Product;
 
 class ProductInventoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Product $product)
     {
         return Inertia::render('admin/products/inventory/index', [
@@ -19,9 +16,6 @@ class ProductInventoryController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(ProductInventoryCreateRequest $request, Product $product)
     {
         $validated = $request->validated();

@@ -16,12 +16,12 @@ export function useAdminNotifications() {
 
     const echoRef = useRef<Echo<'reverb'> | null>(null);
     const alertAudioRef = useRef<HTMLAudioElement | null>(null);
-    // Capture the initial admin state once — subscriptions should only be set up once on mount
+
     const isAdminRef = useRef(initialNotifications !== null);
 
     useEffect(() => {
         if (!isAdminRef.current) {
-            // Not an admin — do not subscribe
+
             setConnectionState('disabled');
             return;
         }
@@ -32,16 +32,16 @@ export function useAdminNotifications() {
             return;
         }
 
-        // Preload the alert sound once and reuse the same Audio instance for every emergency event.
-        // This avoids re-fetching/decoding the file on each notification and keeps memory usage flat.
+
+
         const audio = new Audio('/alert-notification.wav');
         audio.preload = 'auto';
         audio.volume = 0.7;
         alertAudioRef.current = audio;
 
-        // Browsers block autoplay until the user has interacted with the page.
-        // "Unlock" the audio element on the first user gesture by playing it muted, then resetting it.
-        // After this one-time priming, subsequent .play() calls (triggered by WebSocket events) are allowed.
+
+
+
         const unlockAudio = () => {
             const a = alertAudioRef.current;
             if (!a) return;
@@ -66,7 +66,7 @@ export function useAdminNotifications() {
         unlockEvents.forEach((evt) => document.addEventListener(evt, handleUnlock, { once: true, passive: true }));
 
         try {
-            // @ts-expect-error — Pusher must be on window for Echo's reverb broadcaster
+            // @ts-expect-error
             window.Pusher = Pusher;
 
             echoRef.current = new Echo<'reverb'>({
@@ -91,9 +91,9 @@ export function useAdminNotifications() {
                 },
             });
 
-            // Track the underlying Pusher connection so the UI can show whether real-time alerts are active.
-            // Reverb speaks the Pusher protocol, so the standard state machine applies:
-            // initialized → connecting → connected, plus unavailable / failed / disconnected.
+
+
+
             const pusherConnection = echoRef.current.connector.pusher.connection;
             setConnectionState(pusherConnection.state as ConnectionState);
             const handleStateChange = ({ current }: { current: ConnectionState }) => {
@@ -127,11 +127,11 @@ export function useAdminNotifications() {
                         },
                     });
 
-                    // Play the alert sound. Reset currentTime so rapid consecutive events still trigger playback.
+
                     const alertAudio = alertAudioRef.current;
                     if (alertAudio) {
                         alertAudio.currentTime = 0;
-                        // play() returns a Promise that may reject due to browser autoplay policies — swallow it.
+
                         void alertAudio.play().catch((err) => {
                             console.warn('[AdminNotifications] Unable to play alert sound:', err);
                         });

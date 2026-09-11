@@ -74,7 +74,7 @@ export default function CreateMachine({ next_serial }: Props) {
         }
     };
 
-    // Build serial number from components
+
     useEffect(() => {
         if (data.model && data.year && data.product_code) {
             const serial = `${data.model}${data.year}${data.product_code.padStart(4, '0')}`;

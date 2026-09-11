@@ -6,11 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Knowledge extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'title',
         'cover_image',
@@ -23,11 +18,6 @@ class Knowledge extends Model
         'order',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -35,9 +25,6 @@ class Knowledge extends Model
         ];
     }
 
-    /**
-     * Get the cover image URL
-     */
     public function getCoverImageUrlAttribute(): ?string
     {
         return $this->cover_image ? asset('storage/'.$this->cover_image) : null;

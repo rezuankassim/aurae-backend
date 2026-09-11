@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 
 class UserSettingController extends Controller
 {
-    /**
-     * Get the authenticated user's settings.
-     */
     public function show(Request $request)
     {
         $user = $request->user();
@@ -23,9 +20,6 @@ class UserSettingController extends Controller
             ]);
     }
 
-    /**
-     * Update the authenticated user's settings.
-     */
     public function update(Request $request)
     {
         $validated = $request->validate([

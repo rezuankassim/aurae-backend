@@ -75,7 +75,7 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
         try {
             addLog('Connecting to WebSocket...');
 
-            // @ts-expect-error - Pusher is assigned to window
+            // @ts-expect-error
             window.Pusher = Pusher;
 
             echoRef.current = new Echo({
@@ -266,7 +266,7 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
                 <Heading title="WebSocket Test" description="Test WebSocket connection for DeviceAuthenticated event" />
 
                 <div className="grid gap-4 md:grid-cols-2">
-                    {/* Connection Controls */}
+                    {}
                     <Card>
                         <CardHeader>
                             <CardTitle>Connection</CardTitle>
@@ -294,7 +294,7 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
                         </CardContent>
                     </Card>
 
-                    {/* Channel Controls */}
+                    {}
                     <Card>
                         <CardHeader>
                             <CardTitle>Channel Listener</CardTitle>
@@ -332,7 +332,7 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
                         </CardContent>
                     </Card>
 
-                    {/* Event Trigger */}
+                    {}
                     <Card>
                         <CardHeader>
                             <CardTitle>Trigger Event</CardTitle>
@@ -366,7 +366,7 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
                         </CardContent>
                     </Card>
 
-                    {/* Ping Pong Test */}
+                    {}
                     <Card>
                         <CardHeader>
                             <CardTitle>Ping Pong Test</CardTitle>
@@ -395,7 +395,7 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
                         </CardContent>
                     </Card>
 
-                    {/* Connection Log */}
+                    {}
                     <Card>
                         <CardHeader>
                             <div className="flex items-center justify-between">
@@ -424,7 +424,7 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
                     </Card>
                 </div>
 
-                {/* Received Events */}
+                {}
                 {receivedEvents.length > 0 && (
                     <Card>
                         <CardHeader>
@@ -454,7 +454,7 @@ export default function WebSocketTest({ reverbConfig }: { reverbConfig: ReverbCo
                     </Card>
                 )}
 
-                {/* Pong Events */}
+                {}
                 {pongEvents.length > 0 && (
                     <Card>
                         <CardHeader>

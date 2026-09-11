@@ -11,9 +11,6 @@ use Inertia\Inertia;
 
 class NewsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $news = News::latest()->get();
@@ -23,17 +20,11 @@ class NewsController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return Inertia::render('admin/news/create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(NewsCreateRequest $request)
     {
         $validated = $request->validated();
@@ -43,20 +34,17 @@ class NewsController extends Controller
             $validated['image'] = $path;
         }
 
-        // Set is_published based on status field
         $validated['is_published'] = $validated['status'] === 'published';
 
-        // Handle scheduled publishing date (optional)
         if (isset($validated['published_date']) && isset($validated['published_time'])) {
             $validated['published_at'] = Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']);
         } elseif ($validated['is_published']) {
-            // If published now without scheduled date, set published_at to now
+
             $validated['published_at'] = now();
         } else {
             $validated['published_at'] = null;
         }
 
-        // Remove temporary fields
         unset($validated['status'], $validated['published_date'], $validated['published_time']);
 
         News::create($validated);
@@ -64,9 +52,6 @@ class NewsController extends Controller
         return to_route('admin.news.index')->with('success', 'News created successfully');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(News $news)
     {
         transform($news, function ($item) {
@@ -78,9 +63,6 @@ class NewsController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(News $news)
     {
         transform($news, function ($item) {
@@ -96,9 +78,6 @@ class NewsController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(NewsUpdateRequest $request, News $news)
     {
         $validated = $request->validated();
@@ -108,21 +87,18 @@ class NewsController extends Controller
             $validated['image'] = $path;
         }
 
-        // Set is_published based on status field
         $validated['is_published'] = $validated['status'] === 'published';
 
-        // Handle scheduled publishing date (optional)
         if (isset($validated['published_date']) && isset($validated['published_time'])) {
             $validated['published_at'] = Carbon::createFromFormat('d-m-Y H:i:s', $validated['published_date'].' '.$validated['published_time']);
         } elseif ($validated['is_published'] && ! $news->published_at) {
-            // If published now without scheduled date and no previous published_at, set to now
+
             $validated['published_at'] = now();
         } elseif (! $validated['is_published'] && ! isset($validated['published_date'])) {
-            // If unpublished and no scheduled date provided, clear published_at
+
             $validated['published_at'] = null;
         }
 
-        // Remove temporary fields
         unset($validated['status'], $validated['published_date'], $validated['published_time']);
 
         $news->update($validated);
@@ -130,9 +106,6 @@ class NewsController extends Controller
         return to_route('admin.news.index')->with('success', 'News updated successfully');
     }
 
-    /**
-     * Unpublish the specified news entry.
-     */
     public function unpublish(News $news)
     {
         $news->update([
@@ -143,11 +116,5 @@ class NewsController extends Controller
         return back()->with('success', 'News unpublished successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    public function destroy(string $id) {}
 }

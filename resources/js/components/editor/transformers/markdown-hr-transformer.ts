@@ -11,7 +11,7 @@ export const HR: ElementTransformer = {
     replace: (parentNode, _1, _2, isImport) => {
         const line = $createHorizontalRuleNode();
 
-        // TODO: Get rid of isImport flag
+
         if (isImport || parentNode.getNextSibling() != null) {
             parentNode.replace(line);
         } else {

@@ -11,9 +11,6 @@ use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display the admin dashboard.
-     */
     public function index()
     {
         return Inertia::render('admin/dashboard/index', [

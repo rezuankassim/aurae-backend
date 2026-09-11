@@ -11,9 +11,6 @@ use Inertia\Inertia;
 
 class HealthReportController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $healthReports = HealthReport::with('user:id,name,email')
@@ -45,9 +42,6 @@ class HealthReportController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $users = User::query()
@@ -61,9 +55,6 @@ class HealthReportController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(HealthReportCreateRequest $request)
     {
         $validated = $request->validated();
@@ -89,9 +80,6 @@ class HealthReportController extends Controller
         return redirect()->route('admin.health-reports.index')->with('success', 'Health report uploaded successfully.');
     }
 
-    /**
-     * Display the specified resource (PDF file).
-     */
     public function show(HealthReport $healthReport, string $type)
     {
         $fileField = match ($type) {
@@ -111,12 +99,9 @@ class HealthReportController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(HealthReport $healthReport)
     {
-        // Delete files from storage
+
         $fileFields = ['full_body_file', 'meridian_file', 'multidimensional_file'];
 
         foreach ($fileFields as $field) {

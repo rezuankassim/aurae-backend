@@ -17,16 +17,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login')->name('home');
 
-// SenangPay payment callbacks (no auth middleware)
 Route::get('/payment/senangpay/return', [SenangpayCallbackController::class, 'returnUrl'])->name('payment.senangpay.return');
 Route::get('/payment/senangpay/recurring/return', [SenangpayCallbackController::class, 'recurringReturnUrl'])->name('payment.senangpay.recurring.return');
 Route::post('/payment/senangpay/recurring/callback', [SenangpayCallbackController::class, 'recurringCallback'])->name('payment.senangpay.recurring.callback');
 
-// Public product routes
 Route::get('products', [ProductController::class, 'index'])->name('products.index');
 Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
 
-// Public legal pages
 Route::get('terms-and-conditions', [LegalController::class, 'termsAndConditions'])->name('legal.terms');
 Route::get('privacy-policy', [LegalController::class, 'privacyPolicy'])->name('legal.privacy');
 
@@ -36,20 +33,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('devices', [DeviceController::class, 'index'])->name('devices.index');
     Route::get('devices/{device}', [DeviceController::class, 'show'])->name('devices.show');
 
-    // Cart routes
     Route::get('cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('cart/add', [CartController::class, 'add'])->name('cart.add');
     Route::put('cart/lines/{cartLine}', [CartController::class, 'updateLine'])->name('cart.lines.update');
     Route::delete('cart/lines/{cartLine}', [CartController::class, 'removeLine'])->name('cart.lines.destroy');
 
-    // Checkout routes
     Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('checkout/address', [CheckoutController::class, 'saveAddress'])->name('checkout.address');
     Route::get('checkout/review', [CheckoutController::class, 'review'])->name('checkout.review');
     Route::post('checkout/complete', [CheckoutController::class, 'complete'])->name('checkout.complete');
     Route::get('checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
 
-    // Order history routes
     Route::get('order-history', [OrderHistoryController::class, 'index'])->name('order-history.index');
     Route::get('order-history/{order}', [OrderHistoryController::class, 'show'])->name('order-history.show');
 

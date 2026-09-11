@@ -9,9 +9,6 @@ use Inertia\Inertia;
 
 class UserProgramLogController extends Controller
 {
-    /**
-     * Display a listing of the user's program logs.
-     */
     public function index(User $user)
     {
         $programLogs = ProgramLog::where('user_id', $user->id)

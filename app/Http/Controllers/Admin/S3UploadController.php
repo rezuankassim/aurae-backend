@@ -10,9 +10,6 @@ use Illuminate\Support\Str;
 
 class S3UploadController extends Controller
 {
-    /**
-     * Generate a pre-signed URL for direct S3 upload.
-     */
     public function presignedUrl(Request $request): JsonResponse
     {
         $request->validate([
@@ -21,7 +18,6 @@ class S3UploadController extends Controller
             'folder' => ['required', 'string', 'in:music,music/thumbnails'],
         ]);
 
-        // Check if we're in production (use S3) or development (use local)
         if (! app()->environment('production')) {
             return response()->json([
                 'use_local' => true,
@@ -33,7 +29,6 @@ class S3UploadController extends Controller
         $contentType = $request->input('content_type');
         $folder = $request->input('folder');
 
-        // Generate unique filename
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
         $uniqueFilename = Str::uuid().'.'.$extension;
         $key = $folder.'/'.$uniqueFilename;

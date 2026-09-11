@@ -10,7 +10,7 @@ export function slugify(text: string) {
         .toString()
         .toLowerCase()
         .trim()
-        .replace(/[\s_]+/g, '-') // replace spaces & underscores with -
-        .replace(/[^\w-]+/g, '') // remove non-word characters
-        .replace(/--+/g, '-'); // collapse multiple dashes
+        .replace(/[\s_]+/g, '-')
+        .replace(/[^\w-]+/g, '')
+        .replace(/--+/g, '-');
 }

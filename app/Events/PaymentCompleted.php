@@ -12,9 +12,6 @@ class PaymentCompleted implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
     public function __construct(
         public int $userId,
         public string $referenceNumber,
@@ -23,15 +20,8 @@ class PaymentCompleted implements ShouldBroadcast
         public ?string $transactionId = null,
         public ?string $amount = null,
         public ?string $currency = null,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): array
     {
         return [
@@ -39,19 +29,11 @@ class PaymentCompleted implements ShouldBroadcast
         ];
     }
 
-    /**
-     * The event's broadcast name.
-     */
     public function broadcastAs(): string
     {
         return 'payment.completed';
     }
 
-    /**
-     * Get the data to broadcast.
-     *
-     * @return array<string, mixed>
-     */
     public function broadcastWith(): array
     {
         return [

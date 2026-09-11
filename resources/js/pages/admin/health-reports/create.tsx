@@ -123,7 +123,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
                                         <InputError message={errors.user_id} />
                                     </div>
 
-                                    {/* Full Body Health Report */}
+                                    {}
                                     <div className="grid gap-2">
                                         <Label htmlFor="full_body_file">Full Body Health Report (全身健康评估报告): PDF *</Label>
 
@@ -173,7 +173,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
                                         <InputError message={errors.full_body_file} />
                                     </div>
 
-                                    {/* Meridian Health Report */}
+                                    {}
                                     <div className="grid gap-2">
                                         <Label htmlFor="meridian_file">Meridian Health Report (经络健康评估报告): PDF *</Label>
 
@@ -223,7 +223,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
                                         <InputError message={errors.meridian_file} />
                                     </div>
 
-                                    {/* Multidimensional Health Report */}
+                                    {}
                                     <div className="grid gap-2">
                                         <Label htmlFor="multidimensional_file">Multidimensional Health Report (多维健康评估报告): PDF *</Label>
 
@@ -275,7 +275,7 @@ export default function HealthReportsCreate({ users }: { users: User[] }) {
                                         <InputError message={errors.multidimensional_file} />
                                     </div>
 
-                                    {/* General files error */}
+                                    {}
                                     <InputError message={errors.files} />
                                 </CardContent>
                             </Card>

@@ -7,17 +7,11 @@ use Illuminate\Support\Facades\Storage;
 
 class DeviceResource extends BaseResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
-        // Load machine with its subscription if not already loaded
+
         $machine = $this->relationLoaded('machine') ? $this->machine : $this->machine()->with('userSubscription.subscription')->first();
 
-        // Get the subscription linked to this device's machine
         $subscription = $machine?->userSubscription;
 
         return [

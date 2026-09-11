@@ -9,9 +9,6 @@ use Illuminate\Http\Request;
 
 class WebSocketController extends Controller
 {
-    /**
-     * Handle ping request from device
-     */
     public function ping(Request $request)
     {
         $request->validate([
@@ -20,7 +17,6 @@ class WebSocketController extends Controller
 
         $deviceUuid = $request->input('device_uuid');
 
-        // Broadcast pong event back to the device
         broadcast(new DevicePing($deviceUuid))->toOthers();
 
         return BaseResource::make([

@@ -6,11 +6,6 @@ use Illuminate\Http\Request;
 
 class DeviceMaintenanceResource extends BaseResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
@@ -36,9 +31,6 @@ class DeviceMaintenanceResource extends BaseResource
         ];
     }
 
-    /**
-     * Get the status label based on status code.
-     */
     private function getStatusLabel(): string
     {
         return match ($this->status) {

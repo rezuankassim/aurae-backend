@@ -8,9 +8,6 @@ use App\Models\Knowledge;
 
 class KnowledgeController extends Controller
 {
-    /**
-     * Display a listing of published knowledge.
-     */
     public function index()
     {
         $knowledge = Knowledge::where('is_published', true)
@@ -28,12 +25,9 @@ class KnowledgeController extends Controller
             ]);
     }
 
-    /**
-     * Display the specified knowledge.
-     */
     public function show(Knowledge $knowledge)
     {
-        // Only show published knowledge
+
         if (! $knowledge->is_published || ($knowledge->published_at && $knowledge->published_at->isFuture())) {
             return response()->json([
                 'status' => 404,

@@ -12,9 +12,6 @@ use Lunar\Models\State;
 
 class AddressController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $countries = Country::with('states')->get()
@@ -47,9 +44,6 @@ class AddressController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(AddressCreateRequest $request)
     {
         $validated = $request->validated();
@@ -85,9 +79,6 @@ class AddressController extends Controller
         return to_route('address.index')->with('success', 'Address saved successfully');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Address $address)
     {
         $countries = Country::with('states')->get()
@@ -112,9 +103,6 @@ class AddressController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(AddressCreateRequest $request, Address $address)
     {
         $validated = $request->validated();
@@ -148,9 +136,6 @@ class AddressController extends Controller
         return to_route('address.index')->with('success', 'Address updated successfully');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Address $address)
     {
         $address->delete();

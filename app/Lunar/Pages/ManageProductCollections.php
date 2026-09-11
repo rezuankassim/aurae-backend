@@ -26,7 +26,7 @@ class ManageProductCollections extends BaseManageProductCollections
                     ->label(__('lunarpanel::product.table.name.label')),
             ])
             ->filters([
-                //
+
             ])
             ->headerActions([
                 Tables\Actions\AttachAction::make()

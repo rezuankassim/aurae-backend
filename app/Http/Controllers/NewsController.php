@@ -7,9 +7,6 @@ use Inertia\Inertia;
 
 class NewsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $news = News::query()
@@ -28,9 +25,6 @@ class NewsController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(News $news)
     {
         abort_if(! $news->is_published, 404);

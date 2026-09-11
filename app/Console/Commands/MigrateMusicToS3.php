@@ -8,23 +8,10 @@ use Illuminate\Support\Facades\Storage;
 
 class MigrateMusicToS3 extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'music:migrate-to-s3 {--dry-run : Show what would be migrated without actually migrating}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Migrate all music files from local storage to S3';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
         $dryRun = $this->option('dry-run');
@@ -54,7 +41,6 @@ class MigrateMusicToS3 extends Command
             try {
                 $updated = false;
 
-                // Migrate music file
                 if ($item->path && Storage::disk('public')->exists($item->path)) {
                     if (! $dryRun) {
                         $fileContents = Storage::disk('public')->get($item->path);
@@ -67,7 +53,6 @@ class MigrateMusicToS3 extends Command
                     $skipped++;
                 }
 
-                // Migrate thumbnail
                 if ($item->thumbnail && Storage::disk('public')->exists($item->thumbnail)) {
                     if (! $dryRun) {
                         $thumbnailContents = Storage::disk('public')->get($item->thumbnail);
@@ -114,9 +99,6 @@ class MigrateMusicToS3 extends Command
         return self::SUCCESS;
     }
 
-    /**
-     * Delete local files after successful migration.
-     */
     protected function deleteLocalFiles($music): void
     {
         $deleted = 0;

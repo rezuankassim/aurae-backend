@@ -6,11 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProgramLog extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'user_id',
         'therapy_id',
@@ -22,11 +17,6 @@ class ProgramLog extends Model
         'emergency',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -36,17 +26,11 @@ class ProgramLog extends Model
         ];
     }
 
-    /**
-     * Get the user that owns the program log.
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the therapy (program) associated with this log.
-     */
     public function therapy()
     {
         return $this->belongsTo(Therapy::class);

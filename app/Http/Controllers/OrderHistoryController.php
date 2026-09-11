@@ -7,9 +7,6 @@ use Lunar\Models\Order;
 
 class OrderHistoryController extends Controller
 {
-    /**
-     * Display a listing of the user's orders.
-     */
     public function index()
     {
         $orders = Order::where('user_id', auth()->id())
@@ -25,12 +22,9 @@ class OrderHistoryController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified order.
-     */
     public function show(Order $order)
     {
-        // Ensure user can only view their own orders
+
         if ($order->user_id !== auth()->id()) {
             abort(403);
         }

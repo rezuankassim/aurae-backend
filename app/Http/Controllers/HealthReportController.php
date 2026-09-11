@@ -8,9 +8,6 @@ use Inertia\Inertia;
 
 class HealthReportController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $healthReports = HealthReport::where('user_id', auth()->id())
@@ -35,9 +32,6 @@ class HealthReportController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource (PDF file).
-     */
     public function show(HealthReport $healthReport, string $type)
     {
         abort_if($healthReport->user_id !== auth()->id(), 403);

@@ -6,11 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class GeneralSetting extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'contact_no',
         'apk_file_path',

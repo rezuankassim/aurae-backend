@@ -27,9 +27,7 @@ export default function ShowNews({ news }: { news: News }) {
                 <div className="flex items-center justify-between">
                     <Heading title="Show News" description="Manage system's news, create new or publish" />
 
-                    {/* <Button className="mb-6" asChild>
-                        <Link href={create().url}>Create news</Link>
-                    </Button> */}
+                    {}
                 </div>
 
                 <span className="flex items-center gap-2 text-sm text-muted-foreground">

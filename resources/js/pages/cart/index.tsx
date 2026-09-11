@@ -92,7 +92,7 @@ return line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg';
                 </div>
 
                 <div className="grid gap-6 lg:grid-cols-3">
-                    {/* Cart Items */}
+                    {}
                     <div className="space-y-4 lg:col-span-2">
                         {cart.lines.map((line) => (
                             <Card key={line.id}>
@@ -153,7 +153,7 @@ return line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg';
                         ))}
                     </div>
 
-                    {/* Order Summary */}
+                    {}
                     <div className="lg:col-span-1">
                         <Card className="sticky top-4">
                             <CardHeader>

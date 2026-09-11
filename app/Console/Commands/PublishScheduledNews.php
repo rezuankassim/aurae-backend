@@ -7,26 +7,13 @@ use Illuminate\Console\Command;
 
 class PublishScheduledNews extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'news:publish-scheduled';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Publish news items that have reached their scheduled published_at time';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
-        // Find all unpublished news with published_at <= now
+
         $newsToPublish = News::where('is_published', false)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
@@ -40,7 +27,6 @@ class PublishScheduledNews extends Command
 
         $count = $newsToPublish->count();
 
-        // Update all matching news to published
         News::where('is_published', false)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())

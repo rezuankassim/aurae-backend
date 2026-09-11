@@ -7,11 +7,6 @@ use Lunar\Models\Currency;
 
 class CollectionResource extends BaseResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         $defaultCurrency = Currency::getDefault();
@@ -20,7 +15,7 @@ class CollectionResource extends BaseResource
             'id' => $this->id,
             'name' => $this->translateAttribute('name'),
             'currency' => $defaultCurrency?->code,
-            'payment_gateway_currency' => 'MYR', // RevPay requirement (ISO 4217)
+            'payment_gateway_currency' => 'MYR',
             'products' => $this->whenLoaded('products', function () {
                 return ProductResource::collection($this->products);
             }),

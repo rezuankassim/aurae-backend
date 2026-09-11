@@ -13,30 +13,23 @@ use Lunar\Shipping\Models\ShippingZone;
 
 class ShippingSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Get or create a shipping zone for Malaysia
+
         $zone = ShippingZone::firstOrCreate(
             ['name' => 'Malaysia'],
             ['type' => 'countries']
         );
 
-        // Attach Malaysia country to the zone
         $malaysia = Country::where('iso2', 'MY')->first();
         if ($malaysia && ! $zone->countries()->where('country_id', $malaysia->id)->exists()) {
             $zone->countries()->attach($malaysia->id);
         }
 
-        // Get default currency
         $currency = Currency::getDefault();
 
-        // Get default customer group
         $customerGroup = CustomerGroup::getDefault();
 
-        // Create Basic Delivery shipping method
         $basicDelivery = ShippingMethod::updateOrCreate(
             ['code' => 'BASDEL'],
             [
@@ -48,7 +41,6 @@ class ShippingSeeder extends Seeder
             ]
         );
 
-        // Attach customer group to shipping method
         if ($customerGroup && ! $basicDelivery->customerGroups()->where('customer_group_id', $customerGroup->id)->exists()) {
             $basicDelivery->customerGroups()->attach($customerGroup->id, [
                 'visible' => true,
@@ -56,7 +48,6 @@ class ShippingSeeder extends Seeder
             ]);
         }
 
-        // Create shipping rate for Basic Delivery
         $basicDeliveryRate = ShippingRate::firstOrCreate(
             [
                 'shipping_method_id' => $basicDelivery->id,
@@ -65,18 +56,16 @@ class ShippingSeeder extends Seeder
             ['enabled' => true]
         );
 
-        // Create price for Basic Delivery (RM 5.00 = 500 cents)
         if (! $basicDeliveryRate->prices()->where('currency_id', $currency->id)->exists()) {
             Price::create([
                 'priceable_type' => ShippingRate::class,
                 'priceable_id' => $basicDeliveryRate->id,
                 'currency_id' => $currency->id,
-                'price' => 500, // RM 5.00 in cents
+                'price' => 500,
                 'min_quantity' => 1,
             ]);
         }
 
-        // Create Pick Up shipping method
         $pickup = ShippingMethod::updateOrCreate(
             ['code' => 'PICKUP'],
             [
@@ -88,7 +77,6 @@ class ShippingSeeder extends Seeder
             ]
         );
 
-        // Attach customer group to pickup method
         if ($customerGroup && ! $pickup->customerGroups()->where('customer_group_id', $customerGroup->id)->exists()) {
             $pickup->customerGroups()->attach($customerGroup->id, [
                 'visible' => true,
@@ -96,7 +84,6 @@ class ShippingSeeder extends Seeder
             ]);
         }
 
-        // Create shipping rate for Pick Up
         $pickupRate = ShippingRate::firstOrCreate(
             [
                 'shipping_method_id' => $pickup->id,
@@ -105,8 +92,6 @@ class ShippingSeeder extends Seeder
             ['enabled' => true]
         );
 
-        // Collection driver uses free shipping, but we still need a price entry
-        // Create price for Pick Up (RM 0.00)
         if (! $pickupRate->prices()->where('currency_id', $currency->id)->exists()) {
             Price::create([
                 'priceable_type' => ShippingRate::class,

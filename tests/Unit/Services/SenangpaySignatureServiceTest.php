@@ -25,9 +25,8 @@ class SenangpaySignatureServiceTest extends TestCase
             orderId: 'ORD-2026-00001'
         );
 
-        // Should be lowercase SHA256
         $this->assertIsString($signature);
-        $this->assertEquals(64, strlen($signature)); // SHA256 produces 64 hex characters
+        $this->assertEquals(64, strlen($signature));
         $this->assertEquals(strtolower($signature), $signature);
     }
 
@@ -61,7 +60,7 @@ class SenangpaySignatureServiceTest extends TestCase
         $signature2 = $this->service->generateQueryOrderSignature(
             merchantId: 'MERCHANT123',
             secretKey: 'test-secret-key',
-            orderId: 'ORD-2026-00002' // Different order ID
+            orderId: 'ORD-2026-00002'
         );
 
         $this->assertNotEquals($signature1, $signature2);
@@ -139,7 +138,6 @@ class SenangpaySignatureServiceTest extends TestCase
 
         $uppercaseSignature = strtoupper($signature);
 
-        // SHA256 comparison should be case-sensitive with hash_equals
         $this->assertFalse($this->service->verifySignature($signature, $uppercaseSignature));
     }
 

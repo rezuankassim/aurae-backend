@@ -42,16 +42,13 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
-    // Admin notifications
     Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/{notification}', [AdminNotificationController::class, 'show'])->name('notifications.show');
     Route::post('/notifications/read-all', [AdminNotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::post('/notifications/{notification}/read', [AdminNotificationController::class, 'markAsRead'])->name('notifications.read');
 
-    // Editor image upload
     Route::post('/editor-upload', [EditorUploadController::class, 'store'])->name('editor-upload.store');
 
-    // Chunked upload routes
     Route::post('/chunked-upload/initiate', [ChunkedUploadController::class, 'initiate'])->name('chunked-upload.initiate');
     Route::post('/chunked-upload/chunk', [ChunkedUploadController::class, 'uploadChunk'])->name('chunked-upload.chunk');
     Route::post('/chunked-upload/finalize', [ChunkedUploadController::class, 'finalize'])->name('chunked-upload.finalize');
@@ -175,7 +172,6 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status.update');
 
-    // S3 direct upload
     Route::post('/s3-upload/presigned-url', [S3UploadController::class, 'presignedUrl'])->name('s3-upload.presigned-url');
 
     Route::get('/music', [MusicController::class, 'index'])->name('music.index');
@@ -228,7 +224,6 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::put('/subscriptions/{subscription}', [SubscriptionController::class, 'update'])->name('subscription.update');
     Route::delete('/subscriptions/{subscription}', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');
 
-    // User subscriptions
     Route::get('/user-subscriptions', [UserSubscriptionController::class, 'index'])->name('user-subscriptions.index');
     Route::get('/user-subscriptions/create', [UserSubscriptionController::class, 'create'])->name('user-subscriptions.create');
     Route::post('/user-subscriptions', [UserSubscriptionController::class, 'store'])->name('user-subscriptions.store');
@@ -238,7 +233,6 @@ Route::middleware(['auth', EnsureIsAdmin::class])->as('admin.')->prefix('admin')
     Route::post('/user-subscriptions/{userSubscription}/extend', [UserSubscriptionController::class, 'extend'])->name('user-subscriptions.extend');
     Route::post('/user-subscriptions/{userSubscription}/activate', [UserSubscriptionController::class, 'activate'])->name('user-subscriptions.activate');
 
-    // Machines
     Route::get('/machines', [MachineController::class, 'index'])->name('machines.index');
     Route::get('/machines/create', [MachineController::class, 'create'])->name('machines.create');
     Route::post('/machines', [MachineController::class, 'store'])->name('machines.store');

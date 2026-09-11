@@ -99,7 +99,7 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${userSubscription.user.name}'s Subscription`} />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
-                {/* Flash Messages */}
+                {}
                 {flash?.success && (
                     <Alert>
                         <AlertTitle>Success</AlertTitle>
@@ -122,7 +122,7 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
                     </Alert>
                 )}
 
-                {/* Header */}
+                {}
                 <div className="flex items-start justify-between">
                     <div>
                         <h1 className="text-3xl font-bold">{userSubscription.user.name}'s Subscription</h1>
@@ -141,7 +141,7 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
                     </div>
                 </div>
 
-                {/* Recurring Warning */}
+                {}
                 {userSubscription.is_recurring && userSubscription.status === 'active' && (
                     <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
                         <RefreshCcw className="h-4 w-4" />
@@ -154,7 +154,7 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
                 )}
 
                 <div className="grid gap-6 lg:grid-cols-3">
-                    {/* Subscription Details */}
+                    {}
                     <div className="space-y-6 lg:col-span-2">
                         <Card>
                             <CardHeader>
@@ -254,7 +254,7 @@ export default function UserSubscriptionShow({ userSubscription }: Props) {
                         )}
                     </div>
 
-                    {/* Actions */}
+                    {}
                     <div className="space-y-6">
                         {userSubscription.status !== 'active' && userSubscription.status !== 'cancelled' && (
                             <Card className="border-green-200 dark:border-green-900">

@@ -9,9 +9,6 @@ use Inertia\Inertia;
 
 class DeviceMaintenanceController extends Controller
 {
-    /**
-     * Display a listing of all device maintenance requests.
-     */
     public function index(Request $request)
     {
         $query = DeviceMaintenance::with(['user', 'device'])
@@ -20,7 +17,6 @@ class DeviceMaintenanceController extends Controller
             })
             ->latest();
 
-        // Apply filters if provided
         if ($request->has('status') && $request->status !== '') {
             $query->where('status', $request->status);
         }
@@ -49,14 +45,10 @@ class DeviceMaintenanceController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified maintenance request.
-     */
     public function show(DeviceMaintenance $deviceMaintenance)
     {
         $deviceMaintenance->load(['user', 'user.addresses', 'device', 'device.latestLocation']);
 
-        // Format requested_at_changes for display
         if ($deviceMaintenance->requested_at_changes) {
             $requested_at_changes = collect($deviceMaintenance->requested_at_changes);
 
@@ -84,9 +76,6 @@ class DeviceMaintenanceController extends Controller
         ]);
     }
 
-    /**
-     * Update the status of the specified maintenance request.
-     */
     public function updateStatus(Request $request, DeviceMaintenance $deviceMaintenance)
     {
         $validated = $request->validate([
@@ -107,7 +96,6 @@ class DeviceMaintenanceController extends Controller
             $updateData['is_factory_approved'] = $validated['is_factory_approved'];
         }
 
-        // Track changes if factory is proposing a new time
         if (isset($validated['factory_maintenance_requested_at']) &&
             $validated['factory_maintenance_requested_at'] !== $deviceMaintenance->factory_maintenance_requested_at?->toDateTimeString()) {
 
@@ -122,7 +110,7 @@ class DeviceMaintenanceController extends Controller
                 ],
             ];
             $updateData['requested_at_changes'] = $requested_changes;
-            $updateData['status'] = 0; // Set to pending for user approval
+            $updateData['status'] = 0;
             $updateData['is_user_approved'] = false;
         }
 

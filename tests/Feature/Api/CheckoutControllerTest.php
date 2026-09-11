@@ -25,10 +25,8 @@ class CheckoutControllerTest extends TestCase
     {
         parent::setUp();
 
-        // Create default Language for Lunar PHP
         Language::factory()->create(['default' => true, 'code' => 'en']);
 
-        // Create default TaxClass for shipping
         TaxClass::factory()->create(['default' => true, 'name' => 'Default']);
 
         config([
@@ -40,9 +38,6 @@ class CheckoutControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * Get device headers required by EnsureDevice middleware.
-     */
     private function deviceHeaders(): array
     {
         return [
@@ -84,7 +79,6 @@ class CheckoutControllerTest extends TestCase
             'message' => 'Addresses saved successfully.',
         ]);
 
-        // Assert addresses created in database
         $this->assertDatabaseHas('lunar_cart_addresses', [
             'cart_id' => $cart->id,
             'type' => 'shipping',
@@ -146,7 +140,7 @@ class CheckoutControllerTest extends TestCase
     #[Test]
     public function it_requires_device_headers_for_api_access()
     {
-        // Without device headers, EnsureDevice middleware returns 400
+
         $user = User::factory()->create();
 
         $response = $this->actingAs($user, 'sanctum')
@@ -171,18 +165,16 @@ class CheckoutControllerTest extends TestCase
             ->postJson('/api/checkout/set-addresses', [
                 'shipping_address' => [
                     'first_name' => 'John',
-                    // Missing required fields: last_name, line_one, city, postcode, country_id, contact_email, contact_phone
+
                 ],
                 'billing_same_as_shipping' => true,
             ]);
 
-        // The API returns HTTP 200 with status 500 in JSON body for validation errors
-        // This is due to global exception handling
         $response->assertStatus(200);
         $response->assertJson([
             'status' => 500,
         ]);
-        // Check that validation error message is present
+
         $this->assertStringContainsString('shipping address.last name field is required', $response->json('message'));
     }
 
@@ -192,7 +184,6 @@ class CheckoutControllerTest extends TestCase
         $user = User::factory()->create();
         $cart = $this->createCartWithItems($user);
 
-        // Set addresses first
         $this->setCartAddresses($cart);
 
         $response = $this->actingAs($user, 'sanctum')
@@ -201,10 +192,8 @@ class CheckoutControllerTest extends TestCase
                 'payment_method' => 'revpay',
             ]);
 
-        // The payment initiation might fail with "Missing Shipping Option"
-        // if shipping options are not properly configured in tests
         if ($response->status() === 500 && str_contains($response->json('message', ''), 'Missing Shipping Option')) {
-            // This is acceptable in test environment - skip the test
+
             $this->markTestSkipped('Shipping options configuration required for full payment flow');
         }
 
@@ -224,13 +213,11 @@ class CheckoutControllerTest extends TestCase
             ],
         ]);
 
-        // Assert order created
         $this->assertDatabaseHas('lunar_orders', [
             'user_id' => $user->id,
             'status' => 'payment-pending',
         ]);
 
-        // Assert intent transaction created
         $this->assertDatabaseHas('lunar_transactions', [
             'type' => 'intent',
             'driver' => 'revpay',
@@ -343,7 +330,6 @@ class CheckoutControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        // Create multiple orders
         $order1 = $this->createTestOrder($user);
         $order2 = $this->createTestOrder($user);
 
@@ -431,7 +417,6 @@ class CheckoutControllerTest extends TestCase
             ],
         ]);
 
-        // Assert new intent transaction was created
         $this->assertDatabaseHas('lunar_transactions', [
             'order_id' => $order->id,
             'type' => 'intent',
@@ -439,7 +424,6 @@ class CheckoutControllerTest extends TestCase
             'status' => 'pending',
         ]);
 
-        // Assert order status is still payment-pending
         $this->assertDatabaseHas('lunar_orders', [
             'id' => $order->id,
             'status' => 'payment-pending',
@@ -468,7 +452,6 @@ class CheckoutControllerTest extends TestCase
             'message' => 'Repayment initiated successfully.',
         ]);
 
-        // Assert order status updated to payment-pending
         $this->assertDatabaseHas('lunar_orders', [
             'id' => $order->id,
             'status' => 'payment-pending',
@@ -539,9 +522,8 @@ class CheckoutControllerTest extends TestCase
             'product_id' => $product->id,
         ]);
 
-        // Add price to the variant
         $variant->prices()->create([
-            'price' => 10000, // RM 100.00 in cents
+            'price' => 10000,
             'compare_price' => null,
             'currency_id' => $currency->id,
         ]);
@@ -587,7 +569,6 @@ class CheckoutControllerTest extends TestCase
             'contact_phone' => '+60123456789',
         ]);
 
-        // Shipping options are calculated during cart->calculate()
         $cart->calculate();
     }
 

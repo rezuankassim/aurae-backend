@@ -8,9 +8,6 @@ use App\Models\Faq;
 
 class FaqController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $faqs = Faq::query()
@@ -24,9 +21,6 @@ class FaqController extends Controller
             ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Faq $faq)
     {
         return FaqResource::make($faq)

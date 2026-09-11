@@ -9,9 +9,6 @@ use Inertia\Inertia;
 
 class SubscriptionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $subscriptions = Subscription::latest()->get();
@@ -21,17 +18,11 @@ class SubscriptionController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return Inertia::render('admin/subscription/create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -54,9 +45,6 @@ class SubscriptionController extends Controller
         return to_route('admin.subscription.index')->with('success', 'Subscription created successfully');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Subscription $subscription)
     {
         transform($subscription, function ($item) {
@@ -70,9 +58,6 @@ class SubscriptionController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Subscription $subscription)
     {
         $validated = $request->validate([
@@ -95,9 +80,6 @@ class SubscriptionController extends Controller
         return to_route('admin.subscription.index')->with('success', 'Subscription updated successfully');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Subscription $subscription)
     {
         $subscription->delete();

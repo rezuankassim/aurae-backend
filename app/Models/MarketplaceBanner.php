@@ -9,11 +9,6 @@ class MarketplaceBanner extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'image',
         'title',
@@ -21,11 +16,6 @@ class MarketplaceBanner extends Model
         'order',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [

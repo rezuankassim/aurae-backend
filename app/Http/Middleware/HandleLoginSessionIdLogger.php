@@ -16,11 +16,10 @@ class HandleLoginSessionIdLogger
     {
         if (! auth()->check()) {
             return;
-        } // only if user is now logged in
+        }
 
         $finalSid = $request->session()->getId();
 
-        // Update the most recent login row for this user that has a different (pre-rotation) SID
         LoginActivity::where('user_id', auth()->id())
             ->where('event', 'login')
             ->whereNull('logout_at')

@@ -83,9 +83,7 @@ class AuthenticationController extends Controller
 
     public function checkUniqueValues(Request $request)
     {
-        // If the phone belongs to an existing guest user, treat this as a
-        // guest-onboarding pre-flight and ignore that user's record so the
-        // placeholder guest values do not block the real ones.
+
         $existingUser = $request->filled('phone')
             ? User::where('phone', $request->phone)->first()
             : null;
@@ -110,8 +108,7 @@ class AuthenticationController extends Controller
 
     public function register(Request $request)
     {
-        // Detect guest onboarding: an existing user with the same phone is
-        // eligible for promotion only if they currently have a guest record.
+
         $existingUser = User::query()
             ->where('phone', $request->phone)
             ->where('is_guest', true)
@@ -134,7 +131,7 @@ class AuthenticationController extends Controller
 
         if ($isOnboarding) {
             $user = DB::transaction(function () use ($request, $existingUser) {
-                // Promote the existing guest user to a fully registered user.
+
                 $existingUser->update([
                     'name' => $request->name,
                     'username' => $request->username,
@@ -144,8 +141,6 @@ class AuthenticationController extends Controller
                     'is_guest' => false,
                 ]);
 
-                // Update the linked Lunar customer profile to match the
-                // real name. Falls back to creating one if it is missing.
                 $customer = $existingUser->customers()->first();
                 $customerData = [
                     'first_name' => Str::before($request->name, ' '),
@@ -158,14 +153,6 @@ class AuthenticationController extends Controller
                     $customer = Customer::create($customerData);
                     $customer->users()->attach($existingUser->id);
                 }
-
-                // Remove the guest record so isGuest() returns false going
-                // forward. The user is now a fully registered account.
-                // $existingUser->guest()->delete();
-
-                // Revoke any tokens issued during the guest session so the
-                // old guest token can no longer authenticate.
-                // $existingUser->tokens()->delete();
 
                 return $existingUser->fresh();
             });
@@ -206,7 +193,6 @@ class AuthenticationController extends Controller
     {
         $user = $request->user();
 
-        // Guests are managed via the device guest endpoint; reject here to keep flows separate.
         if ($user->isGuest()) {
             return BaseResource::make(null)
                 ->additional([
@@ -230,24 +216,17 @@ class AuthenticationController extends Controller
         try {
             DB::beginTransaction();
 
-            // Detach the current device from this user so subsequent requests on the
-            // same device cannot operate as the deleted account.
             $request->device->update([
                 'deviceable_type' => null,
                 'deviceable_id' => null,
             ]);
 
-            // Remove this user's morph user_devices rows (FCM tokens, OS info, etc.).
             $user->userDevices()->delete();
 
-            // Detach the Lunar customer pivot link so the user record is no longer
-            // associated with any customer profile. Customer rows are preserved to
-            // keep historical orders/invoices intact.
             DB::table('lunar_customer_user')
                 ->where('user_id', $user->id)
                 ->delete();
 
-            // Audit a final logout entry, mirroring the logout flow, before tokens go away.
             LoginActivity::create([
                 'user_id' => $user->id,
                 'event' => 'logout',
@@ -260,11 +239,8 @@ class AuthenticationController extends Controller
                 'logout_at' => now(),
             ]);
 
-            // Revoke every Sanctum token so the account cannot be reused.
             $user->tokens()->delete();
 
-            // Soft delete the user. The booted() hook in App\Models\User mangles the
-            // unique email/username/phone columns so the same values can be reused.
             $user->delete();
 
             DB::commit();
@@ -292,7 +268,6 @@ class AuthenticationController extends Controller
         $user = $request->user();
         $tokenName = $user->currentAccessToken()->name;
 
-        // Update logout_at on the matching login record
         $updated = LoginActivity::where('user_id', $user->id)
             ->where('event', 'login')
             ->where('guard', 'api')
@@ -302,7 +277,6 @@ class AuthenticationController extends Controller
             ->limit(1)
             ->update(['logout_at' => now()]);
 
-        // Fallback: if no match by session_id (e.g. empty UDID), match by user + latest login
         if (! $updated) {
             LoginActivity::where('user_id', $user->id)
                 ->where('event', 'login')
@@ -335,7 +309,6 @@ class AuthenticationController extends Controller
             ['code' => $code]
         );
 
-        // Send OTP via Exabytes SMS
         $exabytesService = app(ExabytesService::class);
         $result = $exabytesService->sendOtp($request->phone, (string) $code);
 
@@ -403,7 +376,6 @@ class AuthenticationController extends Controller
             ['code' => $code]
         );
 
-        // Send OTP via Exabytes SMS
         $exabytesService = app(ExabytesService::class);
         $result = $exabytesService->sendOtp($request->phone, (string) $code);
 
@@ -420,9 +392,6 @@ class AuthenticationController extends Controller
             ]);
     }
 
-    /**
-     * Step 1: Verify OTP for password reset
-     */
     public function verifyResetOtp(Request $request)
     {
         $request->validate([
@@ -446,7 +415,6 @@ class AuthenticationController extends Controller
             ]);
         }
 
-        // Mark verification as verified (update with a flag)
         $verification->update(['verified_at' => now()]);
 
         return BaseResource::make([
@@ -458,9 +426,6 @@ class AuthenticationController extends Controller
             ]);
     }
 
-    /**
-     * Step 2: Reset password after OTP verification
-     */
     public function resetPassword(Request $request)
     {
         $request->validate([
@@ -468,7 +433,6 @@ class AuthenticationController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        // Check if OTP was verified recently (within last 5 minutes)
         $verification = Verification::where('phone', $request->phone)
             ->whereNotNull('verified_at')
             ->where('verified_at', '>=', now()->subMinutes(5))
@@ -493,7 +457,6 @@ class AuthenticationController extends Controller
 
         $verification->delete();
 
-        // Revoke all existing tokens for security
         $user->tokens()->delete();
 
         return BaseResource::make(null)

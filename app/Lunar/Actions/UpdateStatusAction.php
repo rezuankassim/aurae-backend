@@ -29,7 +29,6 @@ class UpdateStatusAction extends BaseUpdateStatusAction
     {
         $steps = parent::getFormSteps();
 
-        // Insert tracking link field after the status select
         array_splice($steps, 1, 0, [
             Forms\Components\TextInput::make('tracking_link')
                 ->label('Tracking Link')

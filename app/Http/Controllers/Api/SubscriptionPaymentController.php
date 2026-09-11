@@ -17,9 +17,6 @@ class SubscriptionPaymentController extends Controller
         protected SenangpaySignatureService $signatureService
     ) {}
 
-    /**
-     * Initiate recurring subscription payment.
-     */
     public function subscribe(Request $request)
     {
         $validated = $request->validate([
@@ -41,7 +38,6 @@ class SubscriptionPaymentController extends Controller
                 ->setStatusCode(400);
         }
 
-        // Check if subscription has recurring_id configured
         if (! $subscription->senangpay_recurring_id) {
             return BaseResource::make(null)
                 ->additional([
@@ -53,7 +49,7 @@ class SubscriptionPaymentController extends Controller
         }
 
         try {
-            // Create pending user subscription
+
             $userSubscription = UserSubscription::create([
                 'user_id' => $user->id,
                 'subscription_id' => $subscription->id,
@@ -66,33 +62,27 @@ class SubscriptionPaymentController extends Controller
                 'next_billing_at' => now()->addMonth(),
             ]);
 
-            // Generate reference number
             $referenceNumber = 'SUB-'.date('Y').'-'.str_pad($userSubscription->id, 5, '0', STR_PAD_LEFT);
 
-            // Get SenangPay config
             $merchantId = config('services.senangpay.merchant_id');
             $secretKey = config('services.senangpay.secret_key');
             $baseUrl = config('services.senangpay.base_url', 'https://app.senangpay.my');
 
-            // Determine recurring base URL based on sandbox/production
             $isSandbox = str_contains($baseUrl, 'sandbox');
             $recurringBaseUrl = $isSandbox
                 ? 'https://api.sandbox.senangpay.my'
                 : 'https://api.senangpay.my';
 
-            // Get customer details
             $customerName = $user->name ?? 'Customer';
             $customerEmail = $user->email ?? '';
             $customerPhone = $user->phone ?? '';
 
-            // Generate hash for recurring payment: hash('sha256', secret_key + order_id + recurring_id)
             $hash = $this->signatureService->generateRecurringPaymentHash(
                 $secretKey,
                 $referenceNumber,
                 $subscription->senangpay_recurring_id
             );
 
-            // Create transaction record
             SubscriptionTransaction::create([
                 'user_subscription_id' => $userSubscription->id,
                 'success' => true,
@@ -112,12 +102,10 @@ class SubscriptionPaymentController extends Controller
                 ],
             ]);
 
-            // Update user subscription with transaction reference
             $userSubscription->update([
                 'transaction_id' => $referenceNumber,
             ]);
 
-            // Build recurring payment URL
             $paymentUrl = $recurringBaseUrl.'/recurring/payment/'.$merchantId.'?'.http_build_query([
                 'order_id' => $referenceNumber,
                 'recurring_id' => $subscription->senangpay_recurring_id,
@@ -164,12 +152,9 @@ class SubscriptionPaymentController extends Controller
         }
     }
 
-    /**
-     * Check subscription payment status.
-     */
     public function checkPaymentStatus(Request $request, string $reference)
     {
-        // Find transaction
+
         $transaction = SubscriptionTransaction::where('reference', $reference)
             ->where('driver', 'senangpay')
             ->where('type', 'intent')
@@ -198,7 +183,6 @@ class SubscriptionPaymentController extends Controller
                 ->setStatusCode(404);
         }
 
-        // Determine payment status
         $paymentStatus = 'pending';
         $captureTransaction = SubscriptionTransaction::where('reference', $reference)
             ->where('type', 'capture')

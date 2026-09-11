@@ -7,11 +7,6 @@ use Lunar\Facades\Pricing;
 
 class ProductResource extends BaseResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
@@ -39,16 +34,12 @@ class ProductResource extends BaseResource
         ];
     }
 
-    /**
-     * Strip Trix attachment captions (filename/size) from HTML description.
-     */
     protected function cleanDescription(?string $html): ?string
     {
         if (! $html) {
             return $html;
         }
 
-        // Remove <figcaption class="attachment__caption">...</figcaption>
         return preg_replace('/<figcaption[^>]*class="[^"]*attachment__caption[^"]*"[^>]*>.*?<\/figcaption>/s', '', $html);
     }
 

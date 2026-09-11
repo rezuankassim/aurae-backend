@@ -16,9 +16,6 @@ use Illuminate\Http\Request;
 
 class OwnerGuestController extends Controller
 {
-    /**
-     * List all guests across every tablet the authenticated owner has connected.
-     */
     public function index(Request $request)
     {
         $request->validate([
@@ -36,7 +33,6 @@ class OwnerGuestController extends Controller
                 ]);
         }
 
-        // Optional filter to a single device the owner has access to.
         if ($request->filled('device_uuid')) {
             $filteredDeviceId = Device::where('uuid', $request->device_uuid)
                 ->whereIn('id', $deviceIds)
@@ -69,9 +65,6 @@ class OwnerGuestController extends Controller
             ]);
     }
 
-    /**
-     * List a guest's therapy usage history.
-     */
     public function usageHistories(Request $request, Guest $guest)
     {
         $request->validate([
@@ -108,9 +101,6 @@ class OwnerGuestController extends Controller
             ]);
     }
 
-    /**
-     * List a guest's health reports.
-     */
     public function healthReports(Request $request, Guest $guest)
     {
         if (! $this->ownerCanAccessGuest($request, $guest)) {
@@ -129,9 +119,6 @@ class OwnerGuestController extends Controller
             ]);
     }
 
-    /**
-     * Determine if the auth user owns the device the guest belongs to.
-     */
     protected function ownerCanAccessGuest(Request $request, Guest $guest): bool
     {
         return OwnerDeviceResolver::ownsDevice($request->user(), $guest->device_id);

@@ -6,11 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'user_id',
         'title',
@@ -23,11 +18,6 @@ class Notification extends Model
         'read_at',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -38,9 +28,6 @@ class Notification extends Model
         ];
     }
 
-    /**
-     * Get the user that owns the notification
-     */
     public function user()
     {
         return $this->belongsTo(User::class);

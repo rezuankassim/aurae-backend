@@ -10,27 +10,21 @@ use Inertia\Inertia;
 
 class DeviceLocationController extends Controller
 {
-    /**
-     * Display a listing of device locations
-     */
     public function index(Request $request)
     {
         $query = DeviceLocation::with('userDevice')
             ->latest();
 
-        // Filter by device if specified
         if ($request->has('device_id') && $request->device_id) {
             $query->forDevice($request->device_id);
         }
 
-        // Filter by date range if specified
         if ($request->has('from') || $request->has('to')) {
             $query->dateRange($request->from, $request->to);
         }
 
         $locations = $query->paginate(50);
 
-        // Get all IoT devices for filter dropdown
         $devices = Device::orderBy('name')
             ->get()
             ->map(function ($device) {
@@ -51,9 +45,6 @@ class DeviceLocationController extends Controller
         ]);
     }
 
-    /**
-     * Display location history for a specific IoT device
-     */
     public function show(Device $device)
     {
         $locations = DeviceLocation::query()

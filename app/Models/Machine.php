@@ -21,49 +21,31 @@ class Machine extends Model
 
     protected $appends = ['thumbnail_url', 'detail_image_url'];
 
-    /**
-     * Get the user that owns this machine.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the device (tablet) linked to this machine.
-     */
     public function device(): BelongsTo
     {
         return $this->belongsTo(Device::class);
     }
 
-    /**
-     * Get the user subscription this machine is bound to.
-     */
     public function userSubscription(): BelongsTo
     {
         return $this->belongsTo(UserSubscription::class);
     }
 
-    /**
-     * Check if machine is bound to a user.
-     */
     public function isBound(): bool
     {
         return ! is_null($this->user_id);
     }
 
-    /**
-     * Check if machine is active.
-     */
     public function isActive(): bool
     {
         return $this->status === 1;
     }
 
-    /**
-     * Get the thumbnail URL.
-     */
     protected function thumbnailUrl(): Attribute
     {
         return Attribute::make(
@@ -71,9 +53,6 @@ class Machine extends Model
         );
     }
 
-    /**
-     * Get the detail image URL.
-     */
     protected function detailImageUrl(): Attribute
     {
         return Attribute::make(

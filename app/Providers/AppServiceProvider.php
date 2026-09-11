@@ -88,12 +88,9 @@ use Lunar\Shipping\ShippingPlugin;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        // Replace Lunar's hardcoded Dashboard with our custom one that includes the date filter widget
+
         $pagesRef = new \ReflectionProperty(\Lunar\Admin\LunarPanelManager::class, 'pages');
         $pagesRef->setAccessible(true);
         $pagesRef->setValue(null, array_map(
@@ -103,7 +100,6 @@ class AppServiceProvider extends ServiceProvider
             $pagesRef->getValue()
         ));
 
-        // Replace OrderTotalsChart with custom one that uses short month names
         $widgetsRef = new \ReflectionProperty(\Lunar\Admin\LunarPanelManager::class, 'widgets');
         $widgetsRef->setAccessible(true);
         $widgetsRef->setValue(null, array_map(
@@ -113,7 +109,6 @@ class AppServiceProvider extends ServiceProvider
             $widgetsRef->getValue()
         ));
 
-        // Remove AttributeGroupResource and ChannelResource from Lunar panel navigation
         $resourcesRef = new \ReflectionProperty(\Lunar\Admin\LunarPanelManager::class, 'resources');
         $resourcesRef->setAccessible(true);
         $resourcesRef->setValue(null, array_values(array_filter(
@@ -184,13 +179,9 @@ class AppServiceProvider extends ServiceProvider
                     ]);
             })->register();
 
-        // Register SenangPay payment driver
         \Lunar\Facades\Payments::extend('senangpay', fn ($app) => $app->make(SenangpayPayment::class));
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         if ($this->app->environment('production')) {
@@ -232,9 +223,8 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(Failed::class, LogFailedLogin::class);
         Event::listen(ConnectionPruned::class, LogConnectionPruned::class);
 
-        // Allow all admin users to access Lunar admin panel
         Gate::before(function ($user, $ability) {
-            // Check if this is a Lunar admin panel permission
+
             if (str_starts_with($ability, 'lunar:') || str_starts_with($ability, 'catalog:') || str_starts_with($ability, 'sales:') || str_starts_with($ability, 'settings:')) {
                 return $user && $user->is_admin ? true : null;
             }

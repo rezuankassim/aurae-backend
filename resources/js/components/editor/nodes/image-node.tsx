@@ -68,7 +68,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     __maxWidth: number;
     __showCaption: boolean;
     __caption: LexicalEditor;
-    // Captions cannot yet be used within editor cells
+
     __captionsEnabled: boolean;
 
     static getType(): string {
@@ -177,7 +177,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         writable.__showCaption = showCaption;
     }
 
-    // View
+
 
     createDOM(config: EditorConfig): HTMLElement {
         const span = document.createElement('span');

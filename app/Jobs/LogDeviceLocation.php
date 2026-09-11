@@ -10,9 +10,6 @@ class LogDeviceLocation implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public int $userDeviceId,
         public ?string $deviceId,
@@ -26,9 +23,6 @@ class LogDeviceLocation implements ShouldQueue
         public ?string $ipAddress,
     ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         DeviceLocation::create([

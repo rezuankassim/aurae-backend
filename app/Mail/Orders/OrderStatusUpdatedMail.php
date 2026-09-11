@@ -14,21 +14,11 @@ class OrderStatusUpdatedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     *
-     * The constructor signature matches what Lunar's UpdatesOrderStatus trait
-     * expects when instantiating mailer classes:
-     *   new $mailerClass($record, $data['additional_content'])
-     */
     public function __construct(
         public Order $order,
         public ?string $additionalContent = null,
     ) {}
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         $statusLabel = config('lunar.orders.statuses.'.$this->order->status.'.label', ucfirst($this->order->status));
@@ -38,9 +28,6 @@ class OrderStatusUpdatedMail extends Mailable implements ShouldQueue
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(

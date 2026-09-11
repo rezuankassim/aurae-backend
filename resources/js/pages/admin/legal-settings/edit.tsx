@@ -40,14 +40,14 @@ const defaultEditorState = {
 } as unknown as SerializedEditorState;
 
 export default function LegalSettingsEdit({ generalSetting }: { generalSetting: GeneralSetting }) {
-    // Terms and Conditions state
+
     const termsInitialValue = generalSetting.terms_and_conditions_content
         ? (JSON.parse(generalSetting.terms_and_conditions_content) as unknown as SerializedEditorState)
         : defaultEditorState;
     const [termsEditorState, setTermsEditorState] = useState<SerializedEditorState>(termsInitialValue);
     const [termsHtmlState, setTermsHtmlState] = useState<string>(generalSetting.terms_and_conditions_html || '');
 
-    // Privacy Policy state
+
     const privacyInitialValue = generalSetting.privacy_policy_content
         ? (JSON.parse(generalSetting.privacy_policy_content) as unknown as SerializedEditorState)
         : defaultEditorState;

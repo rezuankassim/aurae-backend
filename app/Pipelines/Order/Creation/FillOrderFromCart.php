@@ -7,19 +7,14 @@ use Illuminate\Support\Facades\App;
 use Lunar\Actions\Orders\GenerateOrderReference;
 use Lunar\Models\Contracts\Currency as CurrencyContract;
 use Lunar\Models\Contracts\Order as OrderContract;
-use Lunar\Models\Order;
 
 class FillOrderFromCart
 {
-    /**
-     * @param  Closure(OrderContract): mixed  $next
-     */
     public function handle(OrderContract $order, Closure $next): mixed
     {
-        /** @var Order $order */
+
         $cart = $order->cart;
 
-        // Scope lines to selected only so totals reflect only items being checked out
         $selectedLines = $cart->lines()->where('selected', true)->with([
             'purchasable.taxClass',
             'purchasable.prices.currency',

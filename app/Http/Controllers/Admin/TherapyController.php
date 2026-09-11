@@ -12,9 +12,6 @@ use Inertia\Inertia;
 
 class TherapyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $therapies = Therapy::orderBy('order', 'asc')->where('is_custom', 0)->get();
@@ -31,9 +28,6 @@ class TherapyController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $music = Music::where('is_active', true)->orderBy('title')->get();
@@ -43,14 +37,10 @@ class TherapyController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(TherapyCreateRequest $request)
     {
         $validated = $request->validated();
 
-        // Handle file uploads
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('therapies/images', 'public');
         }
@@ -71,9 +61,6 @@ class TherapyController extends Controller
         return to_route('admin.therapies.index')->with('success', 'Therapy created successfully.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Therapy $therapy)
     {
         $therapy->image_url = $therapy->image_url;
@@ -87,16 +74,12 @@ class TherapyController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(TherapyUpdateRequest $request, Therapy $therapy)
     {
         $validated = $request->validated();
 
-        // Handle file uploads
         if ($request->hasFile('image')) {
-            // Remove old image if exists
+
             if ($therapy->image) {
                 Storage::disk('public')->delete($therapy->image);
             }
@@ -120,9 +103,6 @@ class TherapyController extends Controller
         return to_route('admin.therapies.index')->with('success', 'Therapy updated successfully.');
     }
 
-    /**
-     * Update the order of therapies.
-     */
     public function reorder()
     {
         $therapies = request()->validate([
@@ -138,12 +118,9 @@ class TherapyController extends Controller
         return back()->with('success', 'Therapies reordered successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Therapy $therapy)
     {
-        // Delete associated image file if exists
+
         if ($therapy->image) {
             Storage::disk('public')->delete($therapy->image);
         }

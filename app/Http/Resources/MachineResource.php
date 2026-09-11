@@ -6,11 +6,6 @@ use Illuminate\Http\Request;
 
 class MachineResource extends BaseResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
@@ -41,9 +36,6 @@ class MachineResource extends BaseResource
         ];
     }
 
-    /**
-     * Mask serial number for security (show last 4 digits).
-     */
     protected function maskSerialNumber(string $serialNumber): string
     {
         if (strlen($serialNumber) <= 4) {

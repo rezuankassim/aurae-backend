@@ -14,7 +14,7 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
     const isOpen = usePage<SharedData>().props.sidebarOpen;
 
     useEffect(() => {
-        // Handle flash messages on Inertia visits
+
         const removeListener = router.on('success', (event) => {
             const props = event.detail.page.props as SharedData;
             if (props.success) {

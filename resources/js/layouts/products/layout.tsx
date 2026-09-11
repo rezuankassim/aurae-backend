@@ -21,7 +21,7 @@ export default function ProductsLayout({
     id_record: number;
     with_variants?: boolean;
 }>) {
-    // When server-side rendering, we only render the layout on the client...
+
     if (typeof window === 'undefined') {
         return null;
     }

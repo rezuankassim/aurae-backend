@@ -9,9 +9,6 @@ use Illuminate\Http\Request;
 
 class TherapyController extends Controller
 {
-    /**
-     * Display a listing of therapies.
-     */
     public function index(Request $request)
     {
         $request->validate([
@@ -22,7 +19,6 @@ class TherapyController extends Controller
             ->orderBy('order', 'asc')
             ->orderBy('created_at', 'desc');
 
-        // If include_custom is true, include user's custom therapies
         if ($request->boolean('include_custom')) {
             $query->where(function ($q) use ($request) {
                 $q->where('is_custom', false)
@@ -32,7 +28,7 @@ class TherapyController extends Controller
                     });
             });
         } else {
-            // Only show standard therapies (not custom)
+
             $query->where('is_custom', false);
         }
 

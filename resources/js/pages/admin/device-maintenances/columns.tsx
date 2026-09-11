@@ -73,7 +73,7 @@ export const columns: ColumnDef<DeviceMaintenance>[] = [
 
             const searchTerms = Array.isArray(filterValues) ? filterValues : [filterValues];
 
-            // Check if any of the search terms are included in the userInfoString
+
             return searchTerms.some((term) => userInfoString.includes(term.toLowerCase()));
         },
     },

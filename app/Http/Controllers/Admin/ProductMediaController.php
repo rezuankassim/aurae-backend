@@ -11,9 +11,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ProductMediaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Product $product)
     {
         return Inertia::render('admin/products/media/index', [
@@ -27,9 +24,6 @@ class ProductMediaController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(ProductMediaCreateRequest $request, Product $product)
     {
         $validated = $request->validated();
@@ -53,9 +47,6 @@ class ProductMediaController extends Controller
         return to_route('admin.products.media.index', $product->id)->with('success', 'Media added successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Product $product, Media $media)
     {
         if ($media->model_id !== $product->id) {

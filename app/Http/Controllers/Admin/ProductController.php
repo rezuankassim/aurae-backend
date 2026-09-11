@@ -17,9 +17,6 @@ use Lunar\Models\TaxClass;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $products = Product::query()
@@ -34,9 +31,6 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -77,9 +71,6 @@ class ProductController extends Controller
         return to_route('admin.products.index')->with('success', 'Product created successfully.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Product $product)
     {
         $product->load(['productType', 'brand', 'variants', 'tags']);
@@ -95,9 +86,6 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(ProductUpdateRequest $request, Product $product)
     {
         $validated = $request->validated();
@@ -119,7 +107,6 @@ class ProductController extends Controller
             ],
         ]);
 
-        // Update tags
         if (isset($validated['tags'])) {
             $product->tags()->sync($validated['tags']);
         }
@@ -127,9 +114,6 @@ class ProductController extends Controller
         return back()->with('success', 'Product updated successfully');
     }
 
-    /**
-     * Update the product status.
-     */
     public function updateStatus(Request $request, Product $product)
     {
         $request->validate([
@@ -143,31 +127,23 @@ class ProductController extends Controller
         return back()->with('success', 'Product status updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Product $product)
     {
-        // Delete all related data
+
         foreach ($product->variants as $variant) {
             $variant->basePrices()->delete();
             $variant->values()->detach();
             $variant->delete();
         }
 
-        // Delete product options
         $product->productOptions()->detach();
 
-        // Delete collections
         $product->collections()->detach();
 
-        // Delete tags
         $product->tags()->detach();
 
-        // Delete media
         $product->clearMediaCollection();
 
-        // Delete the product
         $product->delete();
 
         return to_route('admin.products.index')->with('success', 'Product deleted successfully.');

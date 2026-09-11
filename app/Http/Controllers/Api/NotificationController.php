@@ -9,9 +9,6 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    /**
-     * Display a listing of the user's notifications.
-     */
     public function index(Request $request)
     {
         $notifications = Notification::where('user_id', $request->user()->id)
@@ -26,9 +23,6 @@ class NotificationController extends Controller
             ]);
     }
 
-    /**
-     * Mark a single notification as read.
-     */
     public function markAsRead(Request $request, Notification $notification)
     {
         if ($notification->user_id !== $request->user()->id) {
@@ -47,9 +41,6 @@ class NotificationController extends Controller
             ]);
     }
 
-    /**
-     * Mark all notifications as read for the authenticated user.
-     */
     public function markAllAsRead(Request $request)
     {
         Notification::where('user_id', $request->user()->id)

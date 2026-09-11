@@ -6,25 +6,19 @@ use Closure;
 use Illuminate\Support\Facades\App;
 use Lunar\Models\Contracts\Order as OrderContract;
 use Lunar\Models\Contracts\OrderLine as OrderLineContract;
-use Lunar\Models\Order;
-use Lunar\Models\OrderLine;
 use Lunar\Utils\Arr;
 
 class CreateOrderLines
 {
-    /**
-     * @param  Closure(OrderContract): mixed  $next
-     */
     public function handle(OrderContract $order, Closure $next): mixed
     {
-        /** @var Order $order */
+
         if (! $order->id) {
             $order->save();
         }
 
         $cart = $order->cart;
 
-        // Scope to selected lines only
         $selectedLines = $cart->lines()->where('selected', true)->with([
             'purchasable.taxClass',
             'purchasable.prices.currency',
@@ -37,7 +31,7 @@ class CreateOrderLines
         $cart->recalculate();
 
         foreach ($cart->lines as $cartLine) {
-            /** @var OrderLine $orderLine */
+
             $orderLine = $order->lines->first(function ($line) use ($cartLine) {
                 $diff = Arr::diff($line->meta, $cartLine->meta);
 

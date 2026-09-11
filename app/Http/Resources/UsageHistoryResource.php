@@ -6,11 +6,6 @@ use Illuminate\Http\Request;
 
 class UsageHistoryResource extends BaseResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         $content = $this->content ?? null;

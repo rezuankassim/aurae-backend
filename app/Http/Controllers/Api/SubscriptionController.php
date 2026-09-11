@@ -11,9 +11,6 @@ use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
 {
-    /**
-     * Get all active subscriptions.
-     */
     public function index()
     {
         $subscriptions = Subscription::active()->get();
@@ -25,9 +22,6 @@ class SubscriptionController extends Controller
             ]);
     }
 
-    /**
-     * Get user's active subscriptions.
-     */
     public function userSubscription(Request $request)
     {
         $user = $request->user();
@@ -56,9 +50,6 @@ class SubscriptionController extends Controller
             ]);
     }
 
-    /**
-     * Get user's current active subscription (single).
-     */
     public function activeSubscription(Request $request)
     {
         $user = $request->user();

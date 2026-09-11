@@ -20,7 +20,6 @@ class DeviceController extends Controller
             'name' => ['required'],
         ]);
 
-        // Create or find the device by UUID
         $device = Device::firstOrCreate(
             ['uuid' => $request->uuid],
             [
@@ -29,7 +28,6 @@ class DeviceController extends Controller
             ]
         );
 
-        // Generate QR code with device credentials for login
         $qr = Quar::format('png')
             ->size(200)
             ->generate(route('api.device.login', ['id' => $device->id, 'uuid' => $device->uuid]));
@@ -45,9 +43,6 @@ class DeviceController extends Controller
             ]);
     }
 
-    /**
-     * Check device ownership status.
-     */
     public function check(Request $request)
     {
         $request->validate([
@@ -57,7 +52,6 @@ class DeviceController extends Controller
 
         $user = $request->user();
 
-        // Find device by ID and UUID
         $device = Device::where('id', $request->device_id)
             ->where('uuid', $request->device_uuid)
             ->first();
@@ -77,7 +71,6 @@ class DeviceController extends Controller
                 ->setStatusCode(404);
         }
 
-        // Check ownership status via direct device binding or machine binding
         $directOwnership = $device->user_id === $user->id;
         $machineOwnership = $device->machine()
             ->where('user_id', $user->id)
@@ -121,9 +114,8 @@ class DeviceController extends Controller
             ->where('uuid', $request->uuid)
             ->firstOrFail();
 
-        // Check if device is not linked to any user, link it to the current user
         if (! $device->user_id) {
-            // Check if user has reached device limit based on subscription
+
             $user = $request->user();
             $maxDevices = $user->getMaxDevices();
             $currentDeviceCount = Device::where('user_id', $user->id)->count();
@@ -142,7 +134,6 @@ class DeviceController extends Controller
             $device->save();
         }
 
-        // Verify the device belongs to the authenticated user
         if ($device->user_id !== $request->user()->id) {
             return BaseResource::make([])
                 ->additional([
@@ -153,7 +144,6 @@ class DeviceController extends Controller
                 ->setStatusCode(403);
         }
 
-        // Check if device status is active
         if ($device->status !== 1) {
             return BaseResource::make([])
                 ->additional([
@@ -174,12 +164,10 @@ class DeviceController extends Controller
                 ->setStatusCode(403);
         }
 
-        // Update last logged in timestamp
         $device->update([
             'last_logged_in_at' => now(),
         ]);
 
-        // Pass user token to device
         $token = $request->user()->createToken($device->uuid)->plainTextToken;
         $device->token = $token;
 
@@ -188,7 +176,7 @@ class DeviceController extends Controller
             'channel' => 'device.'.$device->uuid,
             'token_length' => strlen($token),
         ]);
-        // Broadcast the authentication event with the access token
+
         DeviceAuthenticated::dispatch($device->uuid, $token);
 
         return DeviceResource::make($device)
@@ -198,43 +186,13 @@ class DeviceController extends Controller
             ]);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+    public function index() {}
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    public function store(Request $request) {}
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    public function show(string $id) {}
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    public function update(Request $request, string $id) {}
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    public function destroy(string $id) {}
 }

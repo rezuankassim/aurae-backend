@@ -21,45 +21,33 @@ class SenangpayPayment extends AbstractPayment
         $this->signatureService = $signatureService;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function authorize(): ?PaymentAuthorize
     {
-        // Ensure order exists
+
         if (! $this->order) {
-            // Check for existing completed order (placed_at is set)
+
             $existingOrder = $this->cart?->completedOrder()->first();
 
             if ($existingOrder) {
-                // Dissociate any existing completed order so a fresh one is created
-                // with a new unique ID. This prevents:
-                // - SenangPay "Duplicated Order Id" rejections (for failed/pending orders)
-                // - Overwriting a paid order's status back to payment-pending and
-                //   accumulating extra intent transactions that cause Lunar to
-                //   incorrectly display "partially refunded" (for payment-received orders)
+
                 $existingOrder->update(['cart_id' => null]);
                 $this->cart->refresh();
                 $this->order = $this->cart->createOrder();
             } else {
-                // No completed order found - use draft or create new
+
                 $draftOrder = $this->cart?->draftOrder()->first();
                 $this->order = $draftOrder ?? $this->cart->createOrder();
             }
         }
 
-        // Get config
         $merchantId = config('services.senangpay.merchant_id');
         $secretKey = config('services.senangpay.secret_key');
         $baseUrl = config('services.senangpay.base_url', 'https://app.senangpay.my');
 
-        // Generate reference number from order
         $referenceNumber = 'ORD-'.date('Y').'-'.str_pad($this->order->id, 5, '0', STR_PAD_LEFT);
 
-        // Format amount to decimal (e.g., 34.90)
         $amount = $this->signatureService->formatAmount($this->order->total->value);
 
-        // Get customer details
         $customerName = '';
         $customerEmail = '';
         $customerPhone = '';
@@ -70,10 +58,8 @@ class SenangpayPayment extends AbstractPayment
             $customerPhone = $this->order->billingAddress->contact_phone;
         }
 
-        // Build detail description (use underscores instead of spaces per SenangPay docs)
         $detail = 'Order_'.$referenceNumber;
 
-        // Generate hash for payment form: md5(secret_key + detail + amount + order_id)
         $hash = $this->signatureService->generatePaymentHash(
             $secretKey,
             $detail,
@@ -81,7 +67,6 @@ class SenangpayPayment extends AbstractPayment
             $referenceNumber
         );
 
-        // Create intent transaction
         Transaction::create([
             'order_id' => $this->order->id,
             'success' => true,
@@ -102,8 +87,6 @@ class SenangpayPayment extends AbstractPayment
             ],
         ]);
 
-        // Build payment URL - SenangPay uses POST to /payment/{merchantID}
-        // We'll provide the URL and params for the mobile app to submit via POST or redirect
         $paymentUrl = $baseUrl.'/payment/'.$merchantId.'?'.http_build_query([
             'detail' => $detail,
             'amount' => $amount,
@@ -114,7 +97,6 @@ class SenangpayPayment extends AbstractPayment
             'phone' => $customerPhone,
         ]);
 
-        // Update order meta with reference number
         $this->order->update([
             'status' => $this->config['authorized'] ?? 'payment-pending',
             'meta' => array_merge((array) $this->order->meta, [
@@ -137,7 +119,6 @@ class SenangpayPayment extends AbstractPayment
             paymentType: 'senangpay',
         );
 
-        // Store payment URL in data for mobile app
         $response->data = [
             'payment_url' => $paymentUrl,
             'reference_number' => $referenceNumber,
@@ -148,12 +129,9 @@ class SenangpayPayment extends AbstractPayment
         return $response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function capture(TransactionContract $transaction, $amount = 0): PaymentCapture
     {
-        // Get intent transaction
+
         $intentTransaction = Transaction::where('order_id', $transaction->order_id)
             ->where('type', 'intent')
             ->where('driver', 'senangpay')
@@ -166,7 +144,6 @@ class SenangpayPayment extends AbstractPayment
             );
         }
 
-        // Create capture transaction
         Transaction::create([
             'parent_transaction_id' => $intentTransaction->id,
             'order_id' => $transaction->order_id,
@@ -195,13 +172,9 @@ class SenangpayPayment extends AbstractPayment
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function refund(TransactionContract $transaction, int $amount = 0, $notes = null): PaymentRefund
     {
-        // SenangPay doesn't provide a direct refund API in the documentation
-        // Refunds must be processed manually via the dashboard
+
         Log::warning('SenangPay refund requested', [
             'order_id' => $transaction->order_id,
             'reference' => $transaction->reference,

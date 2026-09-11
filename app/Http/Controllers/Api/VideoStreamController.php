@@ -9,12 +9,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class VideoStreamController extends Controller
 {
-    /**
-     * Stream video with support for range requests (for seeking/progressive download)
-     */
     public function streamKnowledgeVideo(Knowledge $knowledge)
     {
-        // Check if knowledge has a video
+
         if (! $knowledge->video_path) {
             return response()->json([
                 'status' => 404,
@@ -22,7 +19,6 @@ class VideoStreamController extends Controller
             ], 404);
         }
 
-        // Check if video file exists
         if (! Storage::disk('public')->exists($knowledge->video_path)) {
             return response()->json([
                 'status' => 404,
@@ -40,7 +36,6 @@ class VideoStreamController extends Controller
         $end = $size - 1;
         $length = $size;
 
-        // Handle range request for video seeking
         if (request()->hasHeader('Range')) {
             $range = request()->header('Range');
             $range = str_replace('bytes=', '', $range);
@@ -53,7 +48,7 @@ class VideoStreamController extends Controller
             fseek($stream, $start);
 
             $response = new StreamedResponse(function () use ($stream, $length) {
-                $chunkSize = 1024 * 1024; // 1MB chunks
+                $chunkSize = 1024 * 1024;
                 $bytesRead = 0;
 
                 while (! feof($stream) && $bytesRead < $length) {

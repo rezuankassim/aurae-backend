@@ -10,17 +10,11 @@ use Inertia\Inertia;
 
 class MusicController extends Controller
 {
-    /**
-     * Get the storage disk based on environment.
-     */
     protected function storageDisk(): string
     {
         return app()->environment('production') ? 's3' : 'public';
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $music = Music::orderBy('created_at', 'desc')->get();
@@ -30,24 +24,18 @@ class MusicController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return Inertia::render('admin/music/create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        // Determine if this is a direct S3 upload or traditional file upload
+
         $isS3Upload = $request->has('music_s3_key');
 
         if ($isS3Upload) {
-            // Direct S3 upload - validate S3 keys
+
             $validated = $request->validate([
                 'title' => ['required', 'string', 'max:255'],
                 'thumbnail_s3_key' => ['nullable', 'string'],
@@ -58,11 +46,11 @@ class MusicController extends Controller
             $path = $validated['music_s3_key'];
             $thumbnail = $validated['thumbnail_s3_key'] ?? null;
         } else {
-            // Traditional file upload (development)
+
             $validated = $request->validate([
                 'title' => ['required', 'string', 'max:255'],
-                'thumbnail' => ['nullable', 'image', 'max:10240'], // 10MB max
-                'music' => ['required', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:1073741824'], // 1GB max
+                'thumbnail' => ['nullable', 'image', 'max:10240'],
+                'music' => ['required', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:1073741824'],
                 'is_active' => ['boolean'],
             ]);
 
@@ -85,9 +73,6 @@ class MusicController extends Controller
         return to_route('admin.music.index')->with('success', 'Music added successfully.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Music $music)
     {
         $music->url = $music->url;
@@ -98,16 +83,13 @@ class MusicController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Music $music)
     {
-        // Determine if this is a direct S3 upload or traditional file upload
+
         $isS3Upload = $request->has('music_s3_key') || $request->has('thumbnail_s3_key');
 
         if ($isS3Upload) {
-            // Direct S3 upload
+
             $validated = $request->validate([
                 'title' => ['required', 'string', 'max:255'],
                 'thumbnail_s3_key' => ['nullable', 'string'],
@@ -123,7 +105,7 @@ class MusicController extends Controller
             $disk = $this->storageDisk();
 
             if (! empty($validated['thumbnail_s3_key'])) {
-                // Delete old thumbnail
+
                 if ($music->thumbnail && Storage::disk($disk)->exists($music->thumbnail)) {
                     Storage::disk($disk)->delete($music->thumbnail);
                 }
@@ -131,18 +113,18 @@ class MusicController extends Controller
             }
 
             if (! empty($validated['music_s3_key'])) {
-                // Delete old file
+
                 if ($music->path && Storage::disk($disk)->exists($music->path)) {
                     Storage::disk($disk)->delete($music->path);
                 }
                 $data['path'] = $validated['music_s3_key'];
             }
         } else {
-            // Traditional file upload (development)
+
             $validated = $request->validate([
                 'title' => ['required', 'string', 'max:255'],
                 'thumbnail' => ['nullable', 'image', 'max:10240'],
-                'music' => ['nullable', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:1073741824'], // 1GB
+                'music' => ['nullable', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:1073741824'],
                 'is_active' => ['boolean'],
             ]);
 
@@ -154,7 +136,7 @@ class MusicController extends Controller
             $disk = $this->storageDisk();
 
             if ($request->hasFile('thumbnail')) {
-                // Delete old thumbnail
+
                 if ($music->thumbnail && Storage::disk($disk)->exists($music->thumbnail)) {
                     Storage::disk($disk)->delete($music->thumbnail);
                 }
@@ -162,7 +144,7 @@ class MusicController extends Controller
             }
 
             if ($request->hasFile('music')) {
-                // Delete old file
+
                 if ($music->path && Storage::disk($disk)->exists($music->path)) {
                     Storage::disk($disk)->delete($music->path);
                 }
@@ -175,12 +157,9 @@ class MusicController extends Controller
         return to_route('admin.music.index')->with('success', 'Music updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Music $music)
     {
-        // Try to delete from both disks to ensure cleanup
+
         $disksToCheck = ['public', 's3'];
 
         foreach ($disksToCheck as $disk) {
@@ -193,7 +172,7 @@ class MusicController extends Controller
                     Storage::disk($disk)->delete($music->path);
                 }
             } catch (\Exception $e) {
-                // Silently continue if disk is not configured (e.g., S3 in development)
+
                 continue;
             }
         }

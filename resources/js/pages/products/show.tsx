@@ -65,7 +65,7 @@ export default function ProductShow({ product, relatedProducts }: Props) {
         post('/cart/add', {
             preserveScroll: true,
             onSuccess: () => {
-                // Optionally redirect to cart or show success message
+
             },
         });
     };
@@ -85,7 +85,7 @@ export default function ProductShow({ product, relatedProducts }: Props) {
             <Head title={product.attribute_data?.name?.en || 'Product'} />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
                 <div className="grid gap-6 md:grid-cols-2">
-                    {/* Product Images */}
+                    {}
                     <div className="space-y-4">
                         <div className="aspect-square overflow-hidden rounded-lg bg-muted">
                             <img
@@ -105,7 +105,7 @@ export default function ProductShow({ product, relatedProducts }: Props) {
                         )}
                     </div>
 
-                    {/* Product Info */}
+                    {}
                     <div className="space-y-6">
                         <div>
                             <div className="flex items-start justify-between gap-4">
@@ -190,7 +190,7 @@ export default function ProductShow({ product, relatedProducts }: Props) {
                     </div>
                 </div>
 
-                {/* Related Products */}
+                {}
                 {relatedProducts.length > 0 && (
                     <div className="mt-12 space-y-4">
                         <h2 className="text-2xl font-bold">Related Products</h2>

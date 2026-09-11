@@ -7,11 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class BaseResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return parent::toArray($request);
@@ -22,7 +17,6 @@ class BaseResource extends JsonResource
         $response = parent::toResponse($request);
         $data = json_decode($response->getContent(), true);
 
-        // Deep clean entire JSON (including with() + toArray())
         $cleaned = $this->replaceNullWithString($data);
 
         return response()->json($cleaned, $response->getStatusCode());

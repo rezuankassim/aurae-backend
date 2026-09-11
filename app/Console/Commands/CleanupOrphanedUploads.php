@@ -8,23 +8,10 @@ use Illuminate\Support\Facades\Storage;
 
 class CleanupOrphanedUploads extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'uploads:cleanup {--hours=24 : Delete uploads older than this many hours}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Clean up orphaned and incomplete uploads to free up storage space';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         $hours = (int) $this->option('hours');
@@ -36,13 +23,11 @@ class CleanupOrphanedUploads extends Command
         $totalDeleted = 0;
         $totalSize = 0;
 
-        // 1. Clean up incomplete chunked uploads
         $this->info('🔍 Checking for incomplete chunked uploads...');
         [$deletedChunks, $chunksSize] = $this->cleanupIncompleteChunks($cutoffTime);
         $totalDeleted += $deletedChunks;
         $totalSize += $chunksSize;
 
-        // 2. Clean up orphaned video files
         $this->info('🔍 Checking for orphaned video files...');
         [$deletedVideos, $videosSize] = $this->cleanupOrphanedVideos($cutoffTime);
         $totalDeleted += $deletedVideos;
@@ -56,9 +41,6 @@ class CleanupOrphanedUploads extends Command
         return Command::SUCCESS;
     }
 
-    /**
-     * Clean up incomplete chunked upload sessions
-     */
     protected function cleanupIncompleteChunks($cutoffTime): array
     {
         $tempPath = 'temp/uploads';
@@ -84,7 +66,7 @@ class CleanupOrphanedUploads extends Command
             $createdAt = \Carbon\Carbon::parse($metadata['created_at'] ?? now());
 
             if ($createdAt->lt($cutoffTime)) {
-                // Calculate size before deletion
+
                 $files = Storage::disk('local')->allFiles($dir);
                 foreach ($files as $file) {
                     $size += Storage::disk('local')->size($file);
@@ -105,9 +87,6 @@ class CleanupOrphanedUploads extends Command
         return [$deleted, $size];
     }
 
-    /**
-     * Clean up orphaned video files not linked to any knowledge records
-     */
     protected function cleanupOrphanedVideos($cutoffTime): array
     {
         $videoPath = 'knowledge/videos';
@@ -120,22 +99,20 @@ class CleanupOrphanedUploads extends Command
             return [0, 0];
         }
 
-        // Get all video files
         $allVideos = Storage::disk('public')->files($videoPath);
 
-        // Get all video paths from database
         $linkedVideos = DB::table('knowledge')
             ->whereNotNull('video_path')
             ->pluck('video_path')
             ->toArray();
 
         foreach ($allVideos as $video) {
-            // Check if file is older than cutoff
+
             $lastModified = Storage::disk('public')->lastModified($video);
             $modifiedAt = \Carbon\Carbon::createFromTimestamp($lastModified);
 
             if ($modifiedAt->lt($cutoffTime)) {
-                // Check if this video is linked to any record
+
                 if (! in_array($video, $linkedVideos)) {
                     $fileSize = Storage::disk('public')->size($video);
                     $size += $fileSize;
@@ -156,9 +133,6 @@ class CleanupOrphanedUploads extends Command
         return [$deleted, $size];
     }
 
-    /**
-     * Format bytes to human readable format
-     */
     protected function formatBytes($bytes, $precision = 2): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];

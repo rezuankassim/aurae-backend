@@ -8,9 +8,6 @@ use App\Models\News;
 
 class NewsController extends Controller
 {
-    /**
-     * Display a listing of published news.
-     */
     public function index()
     {
         $news = News::where('is_published', true)
@@ -28,12 +25,9 @@ class NewsController extends Controller
             ]);
     }
 
-    /**
-     * Display the specified news.
-     */
     public function show(News $news)
     {
-        // Only show published news
+
         if (! $news->is_published || ($news->published_at && $news->published_at->isFuture())) {
             return response()->json([
                 'status' => 404,

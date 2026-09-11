@@ -9,9 +9,6 @@ use Inertia\Inertia;
 
 class UserLoginActivityController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(User $user)
     {
         $loginActivities = LoginActivity::where('user_id', $user->id)

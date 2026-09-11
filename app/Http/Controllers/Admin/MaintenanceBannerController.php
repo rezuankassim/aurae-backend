@@ -10,9 +10,6 @@ use Inertia\Inertia;
 
 class MaintenanceBannerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $banners = MaintenanceBanner::orderBy('order')->get();
@@ -22,17 +19,11 @@ class MaintenanceBannerController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return Inertia::render('admin/maintenance-banners/create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -53,9 +44,6 @@ class MaintenanceBannerController extends Controller
             ->with('success', 'Maintenance banner created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(MaintenanceBanner $maintenanceBanner)
     {
         transform($maintenanceBanner, function ($item) {
@@ -67,9 +55,6 @@ class MaintenanceBannerController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(MaintenanceBanner $maintenanceBanner)
     {
         return Inertia::render('admin/maintenance-banners/edit', [
@@ -77,9 +62,6 @@ class MaintenanceBannerController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, MaintenanceBanner $maintenanceBanner)
     {
         $validated = $request->validate([
@@ -90,7 +72,7 @@ class MaintenanceBannerController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
+
             if ($maintenanceBanner->image) {
                 Storage::disk('public')->delete($maintenanceBanner->image);
             }
@@ -105,12 +87,9 @@ class MaintenanceBannerController extends Controller
             ->with('success', 'Maintenance banner updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(MaintenanceBanner $maintenanceBanner)
     {
-        // Delete image file
+
         if ($maintenanceBanner->image) {
             Storage::disk('public')->delete($maintenanceBanner->image);
         }

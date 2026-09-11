@@ -14,9 +14,6 @@ use Lunar\Models\Customer;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $showDeleted = $request->boolean('show_deleted');
@@ -39,17 +36,11 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return Inertia::render('admin/users/create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(UserCreateRequest $request)
     {
         $validated = $request->validated();
@@ -70,9 +61,6 @@ class UserController extends Controller
         return to_route('admin.users.show', $user->id)->with('success', 'User created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(int $user)
     {
         $user = User::withTrashed()->findOrFail($user);
@@ -82,9 +70,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(User $user)
     {
         return Inertia::render('admin/users/edit', [
@@ -92,11 +77,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Format the user payload for admin Inertia pages.
-     *
-     * @return array<string, mixed>
-     */
     protected function userPayload(User $user): array
     {
         return [
@@ -105,9 +85,6 @@ class UserController extends Controller
         ];
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UserUpdateRequest $request, User $user)
     {
         $validated = $request->validated();
@@ -124,9 +101,6 @@ class UserController extends Controller
         return to_route('admin.users.show', $user->id)->with('success', 'User updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, User $user)
     {
         $user->delete();
@@ -138,9 +112,6 @@ class UserController extends Controller
         return to_route('admin.users.index', $params)->with('success', 'User deleted successfully.');
     }
 
-    /**
-     * Restore the specified soft-deleted resource.
-     */
     public function restore(Request $request, int $user)
     {
         $userRecord = User::withTrashed()->findOrFail($user);

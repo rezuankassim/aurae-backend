@@ -9,9 +9,6 @@ use Lunar\Models\Product;
 
 class ProductIdentifierController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Product $product)
     {
         return Inertia::render('admin/products/identifiers/index', [
@@ -19,9 +16,6 @@ class ProductIdentifierController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(ProductIdentifierCreateRequest $request, Product $product)
     {
         $validated = $request->validated();

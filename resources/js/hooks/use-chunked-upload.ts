@@ -9,7 +9,7 @@ interface UploadProgress {
 }
 
 interface ChunkedUploadOptions {
-    chunkSize?: number; // in bytes, default 10MB
+    chunkSize?: number;
     onProgress?: (progress: number) => void;
     onComplete?: (path: string) => void;
     onError?: (error: string) => void;
@@ -36,7 +36,7 @@ export function useChunkedUpload(options: ChunkedUploadOptions = {}) {
         });
 
         try {
-            // Get CSRF token from meta tag or cookie
+
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
             if (!csrfToken) {
@@ -45,7 +45,7 @@ export function useChunkedUpload(options: ChunkedUploadOptions = {}) {
 
             const totalChunks = Math.ceil(file.size / chunkSize);
 
-            // Step 1: Initiate upload
+
             const initiateResponse = await fetch('/admin/chunked-upload/initiate', {
                 method: 'POST',
                 headers: {
@@ -69,7 +69,7 @@ export function useChunkedUpload(options: ChunkedUploadOptions = {}) {
 
             setUploadState((prev) => ({ ...prev, uploadId: upload_id }));
 
-            // Step 2: Upload chunks
+
             for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
                 const start = chunkIndex * chunkSize;
                 const end = Math.min(start + chunkSize, file.size);
@@ -100,7 +100,7 @@ export function useChunkedUpload(options: ChunkedUploadOptions = {}) {
                 onProgress?.(progress);
             }
 
-            // Step 3: Finalize upload
+
             const finalizeResponse = await fetch('/admin/chunked-upload/finalize', {
                 method: 'POST',
                 headers: {
@@ -142,7 +142,7 @@ export function useChunkedUpload(options: ChunkedUploadOptions = {}) {
 
             onError?.(errorMessage);
 
-            // Cancel upload if it was initiated
+
             if (uploadState.uploadId) {
                 try {
                     const cancelCsrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -158,7 +158,7 @@ export function useChunkedUpload(options: ChunkedUploadOptions = {}) {
                         }),
                     });
                 } catch {
-                    // Ignore cancel errors
+
                 }
             }
 

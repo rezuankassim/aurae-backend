@@ -9,9 +9,6 @@ use Inertia\Inertia;
 
 class SocialMediaController extends Controller
 {
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit()
     {
         $socialMedia = SocialMedia::firstOrCreate();
@@ -21,9 +18,6 @@ class SocialMediaController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(SocialMediaUpdateRequest $request)
     {
         $validated = $request->validated();

@@ -12,9 +12,6 @@ use Lunar\Models\TaxClass;
 
 class ProductPricingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Product $product)
     {
         $taxClasses = TaxClass::all();
@@ -26,9 +23,6 @@ class ProductPricingController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(ProductPricingCreateRequest $request, Product $product)
     {
         $validated = $request->validated();
@@ -57,35 +51,11 @@ class ProductPricingController extends Controller
         return to_route('admin.products.pricing.index', $product)->with('success', 'Product pricing updated successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    public function show(string $id) {}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    public function edit(string $id) {}
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    public function update(Request $request, string $id) {}
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    public function destroy(string $id) {}
 }

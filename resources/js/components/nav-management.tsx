@@ -59,7 +59,7 @@ export function NavManagement({ items = [] }: { items: NavItem[] }) {
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 asChild
-                                // @ts-expect-error item href url might be undefined
+                                // @ts-expect-error
                                 isActive={!item.external && page.url.startsWith(typeof item.href === 'string' ? item.href : item.href.url)}
                                 tooltip={{ children: item.title }}
                             >

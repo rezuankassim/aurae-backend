@@ -16,7 +16,7 @@ export function Plugins() {
 
   return (
     <div className="relative">
-      {/* toolbar plugins */}
+      {}
       <div className="relative">
         <RichTextPlugin
           contentEditable={
@@ -28,9 +28,9 @@ export function Plugins() {
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
-        {/* editor plugins */}
+        {}
       </div>
-      {/* actions plugins */}
+      {}
     </div>
   )
 }

@@ -12,11 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureDevice
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
         $deviceUdid = $request->header('X-Device-Udid');
@@ -31,7 +26,6 @@ class EnsureDevice
                 ->setStatusCode(400);
         }
 
-        // We save the device details
         $device = UserDevice::updateOrCreate([
             'udid' => $deviceUdid,
         ], [
@@ -50,20 +44,15 @@ class EnsureDevice
         return $next($request);
     }
 
-    /**
-     * Log the device's GPS location if coordinates are provided
-     */
     protected function logDeviceLocation(Request $request, UserDevice $device): void
     {
         $latitude = $request->header('X-Device-Latitude');
         $longitude = $request->header('X-Device-Longitude');
 
-        // Only log if we have at least latitude and longitude
         if (! $latitude || ! $longitude) {
             return;
         }
 
-        // Try to find the authenticated user's IoT device
         $iotDeviceId = null;
         try {
             $user = $request->user('sanctum');
@@ -74,7 +63,7 @@ class EnsureDevice
                     ->value('id');
             }
         } catch (\Throwable) {
-            // Silently fail — location logging is non-critical
+
         }
 
         LogDeviceLocation::dispatch(

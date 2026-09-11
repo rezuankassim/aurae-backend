@@ -8,9 +8,6 @@ use App\Models\GeneralSetting;
 
 class LegalController extends Controller
 {
-    /**
-     * Get the terms and conditions.
-     */
     public function termsAndConditions()
     {
         $generalSetting = GeneralSetting::first();
@@ -23,9 +20,6 @@ class LegalController extends Controller
         ]);
     }
 
-    /**
-     * Get the privacy policy.
-     */
     public function privacyPolicy()
     {
         $generalSetting = GeneralSetting::first();

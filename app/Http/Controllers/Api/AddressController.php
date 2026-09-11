@@ -66,7 +66,6 @@ class AddressController extends Controller
                 ]);
         }
 
-        // If this address is set as default, unset other defaults
         if ($request->shipping_default) {
             $customer->addresses()->update(['shipping_default' => false]);
         }
@@ -76,7 +75,6 @@ class AddressController extends Controller
         }
 
         $stateName = $request->state;
-        // ? State::find($request->state)?->name : null;
 
         $address = $customer->addresses()->create([
             'country_id' => $request->country_id,
@@ -156,7 +154,6 @@ class AddressController extends Controller
             'billing_default' => ['nullable', 'boolean'],
         ]);
 
-        // If this address is set as default, unset other defaults
         if ($request->has('shipping_default') && $request->shipping_default) {
             $customer->addresses()->where('id', '!=', $address->id)->update(['shipping_default' => false]);
         }
@@ -185,7 +182,7 @@ class AddressController extends Controller
 
         if ($request->has('state')) {
             $data['state'] = $request->state;
-            // ? State::find($request->state)?->name : null;
+
         }
 
         $address->update($data);

@@ -52,7 +52,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 const todayIso = format(new Date(), 'yyyy-MM-dd');
 
 export default function CreateUserSubscription({ subscriptions, users }: Props) {
-    // ── Single form ──────────────────────────────────────────────────────────
+
     const singleForm = useForm<{
         user_id: string;
         subscription_id: string;
@@ -65,7 +65,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
         months: '',
     });
 
-    // ── Bulk form ────────────────────────────────────────────────────────────
+
     const bulkForm = useForm<{
         user_ids: number[];
         subscription_id: string;
@@ -78,11 +78,11 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
         months: '',
     });
 
-    // ── User combobox state (single mode) ────────────────────────────────────
+
     const [userPopoverOpen, setUserPopoverOpen] = useState(false);
     const selectedUser = users.find((u) => String(u.id) === singleForm.data.user_id);
 
-    // ── Bulk user search/filter ──────────────────────────────────────────────
+
     const [bulkSearch, setBulkSearch] = useState('');
     const filteredUsers = users.filter(
         (u) => u.name.toLowerCase().includes(bulkSearch.toLowerCase()) || u.email.toLowerCase().includes(bulkSearch.toLowerCase()),
@@ -108,7 +108,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
         );
     };
 
-    // ── Submit handlers ──────────────────────────────────────────────────────
+
     const handleSingleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         singleForm.post(store().url);
@@ -136,7 +136,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                         <TabsTrigger value="bulk">Bulk Users</TabsTrigger>
                     </TabsList>
 
-                    {/* ── SINGLE MODE ─────────────────────────────────────────── */}
+                    {}
                     <TabsContent value="single">
                         <form onSubmit={handleSingleSubmit} className="max-w-2xl space-y-6">
                             <Card>
@@ -148,7 +148,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-5">
-                                    {/* User */}
+                                    {}
                                     <div className="space-y-2">
                                         <Label>Customer *</Label>
                                         <Popover open={userPopoverOpen} onOpenChange={setUserPopoverOpen}>
@@ -204,7 +204,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                         {singleForm.errors.user_id && <p className="text-sm text-red-600">{singleForm.errors.user_id}</p>}
                                     </div>
 
-                                    {/* Subscription Plan */}
+                                    {}
                                     <div className="space-y-2">
                                         <Label>Subscription Plan *</Label>
                                         <Select
@@ -227,7 +227,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                         )}
                                     </div>
 
-                                    {/* Start Date */}
+                                    {}
                                     <div className="space-y-2">
                                         <Label htmlFor="single-starts-at">Start Date *</Label>
                                         <Input
@@ -239,7 +239,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                         {singleForm.errors.starts_at && <p className="text-sm text-red-600">{singleForm.errors.starts_at}</p>}
                                     </div>
 
-                                    {/* Duration */}
+                                    {}
                                     <div className="space-y-2">
                                         <Label htmlFor="single-months">Duration (months)</Label>
                                         <Input
@@ -267,11 +267,11 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                         </form>
                     </TabsContent>
 
-                    {/* ── BULK MODE ────────────────────────────────────────────── */}
+                    {}
                     <TabsContent value="bulk">
                         <form onSubmit={handleBulkSubmit} className="space-y-6">
                             <div className="grid gap-6 lg:grid-cols-2">
-                                {/* Left: Plan + Dates */}
+                                {}
                                 <div className="space-y-6">
                                     <Card>
                                         <CardHeader>
@@ -279,7 +279,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                             <CardDescription>These settings apply to all selected customers.</CardDescription>
                                         </CardHeader>
                                         <CardContent className="space-y-5">
-                                            {/* Subscription Plan */}
+                                            {}
                                             <div className="space-y-2">
                                                 <Label>Subscription Plan *</Label>
                                                 <Select
@@ -302,7 +302,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                                 )}
                                             </div>
 
-                                            {/* Start Date */}
+                                            {}
                                             <div className="space-y-2">
                                                 <Label htmlFor="bulk-starts-at">Start Date *</Label>
                                                 <Input
@@ -314,7 +314,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                                 {bulkForm.errors.starts_at && <p className="text-sm text-red-600">{bulkForm.errors.starts_at}</p>}
                                             </div>
 
-                                            {/* Duration */}
+                                            {}
                                             <div className="space-y-2">
                                                 <Label htmlFor="bulk-months">Duration (months)</Label>
                                                 <Input
@@ -331,7 +331,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                         </CardContent>
                                     </Card>
 
-                                    {/* Selected summary */}
+                                    {}
                                     {bulkForm.data.user_ids.length > 0 && (
                                         <Card className="border-green-200 dark:border-green-900">
                                             <CardHeader className="pb-3">
@@ -378,7 +378,7 @@ export default function CreateUserSubscription({ subscriptions, users }: Props) 
                                     </div>
                                 </div>
 
-                                {/* Right: User list */}
+                                {}
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Select Customers</CardTitle>

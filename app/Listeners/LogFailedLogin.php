@@ -6,21 +6,12 @@ use App\Models\LoginActivity;
 
 class LogFailedLogin
 {
-    /**
-     * Create the event listener.
-     */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct() {}
 
-    /**
-     * Handle the event.
-     */
     public function handle(object $event): void
     {
         LoginActivity::create([
-            'user_id' => optional($event->user)->id, // may be null
+            'user_id' => optional($event->user)->id,
             'event' => 'failed',
             'guard' => $event->guard ?? null,
             'session_id' => null,

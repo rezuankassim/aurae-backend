@@ -11,24 +11,15 @@ use Lunar\Models\Order;
 
 class PaymentHistoryController extends Controller
 {
-    /**
-     * Get user's payment history.
-     *
-     * This includes:
-     * - Marketplace orders (from Lunar)
-     * - Subscription payments (from SubscriptionTransaction)
-     */
     public function index(Request $request)
     {
         $user = $request->user();
 
-        // Get marketplace orders
         $orders = Order::where('user_id', $user->id)
             ->with(['currency'])
             ->latest('placed_at')
             ->get();
 
-        // Transform orders into payment history items
         $paymentHistory = $orders->map(function ($order) {
             return [
                 'type' => 'marketplace',
@@ -36,11 +27,9 @@ class PaymentHistoryController extends Controller
             ];
         });
 
-        // Get user's subscription IDs
         $userSubscriptionIds = UserSubscription::where('user_id', $user->id)
             ->pluck('id');
 
-        // Get subscription transactions (only captured/successful payments)
         $subscriptionTransactions = SubscriptionTransaction::whereIn('user_subscription_id', $userSubscriptionIds)
             ->where('type', 'capture')
             ->where('success', true)
@@ -48,7 +37,6 @@ class PaymentHistoryController extends Controller
             ->latest('captured_at')
             ->get();
 
-        // Transform subscription transactions into payment history items
         $subscriptionHistory = $subscriptionTransactions->map(function ($transaction) {
             return [
                 'type' => 'subscription',
@@ -56,10 +44,8 @@ class PaymentHistoryController extends Controller
             ];
         });
 
-        // Merge all payment history
         $paymentHistory = $paymentHistory->merge($subscriptionHistory);
 
-        // Sort by date (newest first)
         $paymentHistory = $paymentHistory->sortByDesc(function ($item) {
             if ($item['type'] === 'marketplace') {
                 return $item['data']->placed_at ?? $item['data']->created_at;

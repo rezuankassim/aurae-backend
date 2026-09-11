@@ -14,10 +14,7 @@ class ShippingZoneResourceExtension extends ResourceExtension
 {
     public function extendPages(array $pages): array
     {
-        // Keep BaseManageShippingRates as the registered page class so the sub-navigation
-        // URL lookup (getResourcePageName) can still find it in getPages().
-        // The route closure points to ManageShippingRatesPage so the custom
-        // form/table is rendered when the user navigates to the rates page.
+
         $pages['rates'] = new PageRegistration(
             page: BaseManageShippingRates::class,
             route: fn (Panel $panel): Route => RouteFacade::get(

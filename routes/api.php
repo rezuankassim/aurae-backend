@@ -39,21 +39,17 @@ use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// APK downloads are opened by Android's DownloadManager / browser, which do not send
-// device headers, so they are protected by a temporary signed URL instead of EnsureDevice.
 Route::middleware('signed')->group(function () {
     Route::get('/apk/download', [ApkController::class, 'download'])->name('api.apk.download');
     Route::get('/apk/tablet/download', [ApkController::class, 'tabletDownload'])->name('api.apk.tablet.download');
 });
 
 Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], function () {
-    // Mobile APK info route
+
     Route::get('/apk/info', [ApkController::class, 'info'])->name('api.apk.info');
 
-    // Tablet APK info route
     Route::get('/apk/tablet/info', [ApkController::class, 'tabletInfo'])->name('api.apk.tablet.info');
 
-    // Unprotected routes
     Route::get('/general-settings', [GeneralSettingController::class, 'index'])->name('api.general-settings.index');
     Route::get('/countries', [AddressController::class, 'countries'])->name('api.countries.index');
     Route::get('/states', [AddressController::class, 'states'])->name('api.states.index');
@@ -77,10 +73,8 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
 
     Route::post('/device-retrieve', [DeviceController::class, 'retrieve'])->middleware(EnsureActiveSubscription::class)->name('api.device.retrieve');
 
-    // WebSocket ping-pong
     Route::post('/ws/ping', [WebSocketController::class, 'ping'])->middleware(EnsureActiveSubscription::class)->name('api.ws.ping');
 
-    // Guest management routes
     Route::get('/device-guests', [DeviceGuestController::class, 'index'])->middleware(EnsureActiveSubscription::class)->name('api.device.guests.index');
     Route::post('/device-guest-create', [DeviceGuestController::class, 'store'])->middleware(EnsureActiveSubscription::class)->name('api.device.guests.store');
     Route::post('/device-guest-login', [DeviceGuestController::class, 'login'])->middleware(EnsureActiveSubscription::class)->name('api.device.guests.login');
@@ -138,7 +132,6 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::post('/cart/select-lines', [EcommerceController::class, 'selectLines'])->name('api.ecommerce.cart.select-lines');
         Route::post('/cart/swap-variant', [EcommerceController::class, 'swapCartLineVariant'])->name('api.ecommerce.cart.swap-variant');
 
-        // Checkout and payment routes
         Route::post('/checkout/set-addresses', [CheckoutController::class, 'setAddresses'])->name('api.checkout.set-addresses');
         Route::get('/checkout/shipping-options', [CheckoutController::class, 'getShippingOptions'])->name('api.checkout.shipping-options');
         Route::post('/checkout/set-shipping', [CheckoutController::class, 'setShippingOption'])->name('api.checkout.set-shipping');
@@ -170,38 +163,31 @@ Route::group(['middleware' => [EnsureDevice::class, 'check.app.version']], funct
         Route::get('/health-reports/{healthReport}', [HealthReportController::class, 'show'])->name('api.health-reports.show');
         Route::get('/health-reports/{healthReport}/file/{type}', [HealthReportController::class, 'file'])->name('api.health-reports.file');
 
-        // Owner-side guest routes (cross-device)
         Route::get('/my-guests', [OwnerGuestController::class, 'index'])->middleware(EnsureActiveSubscription::class)->name('api.my-guests.index');
         Route::get('/my-guests/{guest}/usage-histories', [OwnerGuestController::class, 'usageHistories'])->middleware(EnsureActiveSubscription::class)->name('api.my-guests.usage-histories');
         Route::get('/my-guests/{guest}/health-reports', [OwnerGuestController::class, 'healthReports'])->middleware(EnsureActiveSubscription::class)->name('api.my-guests.health-reports');
 
-        // Subscription routes
         Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('api.subscriptions.index');
         Route::get('/user/subscription', [SubscriptionController::class, 'userSubscription'])->name('api.user.subscription');
         Route::get('/subscription/active', [SubscriptionController::class, 'activeSubscription'])->name('api.subscription.active');
 
-        // Subscription payment routes
         Route::post('/subscription/subscribe', [SubscriptionPaymentController::class, 'subscribe'])->name('api.subscription.subscribe');
         Route::get('/subscription/payment-status/{reference}', [SubscriptionPaymentController::class, 'checkPaymentStatus'])->name('api.subscription.payment-status');
 
-        // Machine management routes
         Route::post('/machine/bind', [MachineController::class, 'bind'])->name('api.machine.bind');
         Route::get('/machines', [MachineController::class, 'index'])->name('api.machines.index');
         Route::post('/machine/{machine}/unbind', [MachineController::class, 'unbind'])->name('api.machine.unbind');
         Route::post('/machine/{machine}/change-subscription', [MachineController::class, 'changeSubscription'])->name('api.machine.change-subscription');
         Route::post('/machine/{machine}/essence-low', [MachineController::class, 'essenceLow'])->name('api.machine.essence-low');
 
-        // Profile routes
         Route::get('/profile', [ProfileController::class, 'show'])->name('api.profile.show');
         Route::post('/profile', [ProfileController::class, 'update'])->name('api.profile.update');
         Route::post('/profile/verify-phone', [ProfileController::class, 'verifyPhoneChange'])->name('api.profile.verify-phone');
         Route::post('/profile/resend-otp', [ProfileController::class, 'resendPhoneVerificationOtp'])->name('api.profile.resend-otp');
 
-        // User settings routes
         Route::get('/settings', [UserSettingController::class, 'show'])->name('api.settings.show');
         Route::post('/settings', [UserSettingController::class, 'update'])->name('api.settings.update');
 
-        // Program routes
         Route::post('/program/start', [ProgramController::class, 'start'])->name('api.program.start');
         Route::post('/program/stop', [ProgramController::class, 'stop'])->name('api.program.stop');
     });

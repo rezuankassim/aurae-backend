@@ -13,9 +13,6 @@ use Lunar\Models\ProductVariant;
 
 class CartController extends Controller
 {
-    /**
-     * Display the cart.
-     */
     public function index()
     {
         $cart = CartSession::current();
@@ -35,9 +32,6 @@ class CartController extends Controller
         ]);
     }
 
-    /**
-     * Add item to cart.
-     */
     public function add(Request $request)
     {
         $request->validate([
@@ -68,9 +62,6 @@ class CartController extends Controller
         return back()->with('success', 'Product added to cart successfully.');
     }
 
-    /**
-     * Update cart line quantity.
-     */
     public function updateLine(Request $request, CartLine $cartLine)
     {
         $request->validate([
@@ -86,9 +77,6 @@ class CartController extends Controller
         return back()->with('success', 'Cart updated successfully.');
     }
 
-    /**
-     * Remove item from cart.
-     */
     public function removeLine(CartLine $cartLine)
     {
         $cartLine->delete();

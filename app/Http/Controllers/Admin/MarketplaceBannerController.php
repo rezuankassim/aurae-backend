@@ -10,9 +10,6 @@ use Inertia\Inertia;
 
 class MarketplaceBannerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $banners = MarketplaceBanner::orderBy('order')->get();
@@ -22,17 +19,11 @@ class MarketplaceBannerController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return Inertia::render('admin/marketplace-banners/create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -53,9 +44,6 @@ class MarketplaceBannerController extends Controller
             ->with('success', 'Marketplace banner created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(MarketplaceBanner $marketplaceBanner)
     {
         transform($marketplaceBanner, function ($item) {
@@ -67,9 +55,6 @@ class MarketplaceBannerController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(MarketplaceBanner $marketplaceBanner)
     {
         return Inertia::render('admin/marketplace-banners/edit', [
@@ -77,9 +62,6 @@ class MarketplaceBannerController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, MarketplaceBanner $marketplaceBanner)
     {
         $validated = $request->validate([
@@ -90,7 +72,7 @@ class MarketplaceBannerController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
+
             if ($marketplaceBanner->image) {
                 Storage::disk('public')->delete($marketplaceBanner->image);
             }
@@ -105,12 +87,9 @@ class MarketplaceBannerController extends Controller
             ->with('success', 'Marketplace banner updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(MarketplaceBanner $marketplaceBanner)
     {
-        // Delete image file
+
         if ($marketplaceBanner->image) {
             Storage::disk('public')->delete($marketplaceBanner->image);
         }

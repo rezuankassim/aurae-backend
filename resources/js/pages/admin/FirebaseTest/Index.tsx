@@ -81,7 +81,7 @@ export default function FirebaseTest({ users }: { users: User[] }) {
                 data.data = parsedData;
             }
         } catch {
-            // Ignore invalid JSON
+
         }
 
         if (notificationType === 'token') {
@@ -176,14 +176,14 @@ export default function FirebaseTest({ users }: { users: User[] }) {
                 )}
 
                 <div className="grid gap-4 md:grid-cols-2">
-                    {/* Send Notification Form */}
+                    {}
                     <Card>
                         <CardHeader>
                             <CardTitle>Send Notification</CardTitle>
                             <CardDescription>Configure and send Firebase notifications</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {/* Notification Type */}
+                            {}
                             <div>
                                 <Label htmlFor="notification-type">Send To</Label>
                                 <Select value={notificationType} onValueChange={(value: any) => setNotificationType(value)}>
@@ -198,7 +198,7 @@ export default function FirebaseTest({ users }: { users: User[] }) {
                                 </Select>
                             </div>
 
-                            {/* FCM Token Input */}
+                            {}
                             {notificationType === 'token' && (
                                 <div className="space-y-2">
                                     <Label htmlFor="fcm-token">FCM Token</Label>
@@ -223,7 +223,7 @@ export default function FirebaseTest({ users }: { users: User[] }) {
                                 </div>
                             )}
 
-                            {/* User Selection */}
+                            {}
                             {notificationType === 'user' && (
                                 <div className="space-y-2">
                                     <Label htmlFor="user-select">Select User</Label>
@@ -254,7 +254,7 @@ export default function FirebaseTest({ users }: { users: User[] }) {
                                 </div>
                             )}
 
-                            {/* All Users Info */}
+                            {}
                             {notificationType === 'all' && (
                                 <Alert>
                                     <AlertCircle className="size-4" />
@@ -264,7 +264,7 @@ export default function FirebaseTest({ users }: { users: User[] }) {
                                 </Alert>
                             )}
 
-                            {/* Notification Content */}
+                            {}
                             <div>
                                 <Label htmlFor="title">Title</Label>
                                 <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Notification title" />
@@ -281,7 +281,7 @@ export default function FirebaseTest({ users }: { users: User[] }) {
                                 />
                             </div>
 
-                            {/* Custom Data */}
+                            {}
                             <div>
                                 <Label htmlFor="custom-data">Custom Data (JSON)</Label>
                                 <Textarea
@@ -302,7 +302,7 @@ export default function FirebaseTest({ users }: { users: User[] }) {
                         </CardContent>
                     </Card>
 
-                    {/* Notification Logs */}
+                    {}
                     <Card>
                         <CardHeader>
                             <div className="flex items-center justify-between">
@@ -362,7 +362,7 @@ export default function FirebaseTest({ users }: { users: User[] }) {
                         </CardContent>
                     </Card>
 
-                    {/* Users Overview */}
+                    {}
                     <Card className="md:col-span-2">
                         <CardHeader>
                             <CardTitle>Users with FCM Tokens ({users.length})</CardTitle>

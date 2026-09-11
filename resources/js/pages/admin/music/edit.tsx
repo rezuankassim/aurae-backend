@@ -21,7 +21,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Edit Music',
-        href: '', // Placeholder, will be set in component or handled by navigation logic if needed but mostly breadcrumbs are static
+        href: '',
     },
 ];
 
@@ -55,7 +55,7 @@ export default function MusicEdit({ music }: { music: Music }) {
                 return;
             }
 
-            // Check if we have files to upload to S3
+
             let musicResult = null;
             let thumbnailResult = null;
             let useS3 = false;
@@ -75,7 +75,7 @@ export default function MusicEdit({ music }: { music: Music }) {
             }
 
             if (useS3 || (!musicFile && !thumbnailFile)) {
-                // S3 mode or no files to upload
+
                 router.put(
                     update(music.id).url,
                     {
@@ -91,7 +91,7 @@ export default function MusicEdit({ music }: { music: Music }) {
                     },
                 );
             } else {
-                // Development mode - use traditional form upload
+
                 const formData = new FormData();
                 formData.append('_method', 'PUT');
                 formData.append('title', title);

@@ -12,9 +12,6 @@ use Lunar\Shipping\Facades\Shipping;
 
 class CheckoutController extends Controller
 {
-    /**
-     * Display the checkout page.
-     */
     public function index()
     {
         $cart = CartSession::current();
@@ -41,9 +38,6 @@ class CheckoutController extends Controller
         ]);
     }
 
-    /**
-     * Save shipping and billing addresses.
-     */
     public function saveAddress(Request $request)
     {
         $validated = $request->validate([
@@ -77,7 +71,6 @@ class CheckoutController extends Controller
                 ->with('error', 'Cart not found.');
         }
 
-        // Set shipping address
         $cart->shippingAddress()->updateOrCreate(
             ['cart_id' => $cart->id, 'type' => 'shipping'],
             [
@@ -94,7 +87,6 @@ class CheckoutController extends Controller
             ]
         );
 
-        // Set billing address
         if ($request->boolean('same_as_shipping')) {
             $cart->billingAddress()->updateOrCreate(
                 ['cart_id' => $cart->id, 'type' => 'billing'],
@@ -132,9 +124,6 @@ class CheckoutController extends Controller
         return redirect()->route('checkout.review');
     }
 
-    /**
-     * Show order review page.
-     */
     public function review()
     {
         $cart = CartSession::current();
@@ -163,9 +152,6 @@ class CheckoutController extends Controller
         ]);
     }
 
-    /**
-     * Complete the order.
-     */
     public function complete(Request $request)
     {
         $cart = CartSession::current();
@@ -180,10 +166,8 @@ class CheckoutController extends Controller
                 ->with('error', 'Please complete your shipping information.');
         }
 
-        // Calculate cart and set default shipping option
         $cart->calculate();
 
-        // Set default shipping option (BASDEL - Basic Delivery)
         $shippingRates = Shipping::shippingRates($cart)->get();
         $shippingOptions = Shipping::shippingOptions($cart)->get(
             new ShippingOptionLookup(
@@ -191,7 +175,6 @@ class CheckoutController extends Controller
             )
         );
 
-        // Find BASDEL option
         foreach ($shippingOptions as $optionResult) {
             if ($optionResult->option->getIdentifier() === 'BASDEL') {
                 $cart->setShippingOption($optionResult->option);
@@ -199,13 +182,12 @@ class CheckoutController extends Controller
             }
         }
 
-        // Create the order
         $order = $cart->createOrder(
             allowMultipleOrders: false,
         );
 
         if ($order) {
-            // Clear the cart session
+
             CartSession::forget();
 
             return redirect()->route('checkout.success', ['order' => $order->id])
@@ -215,12 +197,9 @@ class CheckoutController extends Controller
         return back()->with('error', 'Failed to create order. Please try again.');
     }
 
-    /**
-     * Show order success page.
-     */
     public function success(Order $order)
     {
-        // Ensure user can only view their own orders
+
         if ($order->user_id !== auth()->id()) {
             abort(403);
         }

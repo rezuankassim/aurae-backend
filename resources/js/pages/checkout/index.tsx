@@ -64,7 +64,7 @@ export default function CheckoutIndex({ cart, countries }: Props) {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Shipping Address */}
+                    {}
                     <Card>
                         <CardHeader>
                             <CardTitle>Shipping Address</CardTitle>
@@ -194,7 +194,7 @@ export default function CheckoutIndex({ cart, countries }: Props) {
                         </CardContent>
                     </Card>
 
-                    {/* Billing Address */}
+                    {}
                     <Card>
                         <CardHeader>
                             <CardTitle>Billing Address</CardTitle>

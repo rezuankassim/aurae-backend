@@ -16,9 +16,6 @@ class GeneralSettingController extends Controller
         protected MachineSerialService $serialService
     ) {}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit()
     {
         $generalSetting = GeneralSetting::firstOrCreate();
@@ -30,9 +27,6 @@ class GeneralSettingController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(GeneralSettingUpdateRequest $request)
     {
         $validated = $request->validated();
@@ -40,9 +34,8 @@ class GeneralSettingController extends Controller
         $generalSetting = GeneralSetting::first();
         $generalSetting->contact_no = $validated['contact_no'];
 
-        // Handle APK file upload
         if ($request->hasFile('apk_file')) {
-            // Delete old APK file if it exists (check both disks for backward compatibility)
+
             if ($generalSetting->apk_file_path) {
                 foreach (['local', 'public'] as $oldDisk) {
                     if (Storage::disk($oldDisk)->exists($generalSetting->apk_file_path)) {
@@ -51,7 +44,6 @@ class GeneralSettingController extends Controller
                 }
             }
 
-            // Store new APK file on the private disk so it is only reachable via signed URLs
             $file = $request->file('apk_file');
             $filename = time().'_'.$file->getClientOriginalName();
             $path = $file->storeAs('apk', $filename, 'local');
@@ -60,7 +52,6 @@ class GeneralSettingController extends Controller
             $generalSetting->apk_file_size = $file->getSize();
         }
 
-        // Update APK version and release notes
         if ($request->filled('apk_version')) {
             $generalSetting->apk_version = $validated['apk_version'];
         }
@@ -69,9 +60,8 @@ class GeneralSettingController extends Controller
             $generalSetting->apk_release_notes = $validated['apk_release_notes'];
         }
 
-        // Handle Tablet APK file upload
         if ($request->hasFile('tablet_apk_file')) {
-            // Delete old tablet APK file if it exists (check both disks for backward compatibility)
+
             if ($generalSetting->tablet_apk_file_path) {
                 foreach (['local', 'public'] as $oldDisk) {
                     if (Storage::disk($oldDisk)->exists($generalSetting->tablet_apk_file_path)) {
@@ -80,7 +70,6 @@ class GeneralSettingController extends Controller
                 }
             }
 
-            // Store new tablet APK file on the private disk so it is only reachable via signed URLs
             $file = $request->file('tablet_apk_file');
             $filename = time().'_tablet_'.$file->getClientOriginalName();
             $path = $file->storeAs('apk/tablet', $filename, 'local');
@@ -89,7 +78,6 @@ class GeneralSettingController extends Controller
             $generalSetting->tablet_apk_file_size = $file->getSize();
         }
 
-        // Update Tablet APK version and release notes
         if ($request->filled('tablet_apk_version')) {
             $generalSetting->tablet_apk_version = $validated['tablet_apk_version'];
         }
@@ -98,7 +86,6 @@ class GeneralSettingController extends Controller
             $generalSetting->tablet_apk_release_notes = $validated['tablet_apk_release_notes'];
         }
 
-        // Update machine serial format settings
         if ($request->filled('machine_serial_format')) {
             $generalSetting->machine_serial_format = $validated['machine_serial_format'];
         }

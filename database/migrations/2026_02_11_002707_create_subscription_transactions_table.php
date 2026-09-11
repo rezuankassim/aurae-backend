@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('subscription_transactions', function (Blueprint $table) {
@@ -16,8 +13,8 @@ return new class extends Migration
             $table->foreignId('parent_transaction_id')->nullable()->constrained('subscription_transactions')->nullOnDelete();
             $table->foreignId('user_subscription_id')->nullable()->constrained()->nullOnDelete();
             $table->boolean('success')->default(true);
-            $table->string('type'); // intent, capture
-            $table->string('driver'); // senangpay
+            $table->string('type');
+            $table->string('driver');
             $table->decimal('amount', 10, 2);
             $table->string('reference');
             $table->string('status');
@@ -30,9 +27,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('subscription_transactions');

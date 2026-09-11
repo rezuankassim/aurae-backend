@@ -22,9 +22,6 @@ class SendPushNotification implements ShouldQueue
 
     public $sendToAll;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         array $userIds = [],
         string $title = '',
@@ -41,9 +38,6 @@ class SendPushNotification implements ShouldQueue
         $this->sendToAll = $sendToAll;
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(FirebaseService $firebaseService): void
     {
         if ($this->sendToAll) {

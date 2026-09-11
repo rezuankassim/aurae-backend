@@ -7,9 +7,6 @@ use Inertia\Inertia;
 
 class LegalController extends Controller
 {
-    /**
-     * Display the terms and conditions page.
-     */
     public function termsAndConditions()
     {
         $generalSetting = GeneralSetting::first();
@@ -19,9 +16,6 @@ class LegalController extends Controller
         ]);
     }
 
-    /**
-     * Display the privacy policy page.
-     */
     public function privacyPolicy()
     {
         $generalSetting = GeneralSetting::first();

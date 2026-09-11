@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 
 class MaintenanceBannerController extends Controller
 {
-    /**
-     * Get all active maintenance banners for mobile app.
-     */
     public function index(Request $request)
     {
         $banners = MaintenanceBanner::where('is_active', true)

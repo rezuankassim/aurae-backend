@@ -9,9 +9,6 @@ use Illuminate\Http\Request;
 
 class CustomTherapyController extends Controller
 {
-    /**
-     * Display a listing of the user's custom therapies.
-     */
     public function index(Request $request)
     {
         $customTherapies = Therapy::where('is_custom', true)
@@ -26,15 +23,12 @@ class CustomTherapyController extends Controller
             ]);
     }
 
-    /**
-     * Store a newly created custom therapy in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'image' => ['nullable', 'image', 'max:10240'], // 10MB max
+            'image' => ['nullable', 'image', 'max:10240'],
             'music_id' => ['required', 'exists:music,id'],
             'duration' => ['required', 'numeric', 'min:0'],
             'temperature' => ['required', 'numeric'],
@@ -45,7 +39,6 @@ class CustomTherapyController extends Controller
 
         $validated = $request->only(['name', 'description']);
 
-        // Handle file uploads
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('therapies/images', 'public');
         }
@@ -70,12 +63,9 @@ class CustomTherapyController extends Controller
             ]);
     }
 
-    /**
-     * Remove the specified custom therapy from storage.
-     */
     public function destroy(Request $request, Therapy $customTherapy)
     {
-        // Ensure the therapy is custom and belongs to the authenticated user
+
         if (! $customTherapy->is_custom || $customTherapy->user_id !== $request->user()->id) {
             return response()->json([
                 'status' => 403,
@@ -83,7 +73,6 @@ class CustomTherapyController extends Controller
             ], 403);
         }
 
-        // Delete associated image file if exists
         if ($customTherapy->image) {
             \Illuminate\Support\Facades\Storage::disk('public')->delete($customTherapy->image);
         }

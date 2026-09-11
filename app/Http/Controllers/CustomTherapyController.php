@@ -11,9 +11,6 @@ use Inertia\Inertia;
 
 class CustomTherapyController extends Controller
 {
-    /**
-     * Display a listing of user's custom therapies.
-     */
     public function index(Request $request)
     {
         $customTherapies = Therapy::where('is_custom', true)
@@ -26,12 +23,9 @@ class CustomTherapyController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified custom therapy.
-     */
     public function edit(Request $request, Therapy $customTherapy)
     {
-        // Ensure the therapy belongs to the authenticated user
+
         if ($customTherapy->user_id !== $request->user()->id || ! $customTherapy->is_custom) {
             return redirect()->route('custom-therapies.index')
                 ->with('error', 'You do not have permission to edit this therapy.');
@@ -48,12 +42,9 @@ class CustomTherapyController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified custom therapy in storage.
-     */
     public function update(TherapyUpdateRequest $request, Therapy $customTherapy)
     {
-        // Ensure the therapy belongs to the authenticated user
+
         if ($customTherapy->user_id !== $request->user()->id || ! $customTherapy->is_custom) {
             return redirect()->route('custom-therapies.index')
                 ->with('error', 'You do not have permission to edit this therapy.');
@@ -61,9 +52,8 @@ class CustomTherapyController extends Controller
 
         $validated = $request->validated();
 
-        // Handle file uploads
         if ($request->hasFile('image')) {
-            // Remove old image if exists
+
             if ($customTherapy->image) {
                 Storage::disk('public')->delete($customTherapy->image);
             }
@@ -87,18 +77,14 @@ class CustomTherapyController extends Controller
         return to_route('custom-therapies.index')->with('success', 'Custom therapy updated successfully.');
     }
 
-    /**
-     * Remove the specified custom therapy from storage.
-     */
     public function destroy(Request $request, Therapy $customTherapy)
     {
-        // Ensure the therapy belongs to the authenticated user
+
         if ($customTherapy->user_id !== $request->user()->id || ! $customTherapy->is_custom) {
             return redirect()->route('custom-therapies.index')
                 ->with('error', 'You do not have permission to delete this therapy.');
         }
 
-        // Delete associated files
         if ($customTherapy->image) {
             Storage::disk('public')->delete($customTherapy->image);
         }

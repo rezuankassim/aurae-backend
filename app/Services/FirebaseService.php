@@ -24,15 +24,12 @@ class FirebaseService
         }
     }
 
-    /**
-     * Send notification to a single user
-     */
     public function sendToUser(User $user, string $title, string $body, array $data = [], string $type = 'general')
     {
-        // Check if user has disabled app notifications
+
         $setting = $user->setting;
         if ($setting && ! $setting->allow_app_notification) {
-            // Store notification record but don't send
+
             NotificationModel::create([
                 'user_id' => $user->id,
                 'title' => $title,
@@ -58,7 +55,6 @@ class FirebaseService
             $results[] = $result;
         }
 
-        // Store notification record
         NotificationModel::create([
             'user_id' => $user->id,
             'title' => $title,
@@ -73,17 +69,9 @@ class FirebaseService
         return $results;
     }
 
-    /**
-     * Send a push notification to a user's devices WITHOUT creating a notification record.
-     *
-     * The caller is responsible for persisting the Notification record. Respects the
-     * user's allow_app_notification setting (returns a skipped result without sending).
-     *
-     * @return array{sent: bool, skipped: bool, error: string|null, results: array}
-     */
     public function pushToUser(User $user, string $title, string $body, array $data = []): array
     {
-        // Respect the user's notification preference.
+
         $setting = $user->setting;
         if ($setting && ! $setting->allow_app_notification) {
             return [
@@ -112,9 +100,6 @@ class FirebaseService
         ];
     }
 
-    /**
-     * Send notification to multiple users
-     */
     public function sendToUsers(array $userIds, string $title, string $body, array $data = [], string $type = 'general')
     {
         $users = User::whereIn('id', $userIds)->get();
@@ -126,9 +111,6 @@ class FirebaseService
         return true;
     }
 
-    /**
-     * Send notification to all users
-     */
     public function sendToAll(string $title, string $body, array $data = [], string $type = 'general')
     {
         $devices = UserDevice::where('deviceable_type', User::class)
@@ -144,9 +126,6 @@ class FirebaseService
         return true;
     }
 
-    /**
-     * Send notification to a specific device token
-     */
     public function sendToDevice(string $token, string $title, string $body, array $data = [])
     {
         if (! $this->messaging) {
@@ -179,9 +158,6 @@ class FirebaseService
         }
     }
 
-    /**
-     * Validate FCM token
-     */
     public function validateToken(string $token)
     {
         if (! $this->messaging) {

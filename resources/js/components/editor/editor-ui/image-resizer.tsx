@@ -64,7 +64,7 @@ export function ImageResizer({
         startY: 0,
     });
     const editorRootElement = editor.getRootElement();
-    // Find max width, accounting for editor padding.
+
     const maxWidthContainer = maxWidth ? maxWidth : editorRootElement !== null ? editorRootElement.getBoundingClientRect().width - 20 : 100;
     const maxHeightContainer = editorRootElement !== null ? editorRootElement.getBoundingClientRect().height - 20 : 100;
 
@@ -142,7 +142,7 @@ export function ImageResizer({
 
         if (image !== null && positioning.isResizing) {
             const zoom = calculateZoomLevel(image);
-            // Corner cursor
+
             if (isHorizontal && isVertical) {
                 let diff = Math.floor(positioning.startX - event.clientX / zoom);
                 diff = positioning.direction & Direction.east ? -diff : diff;

@@ -14,13 +14,10 @@ class ShippingMethodEditExtension extends EditPageExtension
     {
         $schema = $form->getComponents();
 
-        // Find and modify the driver select field to include all shipping driver options
         $this->modifyDriverSelect($schema);
 
-        // Replace the RichEditor description field with a plain Textarea
         $this->replaceDescriptionWithTextarea($schema);
 
-        // Hide the cutoff and stock_available fields
         $this->hideFields($schema, ['cutoff', 'stock_available']);
 
         return $form->schema($schema);
@@ -29,7 +26,7 @@ class ShippingMethodEditExtension extends EditPageExtension
     protected function modifyDriverSelect(array &$components): void
     {
         foreach ($components as $component) {
-            // Check if this is the driver select
+
             if ($component instanceof Select && $component->getName() === 'driver') {
                 $component->options([
                     'ship-by' => __('lunarpanel.shipping::shippingmethod.form.driver.options.ship-by'),
@@ -41,7 +38,6 @@ class ShippingMethodEditExtension extends EditPageExtension
                 return;
             }
 
-            // Recursively search child components
             if (method_exists($component, 'getChildComponents')) {
                 $childComponents = $component->getChildComponents();
                 $this->modifyDriverSelect($childComponents);
@@ -59,7 +55,6 @@ class ShippingMethodEditExtension extends EditPageExtension
                 return;
             }
 
-            // Recursively search child components and set them back on the parent
             if (method_exists($component, 'getChildComponents') && method_exists($component, 'schema')) {
                 $childComponents = $component->getChildComponents();
                 $this->replaceDescriptionWithTextarea($childComponents);
@@ -75,7 +70,6 @@ class ShippingMethodEditExtension extends EditPageExtension
                 $component->hidden();
             }
 
-            // Recursively search child components and set them back on the parent
             if (method_exists($component, 'getChildComponents') && method_exists($component, 'schema')) {
                 $childComponents = $component->getChildComponents();
                 $this->hideFields($childComponents, $fieldNames);

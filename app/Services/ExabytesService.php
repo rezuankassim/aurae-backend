@@ -22,10 +22,6 @@ class ExabytesService
         $this->brandName = config('services.exabytes.brand_name', 'AURAE');
     }
 
-    /**
-     * Send an OTP SMS to a phone number.
-     * Following Malaysian standard format: RM0.00 [BrandName]: Your verification code is 123456.
-     */
     public function sendOtp(string $phone, string $code): array
     {
         if (! $this->username || ! $this->password) {
@@ -42,15 +38,11 @@ class ExabytesService
             ];
         }
 
-        // Format message according to Malaysian standard
         $message = "Your verification code is {$code}. This code expires in 5 minutes.";
 
         return $this->sendSms($phone, $message);
     }
 
-    /**
-     * Send a custom SMS message to a phone number.
-     */
     public function sendSms(string $phone, string $body): array
     {
         if (! $this->username || ! $this->password) {
@@ -61,13 +53,11 @@ class ExabytesService
         }
 
         try {
-            // Normalize phone number
+
             $phone = $this->normalizePhoneNumber($phone);
 
-            // Determine message type (1 for ASCII, 2 for Unicode)
             $type = $this->detectMessageType($body);
 
-            // Make HTTPS request to Exabytes API
             $response = Http::timeout(30)->get($this->baseUrl, [
                 'un' => $this->username,
                 'pwd' => $this->password,
@@ -77,11 +67,9 @@ class ExabytesService
                 'agreedterm' => 'YES',
             ]);
 
-            // Check if request was successful
             if ($response->successful()) {
                 $responseBody = $response->body();
 
-                // Check for error responses
                 if (str_contains(strtolower($responseBody), 'error') ||
                     str_contains(strtolower($responseBody), 'failed') ||
                     str_contains(strtolower($responseBody), 'invalid')) {
@@ -130,24 +118,17 @@ class ExabytesService
         }
     }
 
-    /**
-     * Normalize phone number to ensure proper format for Exabytes.
-     * Exabytes expects format like: 60123456789 (country code + number without +)
-     */
     protected function normalizePhoneNumber(string $phone): string
     {
-        // Remove all non-numeric characters except +
+
         $phone = preg_replace('/[^0-9+]/', '', $phone);
 
-        // Remove leading + if present
         $phone = ltrim($phone, '+');
 
-        // If phone starts with 0 (Malaysian local format), replace with country code 60
         if (str_starts_with($phone, '0')) {
             $phone = '60'.substr($phone, 1);
         }
 
-        // If phone doesn't start with country code, assume Malaysian and add 60
         if (! str_starts_with($phone, '60') && strlen($phone) < 11) {
             $phone = '60'.$phone;
         }
@@ -155,18 +136,13 @@ class ExabytesService
         return $phone;
     }
 
-    /**
-     * Detect message type based on content.
-     * Type 1: ASCII (English, Bahasa Melayu)
-     * Type 2: Unicode (Chinese, Japanese, Emojis, etc.)
-     */
     protected function detectMessageType(string $message): int
     {
-        // Check if message contains non-ASCII characters
+
         if (preg_match('/[^\x00-\x7F]/', $message)) {
-            return 2; // Unicode
+            return 2;
         }
 
-        return 1; // ASCII
+        return 1;
     }
 }

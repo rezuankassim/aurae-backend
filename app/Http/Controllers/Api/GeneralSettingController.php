@@ -9,9 +9,6 @@ use App\Models\SocialMedia;
 
 class GeneralSettingController extends Controller
 {
-    /**
-     * Display the general settings.
-     */
     public function index()
     {
         $generalSetting = GeneralSetting::first();

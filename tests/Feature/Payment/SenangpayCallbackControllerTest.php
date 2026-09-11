@@ -27,10 +27,8 @@ class SenangpayCallbackControllerTest extends TestCase
     {
         parent::setUp();
 
-        // Create default Language for Lunar PHP
         Language::factory()->create(['default' => true, 'code' => 'en']);
 
-        // Create default TaxClass
         TaxClass::factory()->create(['default' => true, 'name' => 'Default']);
 
         config([
@@ -48,7 +46,6 @@ class SenangpayCallbackControllerTest extends TestCase
     {
         Event::fake([PaymentCompleted::class]);
 
-        // Mock HTTP response for payment status query
         Http::fake([
             'https://app.senangpay.my/apiv1/query_order_status' => Http::response([
                 'status' => 1,
@@ -63,11 +60,9 @@ class SenangpayCallbackControllerTest extends TestCase
             ]),
         ]);
 
-        // Create test user and order
         $user = \App\Models\User::factory()->create();
         $order = $this->createTestOrder($user);
 
-        // Create intent transaction
         $transaction = Transaction::create([
             'order_id' => $order->id,
             'success' => true,
@@ -78,7 +73,6 @@ class SenangpayCallbackControllerTest extends TestCase
             'status' => 'pending',
         ]);
 
-        // Send return URL request
         $response = $this->get('/payment/senangpay/return?'.http_build_query([
             'status_id' => '1',
             'order_id' => 'ORD-2026-00001',
@@ -88,7 +82,6 @@ class SenangpayCallbackControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('payment.processing');
 
-        // Assert capture transaction created
         $this->assertDatabaseHas('lunar_transactions', [
             'order_id' => $order->id,
             'type' => 'capture',
@@ -97,11 +90,9 @@ class SenangpayCallbackControllerTest extends TestCase
             'success' => true,
         ]);
 
-        // Assert order status updated
         $order->refresh();
         $this->assertEquals('payment-received', $order->status);
 
-        // Assert WebSocket event broadcasted
         Event::assertDispatched(PaymentCompleted::class, function ($event) use ($user, $order) {
             return $event->userId === $user->id
                 && $event->referenceNumber === 'ORD-2026-00001'
@@ -115,7 +106,6 @@ class SenangpayCallbackControllerTest extends TestCase
     {
         Event::fake([PaymentCompleted::class]);
 
-        // Mock HTTP response for failed payment
         Http::fake([
             'https://app.senangpay.my/apiv1/query_order_status' => Http::response([
                 'status' => 1,
@@ -152,11 +142,9 @@ class SenangpayCallbackControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('payment.processing');
 
-        // Assert order status updated to failed
         $order->refresh();
         $this->assertEquals('payment-failed', $order->status);
 
-        // Assert WebSocket event with failed status
         Event::assertDispatched(PaymentCompleted::class, function ($event) {
             return $event->status === 'failed';
         });
@@ -165,7 +153,7 @@ class SenangpayCallbackControllerTest extends TestCase
     #[Test]
     public function return_url_prevents_duplicate_capture()
     {
-        // Mock HTTP response
+
         Http::fake([
             'https://app.senangpay.my/apiv1/query_order_status' => Http::response([
                 'status' => 1,
@@ -193,7 +181,6 @@ class SenangpayCallbackControllerTest extends TestCase
             'status' => 'pending',
         ]);
 
-        // Create capture transaction (already processed)
         Transaction::create([
             'parent_transaction_id' => $intentTransaction->id,
             'order_id' => $order->id,
@@ -205,7 +192,6 @@ class SenangpayCallbackControllerTest extends TestCase
             'status' => 'captured',
         ]);
 
-        // Send return URL request
         $response = $this->get('/payment/senangpay/return?'.http_build_query([
             'status_id' => '1',
             'order_id' => 'ORD-2026-00001',
@@ -214,7 +200,6 @@ class SenangpayCallbackControllerTest extends TestCase
 
         $response->assertStatus(200);
 
-        // Assert only ONE capture transaction exists
         $this->assertEquals(1, Transaction::where('order_id', $order->id)
             ->where('type', 'capture')
             ->count());
@@ -237,7 +222,7 @@ class SenangpayCallbackControllerTest extends TestCase
     #[Test]
     public function return_url_shows_error_if_query_fails()
     {
-        // Mock HTTP response for failed query
+
         Http::fake([
             'https://app.senangpay.my/apiv1/query_order_status' => Http::response(
                 ['status' => 0, 'msg' => 'Order not found'],
@@ -291,7 +276,7 @@ class SenangpayCallbackControllerTest extends TestCase
             'currency_code' => $currency->code,
             'channel_id' => $channel->id,
             'status' => 'payment-pending',
-            'total' => 10000, // 100.00 in cents
+            'total' => 10000,
             'meta' => ['senangpay_reference' => 'ORD-2026-00001'],
         ]);
 

@@ -26,10 +26,6 @@ class SenangpayCallbackController extends Controller
         $this->signatureService = $signatureService;
     }
 
-    /**
-     * Handle return URL after payment completion.
-     * SenangPay redirects here with status_id parameter.
-     */
     public function returnUrl(Request $request)
     {
         $statusId = $request->input('status_id');
@@ -46,7 +42,6 @@ class SenangpayCallbackController extends Controller
             'hash' => $hash,
         ]);
 
-        // Check if this is a subscription payment
         $transaction = Transaction::where('reference', $orderId)
             ->where('driver', 'senangpay')
             ->where('type', 'intent')
@@ -58,7 +53,6 @@ class SenangpayCallbackController extends Controller
             return $this->handleSubscriptionPayment($statusId, $orderId, $transactionId, $msg, $hash, $transaction);
         }
 
-        // Get order by reference number stored in meta
         $order = Order::whereJsonContains('meta->senangpay_reference', $orderId)->first();
 
         if (! $order) {
@@ -69,7 +63,6 @@ class SenangpayCallbackController extends Controller
             ]);
         }
 
-        // Verify hash from return URL parameters
         $secretKey = config('services.senangpay.secret_key');
         $expectedHash = $this->signatureService->generateReturnHash(
             $secretKey,
@@ -91,10 +84,8 @@ class SenangpayCallbackController extends Controller
             ]);
         }
 
-        // Determine status based on status_id (1 = success, 0 = failed)
         $status = $statusId === '1' ? 'success' : 'failed';
 
-        // Broadcast WebSocket event to mobile app
         if ($order->user_id) {
             broadcast(new PaymentCompleted(
                 userId: $order->user_id,
@@ -113,7 +104,6 @@ class SenangpayCallbackController extends Controller
             ]);
         }
 
-        // If payment successful, capture it
         if ($status === 'success') {
             try {
                 $this->capturePayment($order, $orderId, $transactionId);
@@ -124,7 +114,7 @@ class SenangpayCallbackController extends Controller
                 ]);
             }
         } else {
-            // Payment failed - update order status
+
             $order->update([
                 'status' => 'payment-failed',
                 'meta' => array_merge((array) $order->meta, [
@@ -139,16 +129,12 @@ class SenangpayCallbackController extends Controller
             ]);
         }
 
-        // Return simple HTML page
         return response()->view('payment.processing', [
             'status' => $status,
             'reference' => $orderId,
         ]);
     }
 
-    /**
-     * Query payment status from SenangPay API.
-     */
     protected function queryPaymentStatus(string $orderId): ?array
     {
         try {
@@ -156,14 +142,12 @@ class SenangpayCallbackController extends Controller
             $secretKey = config('services.senangpay.secret_key');
             $baseUrl = config('services.senangpay.base_url', 'https://app.senangpay.my');
 
-            // Generate signature
             $signature = $this->signatureService->generateQueryOrderSignature(
                 $merchantId,
                 $secretKey,
                 $orderId
             );
 
-            // Query order status
             $response = Http::withBasicAuth($merchantId, '')
                 ->get($baseUrl.'/apiv1/query_order_status', [
                     'merchant_id' => $merchantId,
@@ -184,7 +168,7 @@ class SenangpayCallbackController extends Controller
             $result = $response->json();
 
             if (isset($result['status']) && $result['status'] === 1) {
-                // Success - return first transaction data
+
                 if (isset($result['data']) && is_array($result['data']) && count($result['data']) > 0) {
                     return $result['data'][0];
                 }
@@ -208,12 +192,9 @@ class SenangpayCallbackController extends Controller
         }
     }
 
-    /**
-     * Capture payment after successful status verification.
-     */
     protected function capturePayment(Order $order, string $orderId, string $transactionId): void
     {
-        // Get intent transaction
+
         $intentTransaction = Transaction::where('reference', $orderId)
             ->where('type', 'intent')
             ->where('driver', 'senangpay')
@@ -225,7 +206,6 @@ class SenangpayCallbackController extends Controller
             return;
         }
 
-        // Check if already processed
         if (Transaction::where('parent_transaction_id', $intentTransaction->id)
             ->where('type', 'capture')
             ->exists()) {
@@ -234,7 +214,6 @@ class SenangpayCallbackController extends Controller
             return;
         }
 
-        // Create capture transaction
         Transaction::create([
             'parent_transaction_id' => $intentTransaction->id,
             'order_id' => $order->id,
@@ -253,8 +232,6 @@ class SenangpayCallbackController extends Controller
             ],
         ]);
 
-        // Update order status and dissociate from cart so future checkouts
-        // from the same cart create a brand-new order instead of reusing this one.
         $order->update([
             'status' => 'payment-received',
             'cart_id' => null,
@@ -264,7 +241,6 @@ class SenangpayCallbackController extends Controller
             ]),
         ]);
 
-        // Decrement stock for each product variant in the order
         foreach ($order->lines()->where('purchasable_type', 'product_variant')->get() as $line) {
             $variant = ProductVariant::find($line->purchasable_id);
 
@@ -281,18 +257,12 @@ class SenangpayCallbackController extends Controller
             }
         }
 
-        // Note: do NOT delete the cart here. The custom CreateOrder action already
-        // removes checked-out lines and resets any remaining ones to selected=true,
-        // so the cart stays alive for the user's next checkout. Deleting it would
-        // force a new cart to be created with no shipping address, breaking checkout.
-
         Log::info('SenangPay capture: Payment captured', [
             'order_id' => $order->id,
             'reference' => $orderId,
             'transaction_id' => $transactionId,
         ]);
 
-        // Send invoice email to the customer
         $customerEmail = $order->billingAddress?->contact_email
             ?? $order->shippingAddress?->contact_email
             ?? $order->user?->email;
@@ -310,7 +280,6 @@ class SenangpayCallbackController extends Controller
             ]);
         }
 
-        // Send notification email to admin
         $adminEmail = config('mail.admin_order_email');
 
         if ($adminEmail) {
@@ -323,9 +292,6 @@ class SenangpayCallbackController extends Controller
         }
     }
 
-    /**
-     * Handle subscription payment callback.
-     */
     protected function handleSubscriptionPayment(
         string $statusId,
         string $orderId,
@@ -334,7 +300,7 @@ class SenangpayCallbackController extends Controller
         string $hash,
         Transaction $intentTransaction
     ) {
-        // Verify hash
+
         $secretKey = config('services.senangpay.secret_key');
         $expectedHash = $this->signatureService->generateReturnHash(
             $secretKey,
@@ -356,7 +322,6 @@ class SenangpayCallbackController extends Controller
             ]);
         }
 
-        // Get user subscription
         $userSubscriptionId = $intentTransaction->meta['user_subscription_id'] ?? null;
         if (! $userSubscriptionId) {
             Log::error('SenangPay subscription: User subscription ID not found', ['order_id' => $orderId]);
@@ -378,15 +343,14 @@ class SenangpayCallbackController extends Controller
             ]);
         }
 
-        // Determine status
         $status = $statusId === '1' ? 'success' : 'failed';
 
         if ($status === 'success') {
-            // Check if already captured
+
             if (! Transaction::where('parent_transaction_id', $intentTransaction->id)
                 ->where('type', 'capture')
                 ->exists()) {
-                // Create capture transaction
+
                 Transaction::create([
                     'parent_transaction_id' => $intentTransaction->id,
                     'order_id' => null,
@@ -408,7 +372,6 @@ class SenangpayCallbackController extends Controller
                     ],
                 ]);
 
-                // Update user subscription
                 $userSubscription->update([
                     'status' => 'active',
                     'payment_status' => 'completed',
@@ -424,7 +387,7 @@ class SenangpayCallbackController extends Controller
                 ]);
             }
         } else {
-            // Payment failed
+
             $userSubscription->update([
                 'status' => 'cancelled',
                 'payment_status' => 'failed',
@@ -442,9 +405,6 @@ class SenangpayCallbackController extends Controller
         ]);
     }
 
-    /**
-     * Handle recurring payment return URL.
-     */
     public function recurringReturnUrl(Request $request)
     {
         $statusId = $request->input('status_id', '');
@@ -462,7 +422,6 @@ class SenangpayCallbackController extends Controller
             'all_params' => $request->all(),
         ]);
 
-        // Find the transaction
         $transaction = SubscriptionTransaction::where('reference', $orderId)
             ->where('driver', 'senangpay')
             ->where('type', 'intent')
@@ -476,7 +435,6 @@ class SenangpayCallbackController extends Controller
             ]);
         }
 
-        // Verify hash using recurring hash method
         $secretKey = config('services.senangpay.secret_key');
         $expectedHash = $this->signatureService->generateRecurringReturnHash(
             $secretKey,
@@ -510,15 +468,14 @@ class SenangpayCallbackController extends Controller
             ]);
         }
 
-        // Determine status
         $status = $statusId === '1' ? 'success' : 'failed';
 
         if ($status === 'success') {
-            // Check if already captured
+
             if (! SubscriptionTransaction::where('parent_transaction_id', $transaction->id)
                 ->where('type', 'capture')
                 ->exists()) {
-                // Create capture transaction
+
                 SubscriptionTransaction::create([
                     'parent_transaction_id' => $transaction->id,
                     'user_subscription_id' => $transaction->user_subscription_id,
@@ -537,7 +494,6 @@ class SenangpayCallbackController extends Controller
                     ],
                 ]);
 
-                // Update user subscription
                 $userSubscription->update([
                     'status' => 'active',
                     'payment_status' => 'completed',
@@ -554,7 +510,7 @@ class SenangpayCallbackController extends Controller
                 ]);
             }
         } else {
-            // Payment failed
+
             $userSubscription->update([
                 'status' => 'cancelled',
                 'payment_status' => 'failed',
@@ -572,9 +528,6 @@ class SenangpayCallbackController extends Controller
         ]);
     }
 
-    /**
-     * Handle recurring payment callback (for subsequent charges).
-     */
     public function recurringCallback(Request $request)
     {
         $statusId = $request->input('status_id');
@@ -591,7 +544,6 @@ class SenangpayCallbackController extends Controller
             'all_params' => $request->all(),
         ]);
 
-        // Verify hash
         $secretKey = config('services.senangpay.secret_key');
         $expectedHash = $this->signatureService->generateRecurringReturnHash(
             $secretKey,
@@ -608,23 +560,20 @@ class SenangpayCallbackController extends Controller
                 'received_hash' => $hash,
             ]);
 
-            // Still return OK to acknowledge receipt, but log the error
             return response('OK', 200)->header('Content-Type', 'text/plain');
         }
 
-        // Find the original transaction by order_id pattern
         $transaction = SubscriptionTransaction::where('reference', $orderId)
             ->where('driver', 'senangpay')
             ->where('type', 'intent')
             ->first();
 
         if (! $transaction) {
-            // This might be a subsequent recurring charge - find by user subscription
+
             Log::info('SenangPay recurring callback: Original transaction not found, checking for renewal', [
                 'order_id' => $orderId,
             ]);
 
-            // Try to find user subscription by reference pattern
             $userSubscription = UserSubscription::where('transaction_id', 'LIKE', 'SUB-%')
                 ->where('is_recurring', true)
                 ->where('status', 'active')
@@ -632,7 +581,7 @@ class SenangpayCallbackController extends Controller
                 ->first();
 
             if ($userSubscription && $statusId === '1') {
-                // This is a renewal payment
+
                 $this->handleRecurringRenewal($userSubscription, $transactionId, $orderId);
 
                 return response('OK', 200)->header('Content-Type', 'text/plain');
@@ -645,7 +594,6 @@ class SenangpayCallbackController extends Controller
             return response('OK', 200)->header('Content-Type', 'text/plain');
         }
 
-        // Get user subscription
         $userSubscription = UserSubscription::find($transaction->user_subscription_id);
 
         if (! $userSubscription) {
@@ -662,13 +610,12 @@ class SenangpayCallbackController extends Controller
         if ($status === 'success') {
             $this->handleRecurringRenewal($userSubscription, $transactionId, $orderId);
         } else {
-            // Payment failed - mark subscription as expired or handle retry logic
+
             Log::warning('SenangPay recurring callback: Renewal payment failed', [
                 'user_subscription_id' => $transaction->user_subscription_id,
                 'order_id' => $orderId,
             ]);
 
-            // Optionally mark as expired if payment fails
             if ($userSubscription->ends_at && $userSubscription->ends_at->isPast()) {
                 $userSubscription->update([
                     'status' => 'expired',
@@ -680,12 +627,9 @@ class SenangpayCallbackController extends Controller
         return response('OK', 200)->header('Content-Type', 'text/plain');
     }
 
-    /**
-     * Handle recurring subscription renewal.
-     */
     protected function handleRecurringRenewal(UserSubscription $userSubscription, string $transactionId, string $orderId): void
     {
-        // Create a new transaction record for this renewal
+
         SubscriptionTransaction::create([
             'user_subscription_id' => $userSubscription->id,
             'success' => true,
@@ -704,7 +648,6 @@ class SenangpayCallbackController extends Controller
             ],
         ]);
 
-        // Extend subscription
         $userSubscription->update([
             'ends_at' => now()->addMonth(),
             'next_billing_at' => now()->addMonth(),

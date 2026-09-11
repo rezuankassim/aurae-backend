@@ -9,9 +9,6 @@ use Lunar\Models\Order;
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of all orders.
-     */
     public function index()
     {
         $orders = Order::with([
@@ -27,9 +24,6 @@ class OrderController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified order.
-     */
     public function show(Order $order)
     {
         $order->load([
@@ -46,9 +40,6 @@ class OrderController extends Controller
         ]);
     }
 
-    /**
-     * Update the order status.
-     */
     public function updateStatus(Request $request, Order $order)
     {
         $validated = $request->validate([

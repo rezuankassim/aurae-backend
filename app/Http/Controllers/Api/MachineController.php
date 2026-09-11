@@ -25,9 +25,6 @@ class MachineController extends Controller
         protected FirebaseService $firebaseService
     ) {}
 
-    /**
-     * Bind machine to user.
-     */
     public function bind(Request $request)
     {
         $validated = $request->validate([
@@ -39,7 +36,6 @@ class MachineController extends Controller
 
         $user = $request->user();
 
-        // 1. Verify Device (tablet) exists
         $device = Device::where('id', $validated['device_id'])
             ->where('uuid', $validated['device_uuid'])
             ->first();
@@ -54,7 +50,6 @@ class MachineController extends Controller
                 ->setStatusCode(404);
         }
 
-        // 2. Validate serial number format
         $serialNumber = trim($validated['serial_number']);
 
         if (! $this->serialService->validateFormat($serialNumber)) {
@@ -67,11 +62,10 @@ class MachineController extends Controller
                 ->setStatusCode(422);
         }
 
-        // 3. Get the subscription to use
         $selectedSubscription = null;
 
         if (isset($validated['subscription_id'])) {
-            // Use the specified subscription
+
             $selectedSubscription = UserSubscription::where('id', $validated['subscription_id'])
                 ->where('user_id', $user->id)
                 ->where('status', 'active')
@@ -92,7 +86,6 @@ class MachineController extends Controller
                     ->setStatusCode(404);
             }
 
-            // Check if this subscription already has a machine bound
             if ($selectedSubscription->machine()->exists()) {
                 return BaseResource::make([])
                     ->additional([
@@ -103,7 +96,7 @@ class MachineController extends Controller
                     ->setStatusCode(403);
             }
         } else {
-            // Find first active subscription without a machine bound
+
             $selectedSubscription = $user->subscriptions()
                 ->where('status', 'active')
                 ->where(function ($q) {
@@ -115,7 +108,7 @@ class MachineController extends Controller
                 ->first();
 
             if (! $selectedSubscription) {
-                // Check if user has any active subscriptions
+
                 $hasActiveSubscriptions = $user->subscriptions()
                     ->where('status', 'active')
                     ->where(function ($q) {
@@ -144,7 +137,6 @@ class MachineController extends Controller
             }
         }
 
-        // 4. Check machine limit (total machines vs total active subscriptions)
         $maxMachines = $user->getMaxMachines();
         $currentMachineCount = Machine::where('user_id', $user->id)->count();
 
@@ -160,7 +152,6 @@ class MachineController extends Controller
                 ->setStatusCode(403);
         }
 
-        // 5. Find Machine by serial_number
         $machine = Machine::where('serial_number', $serialNumber)->first();
 
         if (! $machine) {
@@ -173,7 +164,6 @@ class MachineController extends Controller
                 ->setStatusCode(404);
         }
 
-        // 6. Check if machine already bound to another user
         if ($machine->user_id && $machine->user_id !== $user->id) {
             return BaseResource::make([])
                 ->additional([
@@ -184,7 +174,6 @@ class MachineController extends Controller
                 ->setStatusCode(403);
         }
 
-        // 7. Check machine status
         if (! $machine->isActive()) {
             return BaseResource::make([])
                 ->additional([
@@ -195,7 +184,6 @@ class MachineController extends Controller
                 ->setStatusCode(403);
         }
 
-        // Success - bind machine
         $machine->update([
             'user_id' => $user->id,
             'device_id' => $device->id,
@@ -224,9 +212,6 @@ class MachineController extends Controller
             ]);
     }
 
-    /**
-     * List user's bound machines.
-     */
     public function index(Request $request)
     {
         $user = $request->user();
@@ -242,14 +227,10 @@ class MachineController extends Controller
             ]);
     }
 
-    /**
-     * Unbind machine from user.
-     */
     public function unbind(Request $request, Machine $machine)
     {
         $user = $request->user();
 
-        // Verify machine belongs to current user
         if ($machine->user_id !== $user->id) {
             return BaseResource::make([])
                 ->additional([
@@ -260,12 +241,10 @@ class MachineController extends Controller
                 ->setStatusCode(403);
         }
 
-        // Unbind device from user before clearing the association
         if ($machine->device) {
             $machine->device->update(['user_id' => null]);
         }
 
-        // Unbind machine
         $machine->update([
             'user_id' => null,
             'device_id' => null,
@@ -284,9 +263,6 @@ class MachineController extends Controller
             ]);
     }
 
-    /**
-     * Change machine subscription plan.
-     */
     public function changeSubscription(Request $request, Machine $machine)
     {
         $validated = $request->validate([
@@ -295,7 +271,6 @@ class MachineController extends Controller
 
         $user = $request->user();
 
-        // Verify machine belongs to current user
         if ($machine->user_id !== $user->id) {
             return BaseResource::make([])
                 ->additional([
@@ -306,7 +281,6 @@ class MachineController extends Controller
                 ->setStatusCode(403);
         }
 
-        // Verify target subscription belongs to user and is active
         $targetSubscription = UserSubscription::where('id', $validated['subscription_id'])
             ->where('user_id', $user->id)
             ->where('status', 'active')
@@ -327,7 +301,6 @@ class MachineController extends Controller
                 ->setStatusCode(404);
         }
 
-        // Check if trying to change to the same subscription
         if ($machine->user_subscription_id === $targetSubscription->id) {
             return BaseResource::make([])
                 ->additional([
@@ -338,7 +311,6 @@ class MachineController extends Controller
                 ->setStatusCode(400);
         }
 
-        // Check if target subscription already has a machine bound
         if ($targetSubscription->machine()->exists()) {
             return BaseResource::make([])
                 ->additional([
@@ -351,7 +323,6 @@ class MachineController extends Controller
 
         $previousSubscriptionId = $machine->user_subscription_id;
 
-        // Update machine's subscription
         $machine->update([
             'user_subscription_id' => $targetSubscription->id,
         ]);
@@ -374,12 +345,6 @@ class MachineController extends Controller
             ]);
     }
 
-    /**
-     * Notify the machine owner that the essential oil (essence) is running low.
-     *
-     * Triggered by the machine's bound tablet (authenticated with the owner's token).
-     * Always stores a notification record (visible in history) and best-effort sends a push.
-     */
     public function essenceLow(Request $request, string $machine)
     {
         $validated = $request->validate([
@@ -400,7 +365,6 @@ class MachineController extends Controller
                 ->setStatusCode(404);
         }
 
-        // Verify machine belongs to current user
         if ($machine->user_id !== $user->id) {
             return BaseResource::make([])
                 ->additional([
@@ -411,8 +375,6 @@ class MachineController extends Controller
                 ->setStatusCode(403);
         }
 
-        // Anti-spam: skip if we already alerted for this machine within the cooldown window.
-        // A cooldown of 0 disables throttling entirely (machine may notify without limit).
         if (self::ESSENCE_LOW_COOLDOWN_HOURS > 0) {
             $recent = Notification::where('user_id', $user->id)
                 ->where('type', self::ESSENCE_LOW_TYPE)
@@ -447,10 +409,8 @@ class MachineController extends Controller
             $data['essence_level'] = $validated['essence_level'];
         }
 
-        // Best-effort push (does not create a record).
         $push = $this->firebaseService->pushToUser($user, $title, $body, $data);
 
-        // Always persist a visible history record, even if the push was skipped/failed.
         $notification = Notification::create([
             'user_id' => $user->id,
             'title' => $title,

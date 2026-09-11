@@ -12,22 +12,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckAppVersion
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
         $mobileAppVersion = $request->header('X-Device-App-Version');
         $tabletAppVersion = $request->header('X-Device-Tablet-App-Version');
         $generalSetting = Cache::remember('general_setting', 300, fn () => GeneralSetting::first());
 
-        // Check mobile app version if header is present
         if ($mobileAppVersion && $generalSetting && $generalSetting->apk_version) {
             $requiredVersion = $generalSetting->apk_version;
 
-            // Compare versions
             if (version_compare($mobileAppVersion, $requiredVersion, '<')) {
                 $downloadUrl = $generalSetting->apk_file_path
                     ? URL::temporarySignedRoute('api.apk.download', now()->addMinutes(30))
@@ -47,15 +40,13 @@ class CheckAppVersion
                         'message' => 'Please update your app to the latest version to continue using this service.',
                     ])
                     ->response()
-                    ->setStatusCode(426); // 426 Upgrade Required
+                    ->setStatusCode(426);
             }
         }
 
-        // Check tablet app version if header is present
         if ($tabletAppVersion && $generalSetting && $generalSetting->tablet_apk_version) {
             $requiredVersion = $generalSetting->tablet_apk_version;
 
-            // Compare versions
             if (version_compare($tabletAppVersion, $requiredVersion, '<')) {
                 $downloadUrl = $generalSetting->tablet_apk_file_path
                     ? URL::temporarySignedRoute('api.apk.tablet.download', now()->addMinutes(30))
@@ -75,7 +66,7 @@ class CheckAppVersion
                         'message' => 'Please update your app to the latest version to continue using this service.',
                     ])
                     ->response()
-                    ->setStatusCode(426); // 426 Upgrade Required
+                    ->setStatusCode(426);
             }
         }
 

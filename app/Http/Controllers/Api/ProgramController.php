@@ -14,9 +14,6 @@ use Illuminate\Http\Request;
 
 class ProgramController extends Controller
 {
-    /**
-     * Start a program and notify the user.
-     */
     public function start(Request $request)
     {
         $request->validate([
@@ -68,9 +65,6 @@ class ProgramController extends Controller
             ]);
     }
 
-    /**
-     * Stop a program and notify the user.
-     */
     public function stop(Request $request)
     {
         $request->validate([
@@ -109,7 +103,6 @@ class ProgramController extends Controller
             ->latest()
             ->first();
 
-        // date format 24042026 14:42:57
         if (! $usageHistory) {
             $usageHistory = UsageHistory::create([
                 'user_id' => $request->user()->id,

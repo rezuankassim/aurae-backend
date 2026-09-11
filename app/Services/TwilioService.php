@@ -21,9 +21,6 @@ class TwilioService
         }
     }
 
-    /**
-     * Send an OTP SMS to a phone number.
-     */
     public function sendOtp(string $phone, string $code): array
     {
         if (! $this->client) {
@@ -61,9 +58,6 @@ class TwilioService
         }
     }
 
-    /**
-     * Send a custom SMS message to a phone number.
-     */
     public function sendSms(string $phone, string $body): array
     {
         if (! $this->client) {

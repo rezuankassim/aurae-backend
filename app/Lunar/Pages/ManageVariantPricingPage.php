@@ -19,9 +19,6 @@ class ManageVariantPricingPage extends ManageVariantPricing
 
         $variant = $this->getOwnerRecord();
 
-        // Merge form-returned prices with the full basePrices data
-        // because getState() only returns validated component fields (value, compare_price)
-        // but the handler needs id, factor, currency_id, original_value, etc.
         $formPrices = $data['basePrices'] ?? [];
         $prices = collect($this->basePrices)->map(function ($price, $index) use ($formPrices) {
             if (isset($formPrices[$index])) {

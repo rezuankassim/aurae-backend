@@ -8,9 +8,6 @@ use Lunar\Models\Product;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of products.
-     */
     public function index()
     {
         $collectionGroups = CollectionGroup::with([
@@ -29,7 +26,6 @@ class ProductController extends Controller
             },
         ])->get();
 
-        // Also get all published products not filtered by collection
         $products = Product::where('status', 'published')
             ->with([
                 'variants.prices.currency',
@@ -45,9 +41,6 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified product.
-     */
     public function show(Product $product)
     {
         $product->load([
@@ -62,7 +55,6 @@ class ProductController extends Controller
             'collections.group',
         ]);
 
-        // Get related products from the same collections
         $relatedProducts = Product::where('status', 'published')
             ->where('id', '!=', $product->id)
             ->whereHas('collections', function ($query) use ($product) {

@@ -60,8 +60,7 @@ class EcommerceController extends Controller
                 'channel_id' => Channel::getDefault()->id,
             ]);
         } else {
-            // Remove any cart lines whose product is no longer published (active)
-            // or whose variant can no longer fulfill the requested quantity (out of stock)
+
             $staleLineIds = $cart->lines
                 ->filter(fn ($line) => $line->purchasable?->product?->status !== 'published'
                     || ! $line->purchasable?->canBeFulfilledAtQuantity($line->quantity)
@@ -192,7 +191,6 @@ class EcommerceController extends Controller
 
         $newVariant = ProductVariant::with('product')->findOrFail($request->product_variant_id);
 
-        // Ensure the new variant belongs to the same product
         if ($line->purchasable->product_id !== $newVariant->product_id) {
             return response()->json([
                 'status' => 422,
@@ -201,7 +199,6 @@ class EcommerceController extends Controller
             ], 422);
         }
 
-        // If the same variant is selected, nothing to do
         if ($line->purchasable_id === $newVariant->id) {
             $cart = $cart->recalculate();
 
@@ -258,12 +255,6 @@ class EcommerceController extends Controller
             ]);
     }
 
-    /**
-     * Set which cart lines are selected for checkout.
-     *
-     * The provided line_ids become selected=true; all other lines in the cart
-     * become selected=false. Passing an empty array deselects everything.
-     */
     public function selectLines(Request $request)
     {
         $request->validate([
@@ -283,7 +274,6 @@ class EcommerceController extends Controller
 
         $lineIds = collect($request->line_ids);
 
-        // Verify all provided IDs belong to this cart
         $validCount = $cart->lines()->whereIn('id', $lineIds)->count();
         if ($lineIds->isNotEmpty() && $validCount !== $lineIds->count()) {
             return response()->json([
@@ -293,7 +283,6 @@ class EcommerceController extends Controller
             ], 422);
         }
 
-        // Deselect all lines, then select only the requested ones
         $cart->lines()->update(['selected' => false]);
 
         if ($lineIds->isNotEmpty()) {

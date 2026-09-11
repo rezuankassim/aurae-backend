@@ -8,25 +8,12 @@ use Illuminate\Support\Facades\Storage;
 
 class CleanupOrphanedMusicFiles extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'music:cleanup-orphaned 
                             {--disk=s3 : The storage disk to check (s3 or public)}
                             {--dry-run : Show what would be deleted without actually deleting}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Find and delete orphaned music files in storage that are not linked to any database record';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
         $disk = $this->option('disk');
@@ -52,18 +39,15 @@ class CleanupOrphanedMusicFiles extends Command
             return self::FAILURE;
         }
 
-        // Get all music file paths from database
         $dbMusicPaths = Music::pluck('path')->filter()->toArray();
         $dbThumbnailPaths = Music::pluck('thumbnail')->filter()->toArray();
         $dbPaths = array_merge($dbMusicPaths, $dbThumbnailPaths);
 
         $this->info('Found '.count($dbMusicPaths).' music files and '.count($dbThumbnailPaths).' thumbnails in database.');
 
-        // Get all files from storage
         $orphanedFiles = [];
         $totalSize = 0;
 
-        // Check music folder
         $this->info('Scanning music/ folder...');
         $musicFiles = $this->getFilesRecursively($storage, 'music');
 
@@ -74,7 +58,7 @@ class CleanupOrphanedMusicFiles extends Command
                 try {
                     $totalSize += $storage->size($file);
                 } catch (\Exception $e) {
-                    // Ignore size errors
+
                 }
             }
         }
@@ -88,7 +72,6 @@ class CleanupOrphanedMusicFiles extends Command
         $this->warn('Found '.count($orphanedFiles).' orphaned file(s):');
         $this->newLine();
 
-        // Display orphaned files
         $tableData = [];
         foreach ($orphanedFiles as $file) {
             $size = 'Unknown';
@@ -97,7 +80,7 @@ class CleanupOrphanedMusicFiles extends Command
                 $bytes = $storage->size($file);
                 $size = $this->formatBytes($bytes);
             } catch (\Exception $e) {
-                // Ignore
+
             }
 
             $tableData[] = [$file, $size];
@@ -122,14 +105,12 @@ class CleanupOrphanedMusicFiles extends Command
             return self::SUCCESS;
         }
 
-        // Confirm deletion
         if (! $this->confirm('Do you want to delete these orphaned files?', false)) {
             $this->info('Operation cancelled.');
 
             return self::SUCCESS;
         }
 
-        // Delete orphaned files
         $deleted = 0;
         $failed = 0;
 
@@ -164,9 +145,6 @@ class CleanupOrphanedMusicFiles extends Command
         return self::SUCCESS;
     }
 
-    /**
-     * Get all files recursively from a directory.
-     */
     protected function getFilesRecursively($storage, string $directory): array
     {
         $files = [];
@@ -181,9 +159,6 @@ class CleanupOrphanedMusicFiles extends Command
         return $files;
     }
 
-    /**
-     * Format bytes to human readable format.
-     */
     protected function formatBytes(int $bytes): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];

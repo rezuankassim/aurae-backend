@@ -16,14 +16,10 @@ class MachineController extends Controller
         protected MachineSerialService $serialService
     ) {}
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $query = Machine::with(['user', 'device']);
 
-        // Search filter
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -32,12 +28,10 @@ class MachineController extends Controller
             });
         }
 
-        // Status filter
         if ($request->has('status') && $request->status !== '') {
             $query->where('status', $request->status);
         }
 
-        // Binding filter
         if ($request->has('bound') && $request->bound !== '') {
             if ($request->bound === '1') {
                 $query->whereNotNull('user_id');
@@ -54,9 +48,6 @@ class MachineController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $nextSerial = $this->serialService->generateNextSerialNumber();
@@ -66,9 +57,6 @@ class MachineController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -79,13 +67,12 @@ class MachineController extends Controller
             'model' => ['nullable', 'string', 'alpha_num', 'min:3', 'max:4'],
             'year' => ['nullable', 'string', 'size:4'],
             'start_product_code' => ['nullable', 'integer', 'min:1', 'max:9999'],
-            'thumbnail' => ['nullable', 'image', 'max:5120'], // 5MB max
-            'detail_image' => ['nullable', 'image', 'max:5120'], // 5MB max
+            'thumbnail' => ['nullable', 'image', 'max:5120'],
+            'detail_image' => ['nullable', 'image', 'max:5120'],
         ]);
 
-        // Bulk generation
         if ($request->has('quantity') && $request->quantity > 1) {
-            // Handle images for bulk generation (same images for all machines)
+
             $thumbnailPath = null;
             $detailImagePath = null;
 
@@ -116,8 +103,6 @@ class MachineController extends Controller
             return to_route('admin.machines.index')
                 ->with('success', "Successfully generated {$request->quantity} machines.");
         }
-
-        // Single machine creation
 
         $machineData = [
             'name' => $validated['name'],
@@ -150,9 +135,6 @@ class MachineController extends Controller
             ->with('success', 'Machine created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Machine $machine)
     {
         $machine->load(['user', 'device', 'userSubscription.subscription']);
@@ -162,9 +144,6 @@ class MachineController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Machine $machine)
     {
         return Inertia::render('admin/machine/edit', [
@@ -172,17 +151,14 @@ class MachineController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Machine $machine)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'serial_number' => ['required', 'string', 'unique:machines,serial_number,'.$machine->id],
             'status' => ['required', 'integer', 'in:0,1'],
-            'thumbnail' => ['nullable', 'image', 'max:5120'], // 5MB max
-            'detail_image' => ['nullable', 'image', 'max:5120'], // 5MB max
+            'thumbnail' => ['nullable', 'image', 'max:5120'],
+            'detail_image' => ['nullable', 'image', 'max:5120'],
         ]);
 
         $updateData = [
@@ -192,7 +168,7 @@ class MachineController extends Controller
         ];
 
         if ($request->hasFile('thumbnail')) {
-            // Delete old thumbnail if exists
+
             if ($machine->thumbnail) {
                 Storage::disk('s3')->delete($machine->thumbnail);
             }
@@ -200,7 +176,7 @@ class MachineController extends Controller
         }
 
         if ($request->hasFile('detail_image')) {
-            // Delete old detail image if exists
+
             if ($machine->detail_image) {
                 Storage::disk('s3')->delete($machine->detail_image);
             }
@@ -213,9 +189,6 @@ class MachineController extends Controller
             ->with('success', 'Machine updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Machine $machine)
     {
         if ($machine->user_id) {
@@ -228,16 +201,12 @@ class MachineController extends Controller
             ->with('success', 'Machine deleted successfully.');
     }
 
-    /**
-     * Unbind machine from user.
-     */
     public function unbind(Machine $machine)
     {
         if (! $machine->user_id) {
             return back()->with('error', 'This machine is not bound to any user.');
         }
 
-        // Unbind device from user before clearing the association
         if ($machine->device) {
             $machine->device->update(['user_id' => null]);
         }
@@ -251,9 +220,6 @@ class MachineController extends Controller
         return back()->with('success', 'Machine unbound successfully.');
     }
 
-    /**
-     * Activate machine.
-     */
     public function activate(Machine $machine)
     {
         $machine->update(['status' => 1]);
@@ -261,9 +227,6 @@ class MachineController extends Controller
         return back()->with('success', 'Machine activated successfully.');
     }
 
-    /**
-     * Deactivate machine.
-     */
     public function deactivate(Machine $machine)
     {
         $machine->update(['status' => 0]);

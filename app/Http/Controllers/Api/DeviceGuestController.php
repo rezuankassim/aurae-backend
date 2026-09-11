@@ -17,9 +17,6 @@ use Lunar\Models\Customer;
 
 class DeviceGuestController extends Controller
 {
-    /**
-     * Create a new guest for a device.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -28,7 +25,6 @@ class DeviceGuestController extends Controller
             'phone' => ['required', 'string', 'max:255'],
         ]);
 
-        // Verify device exists and is active
         $device = Device::where('uuid', $request->device_uuid)
             ->where('status', 1)
             ->firstOrFail();
@@ -36,8 +32,6 @@ class DeviceGuestController extends Controller
         try {
             DB::beginTransaction();
 
-            // Create a user account for the guest
-            // Generate a unique username based on phone and random string
             $username = 'guest_'.Str::slug($request->phone).'_'.Str::random(6);
 
             if (User::where('phone', $request->phone)->exists()) {
@@ -48,24 +42,21 @@ class DeviceGuestController extends Controller
                     'username' => $username,
                     'name' => $request->name,
                     'phone' => $request->phone,
-                    'email' => $username.'@example.com', // Guests don't need email
-                    'password' => bcrypt(Str::random(32)), // Random password, won't be used
+                    'email' => $username.'@example.com',
+                    'password' => bcrypt(Str::random(32)),
                     'is_admin' => false,
                     'is_guest' => true,
                     'status' => 1,
                 ]);
 
-                // Create Lunar customer profile for the guest
                 $customer = Customer::create([
                     'first_name' => $request->name,
                     'last_name' => '',
                 ]);
 
-                // Link customer to user
                 $customer->users()->attach($user);
             }
 
-            // Create guest record
             $guest = Guest::create([
                 'device_id' => $device->id,
                 'name' => $request->name,
@@ -94,9 +85,6 @@ class DeviceGuestController extends Controller
         }
     }
 
-    /**
-     * Guest login (passwordless).
-     */
     public function login(Request $request)
     {
         $request->validate([
@@ -110,7 +98,6 @@ class DeviceGuestController extends Controller
             ->where('device_id', $device->id)
             ->firstOrFail();
 
-        // Check if device status is active
         if ($device->status !== 1) {
             return BaseResource::make([])
                 ->additional([
@@ -121,7 +108,6 @@ class DeviceGuestController extends Controller
                 ->setStatusCode(403);
         }
 
-        // Check if guest has a linked user account
         if (! $guest->user_id) {
             return BaseResource::make([])
                 ->additional([
@@ -142,7 +128,6 @@ class DeviceGuestController extends Controller
                 ->setStatusCode(403);
         }
 
-        // Update last logged in timestamp for both guest and device
         $guest->update([
             'last_logged_in_at' => now(),
         ]);
@@ -151,12 +136,10 @@ class DeviceGuestController extends Controller
             'last_logged_in_at' => now(),
         ]);
 
-        // Generate token for the guest's user account
         $tokenName = "guest-{$guest->id}-device-{$device->uuid}";
         $token = $guest->user->createToken($tokenName)->plainTextToken;
         $guest->token = $token;
 
-        // Log the guest login activity
         LoginActivity::create([
             'user_id' => $guest->user_id,
             'event' => 'login',
@@ -168,7 +151,6 @@ class DeviceGuestController extends Controller
             'occurred_at' => now(),
         ]);
 
-        // Broadcast the authentication event
         DeviceAuthenticated::dispatch($device->uuid, $token);
 
         return GuestResource::make($guest->load('user'))
@@ -178,9 +160,6 @@ class DeviceGuestController extends Controller
             ]);
     }
 
-    /**
-     * List all guests for a device.
-     */
     public function index(Request $request)
     {
         $request->validate([
@@ -201,9 +180,6 @@ class DeviceGuestController extends Controller
             ]);
     }
 
-    /**
-     * Delete a guest from a device.
-     */
     public function destroy(Request $request, string $guestId)
     {
         $request->validate([
@@ -212,7 +188,6 @@ class DeviceGuestController extends Controller
 
         $device = Device::where('uuid', $request->device_uuid)->firstOrFail();
 
-        // Find guest and ensure it belongs to the specified device
         $guest = Guest::where('id', $guestId)
             ->where('device_id', $device->id)
             ->firstOrFail();
@@ -220,33 +195,22 @@ class DeviceGuestController extends Controller
         try {
             DB::beginTransaction();
 
-            // Get the user and customer before deleting guest
             $user = $guest->user;
             $customer = $guest->customer;
 
-            // Delete the guest record
             $guest->delete();
 
-            // Revoke all tokens for the guest user
             if ($user) {
                 $user->tokens()->delete();
 
-                // Detach customer relationship from pivot table before deleting user
-                // This prevents foreign key constraint violation
                 if ($customer) {
                     DB::table('lunar_customer_user')
                         ->where('user_id', $user->id)
                         ->delete();
                 }
 
-                // Delete the user account
                 $user->delete();
             }
-
-            // Optionally delete the Lunar customer record
-            // Note: You might want to keep customer records for order history
-            // Uncomment the line below if you want to delete customers as well
-            // $customer?->delete();
 
             DB::commit();
 

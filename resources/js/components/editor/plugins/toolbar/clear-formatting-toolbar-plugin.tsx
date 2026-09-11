@@ -26,10 +26,10 @@ export function ClearFormattingToolbarPlugin() {
                 }
 
                 nodes.forEach((node, idx) => {
-                    // We split the first and last node by the selection
-                    // So that we don't format unselected text inside those nodes
+
+
                     if ($isTextNode(node)) {
-                        // Use a separate variable to ensure TS does not lose the refinement
+
                         let textNode = node;
                         if (idx === 0 && anchor.offset !== 0) {
                             textNode = textNode.splitText(anchor.offset)[1] || textNode;
@@ -37,14 +37,8 @@ export function ClearFormattingToolbarPlugin() {
                         if (idx === nodes.length - 1) {
                             textNode = textNode.splitText(focus.offset)[0] || textNode;
                         }
-                        /**
-                         * If the selected text has one format applied
-                         * selecting a portion of the text, could
-                         * clear the format to the wrong portion of the text.
-                         *
-                         * The cleared text is based on the length of the selected text.
-                         */
-                        // We need this in case the selected text only has one format
+
+
                         const extractedTextNode = extractedNodes[0];
                         if (nodes.length === 1 && $isTextNode(extractedTextNode)) {
                             textNode = extractedTextNode;

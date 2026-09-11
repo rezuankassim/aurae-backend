@@ -58,7 +58,7 @@ export function ElementFormatToolbarPlugin() {
 
             let matchingParent;
             if ($isLinkNode(parent)) {
-                // If node is a link, we need to fetch the parent paragraph node to set format
+
                 matchingParent = $findMatchingParent(node, (parentNode) => $isElementNode(parentNode) && !parentNode.isInline());
             }
             setElementFormat(
@@ -74,7 +74,7 @@ export function ElementFormatToolbarPlugin() {
     useUpdateToolbarHandler($updateToolbar);
 
     const handleValueChange = (value: string) => {
-        if (!value) return; // Prevent unselecting current value
+        if (!value) return;
 
         setElementFormat(value as ElementFormatType);
 
@@ -90,7 +90,7 @@ export function ElementFormatToolbarPlugin() {
     return (
         <>
             <ToggleGroup type="single" value={elementFormat} defaultValue={elementFormat} onValueChange={handleValueChange}>
-                {/* Alignment toggles */}
+                {}
                 {Object.entries(ELEMENT_FORMAT_OPTIONS).map(([value, option]) => (
                     <ToggleGroupItem key={value} value={value} variant={'outline'} size="sm" aria-label={option.name}>
                         {option.icon}
@@ -98,7 +98,7 @@ export function ElementFormatToolbarPlugin() {
                 ))}
             </ToggleGroup>
             <Separator orientation="vertical" className="!h-7" />
-            {/* Indentation toggles */}
+            {}
             <ToggleGroup type="single" value={elementFormat} defaultValue={elementFormat} onValueChange={handleValueChange}>
                 <ToggleGroupItem value="outdent" aria-label="Outdent" variant={'outline'} size="sm">
                     <IndentDecreaseIcon className="size-4" />

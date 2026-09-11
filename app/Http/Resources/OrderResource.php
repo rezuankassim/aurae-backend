@@ -7,19 +7,14 @@ use Lunar\Shipping\Models\ShippingMethod;
 
 class OrderResource extends BaseResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
-        // Get shipping total safely to avoid ShippingOption instantiation errors
+
         $shippingTotal = null;
         try {
             $shippingTotal = $this->shippingTotal?->formatted;
         } catch (\Throwable $e) {
-            // Handle cases where shipping_breakdown is malformed
+
             $shippingTotal = null;
         }
 
@@ -38,17 +33,15 @@ class OrderResource extends BaseResource
             'updated_at' => $this->updated_at instanceof \Carbon\Carbon ? $this->updated_at->toIso8601String() : $this->updated_at,
             'lines' => $this->whenLoaded('lines', function () {
                 return $this->lines->map(function ($line) {
-                    // Handle ShippingOption lines differently (they don't have a real purchasable model)
-                    // Use the line type field which is more reliable
+
                     $isShippingLine = $line->type === 'shipping';
 
-                    // For non-shipping lines, safely get the purchasable (may be null if deleted)
                     $purchasable = null;
                     if (! $isShippingLine) {
                         try {
                             $purchasable = $line->purchasable;
                         } catch (\Throwable $e) {
-                            // Purchasable could not be loaded
+
                             $purchasable = null;
                         }
                     }

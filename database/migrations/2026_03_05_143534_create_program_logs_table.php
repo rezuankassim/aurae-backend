@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('program_logs', function (Blueprint $table) {
@@ -16,16 +13,13 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('therapy_id')->constrained()->onDelete('cascade');
             $table->string('program_duration');
-            $table->string('action'); // start, stop
+            $table->string('action');
             $table->timestamp('program_started_at')->nullable();
             $table->timestamp('program_ended_at')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('program_logs');

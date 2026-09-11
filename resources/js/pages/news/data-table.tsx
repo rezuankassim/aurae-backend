@@ -59,7 +59,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
             <div className="overflow-hidden">
                 {table.getRowModel().rows?.length ? (
                     table.getRowModel().rows.map((row) => (
-                        // @ts-expect-error because row.original is of type unknown
+                        // @ts-expect-error
                         <Link href={news.show(row.original.id).url} key={row.id}>
                             <Card key={row.id} className="mb-4">
                                 <CardHeader className="flex flex-row items-center justify-between">

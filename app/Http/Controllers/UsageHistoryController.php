@@ -8,9 +8,6 @@ use Inertia\Inertia;
 
 class UsageHistoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $usage_histories = UsageHistory::where('user_id', auth()->id())
@@ -23,9 +20,6 @@ class UsageHistoryController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(UsageHistory $usageHistory)
     {
         abort_if($usageHistory->user_id !== auth()->id(), 403);
@@ -40,27 +34,9 @@ class UsageHistoryController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(UsageHistory $usageHistory)
-    {
-        //
-    }
+    public function edit(UsageHistory $usageHistory) {}
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, UsageHistory $usageHistory)
-    {
-        //
-    }
+    public function update(Request $request, UsageHistory $usageHistory) {}
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(UsageHistory $usageHistory)
-    {
-        //
-    }
+    public function destroy(UsageHistory $usageHistory) {}
 }

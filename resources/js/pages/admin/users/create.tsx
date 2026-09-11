@@ -46,7 +46,7 @@ export default function UsersCreate() {
     };
 
     const generatePassword = () => {
-        // Simple password generator (for demonstration purposes only)
+
         const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
         let password = '';
         for (let i = 0; i < 12; i++) {

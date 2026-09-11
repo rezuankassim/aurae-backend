@@ -10,7 +10,7 @@ class Faq extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'status', // 1: Active, 0: Inactive
+        'status',
         'question',
         'answer',
     ];

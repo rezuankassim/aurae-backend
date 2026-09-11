@@ -11,9 +11,6 @@ use Inertia\Inertia;
 
 class UserEmergencyContactController extends Controller
 {
-    /**
-     * Display the user's emergency contacts.
-     */
     public function index(User $user)
     {
         $emergencyContacts = $user->emergencyContacts()
@@ -26,9 +23,6 @@ class UserEmergencyContactController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created emergency contact for the user.
-     */
     public function store(UserEmergencyContactCreateRequest $request, User $user)
     {
         $user->emergencyContacts()->create($request->validated());
@@ -37,9 +31,6 @@ class UserEmergencyContactController extends Controller
             ->with('success', 'Emergency contact created successfully.');
     }
 
-    /**
-     * Update the specified emergency contact.
-     */
     public function update(UserEmergencyContactUpdateRequest $request, User $user, EmergencyContact $emergencyContact)
     {
         abort_unless($emergencyContact->user_id === $user->id, 403);
@@ -50,9 +41,6 @@ class UserEmergencyContactController extends Controller
             ->with('success', 'Emergency contact updated successfully.');
     }
 
-    /**
-     * Remove the specified emergency contact.
-     */
     public function destroy(User $user, EmergencyContact $emergencyContact)
     {
         abort_unless($emergencyContact->user_id === $user->id, 403);

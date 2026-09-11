@@ -35,7 +35,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 
         const searchTerms = Array.isArray(filterValue) ? filterValue : [filterValue];
 
-        // Check if any of the search terms are included in the userInfoString
+
         return searchTerms.some((term) => userInfoString.includes(term.toLowerCase()));
     };
 

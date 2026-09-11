@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\UserSubscription;
 
 beforeEach(function () {
-    // Ensure GeneralSetting exists for serial validation
+
     GeneralSetting::updateOrCreate(
         ['id' => 1],
         [
@@ -20,7 +20,7 @@ beforeEach(function () {
 
 test('user can bind machine with valid subscription', function () {
     $user = User::factory()->create();
-    $subscription = Subscription::factory()->create(); // max_machines will be set to 1 automatically
+    $subscription = Subscription::factory()->create();
     UserSubscription::factory()->create([
         'user_id' => $user->id,
         'subscription_id' => $subscription->id,
@@ -82,18 +82,16 @@ test('user cannot bind machine without subscription', function () {
             'serial_number' => 'AUR20260001',
         ]);
 
-    // Should return 403 when no subscription exists
     $response->assertStatus(403);
     expect($response->json('message'))->toContain('subscribe to a plan');
 
-    // Verify machine was not bound
     $machine->refresh();
     expect($machine->user_id)->toBeNull();
 });
 
 test('user cannot exceed machine limit', function () {
     $user = User::factory()->create();
-    $subscription = Subscription::factory()->create(); // max_machines will be set to 1 automatically
+    $subscription = Subscription::factory()->create();
     UserSubscription::factory()->create([
         'user_id' => $user->id,
         'subscription_id' => $subscription->id,
@@ -136,7 +134,6 @@ test('user cannot exceed machine limit', function () {
 test('user with multiple subscriptions can bind multiple machines', function () {
     $user = User::factory()->create();
 
-    // Create 3 subscriptions for the user
     $subscription1 = Subscription::factory()->create();
     $subscription2 = Subscription::factory()->create();
     $subscription3 = Subscription::factory()->create();
@@ -171,7 +168,6 @@ test('user with multiple subscriptions can bind multiple machines', function () 
         'status' => 1,
     ]);
 
-    // Create 3 machines
     $machine1 = Machine::create([
         'serial_number' => 'AUR20260001',
         'name' => 'Machine 1',
@@ -190,7 +186,6 @@ test('user with multiple subscriptions can bind multiple machines', function () 
         'status' => 1,
     ]);
 
-    // Bind first machine
     $response1 = $this->actingAs($user)
         ->withHeaders(['X-Device-Udid' => 'test-mobile-device-123'])
         ->postJson('/api/machine/bind', [
@@ -201,7 +196,6 @@ test('user with multiple subscriptions can bind multiple machines', function () 
 
     $response1->assertStatus(200);
 
-    // Bind second machine
     $response2 = $this->actingAs($user)
         ->withHeaders(['X-Device-Udid' => 'test-mobile-device-123'])
         ->postJson('/api/machine/bind', [
@@ -212,7 +206,6 @@ test('user with multiple subscriptions can bind multiple machines', function () 
 
     $response2->assertStatus(200);
 
-    // Bind third machine
     $response3 = $this->actingAs($user)
         ->withHeaders(['X-Device-Udid' => 'test-mobile-device-123'])
         ->postJson('/api/machine/bind', [
@@ -223,7 +216,6 @@ test('user with multiple subscriptions can bind multiple machines', function () 
 
     $response3->assertStatus(200);
 
-    // Verify all machines are bound
     $machine1->refresh();
     $machine2->refresh();
     $machine3->refresh();

@@ -8,20 +8,10 @@ use Illuminate\Database\QueryException;
 
 class MachineSerialService
 {
-    /**
-     * Default format: {MMMM}{YYYY}{SSSS}
-     * Example: A10120260001
-     * - MMMM: Machine serial prefix/model (3-4 chars, e.g., ABC or A101)
-     * - YYYY: Year (4 digits)
-     * - SSSS: Product serial (4 digits, zero-padded)
-     */
     protected const DEFAULT_FORMAT = '{MMMM}{YYYY}{SSSS}';
 
     protected const DEFAULT_PREFIX = 'A101';
 
-    /**
-     * Validate serial number format against configured pattern.
-     */
     public function validateFormat(string $serialNumber): bool
     {
         $pattern = $this->getValidationPattern();
@@ -33,9 +23,6 @@ class MachineSerialService
         return true;
     }
 
-    /**
-     * Generate next serial number based on configured format.
-     */
     public function generateNextSerialNumber(): string
     {
         $settings = GeneralSetting::first();
@@ -47,9 +34,6 @@ class MachineSerialService
         return $this->formatSerialNumber($format, $nextNumber, $settings);
     }
 
-    /**
-     * Create a machine with an auto-generated serial number and retry on duplicates.
-     */
     public function createMachineWithAutoSerial(array $machineData, int $maxAttempts = 5): Machine
     {
         $attempt = 0;
@@ -71,12 +55,9 @@ class MachineSerialService
         throw new \RuntimeException('Unable to allocate a unique machine serial number. Please try again.');
     }
 
-    /**
-     * Extract product serial number from a full serial.
-     */
     protected function extractProductSerial(string $serialNumber): ?int
     {
-        // Format: MODEL(3-4) + YEAR(4) + SERIAL(4)
+
         if (preg_match('/^[A-Z0-9]{3,4}\d{4}(\d{4})$/', $serialNumber, $matches) === 1) {
             return (int) $matches[1];
         }
@@ -84,9 +65,6 @@ class MachineSerialService
         return null;
     }
 
-    /**
-     * Get highest used product serial number for prefix and year.
-     */
     protected function getHighestProductSerial(string $prefix, string $year): int
     {
         $serialPrefix = strtoupper($prefix.$year);
@@ -101,33 +79,23 @@ class MachineSerialService
             ->max() ?? 0;
     }
 
-    /**
-     * Generate regex pattern for validation.
-     * Accepts formats like: ABC20260001 or A10120260001
-     */
     protected function getValidationPattern(): string
     {
-        // Pattern: 3-4 alphanumeric (model) + 4 digits (year) + 4 digits (product code)
+
         return '/^[A-Z0-9]{3,4}\d{4}\d{4}$/';
     }
 
-    /**
-     * Format serial number based on pattern.
-     */
     protected function formatSerialNumber(string $format, int $number, ?GeneralSetting $settings): string
     {
         $formatted = $format;
         $prefix = $settings->machine_serial_prefix ?? self::DEFAULT_PREFIX;
 
-        // Replace machine serial prefix
         $formatted = str_replace('{MMMM}', $prefix, $formatted);
         $formatted = str_replace('{PREFIX}', $prefix, $formatted);
 
-        // Replace date placeholders
         $formatted = str_replace('{YYYY}', date('Y'), $formatted);
         $formatted = str_replace('{MM}', date('m'), $formatted);
 
-        // Replace product serial placeholders with appropriate padding
         if (str_contains($formatted, '{SSSSS}')) {
             $formatted = str_replace('{SSSSS}', str_pad($number, 5, '0', STR_PAD_LEFT), $formatted);
         } elseif (str_contains($formatted, '{SSSS}')) {
@@ -138,7 +106,6 @@ class MachineSerialService
             $formatted = str_replace('{SS}', str_pad($number, 2, '0', STR_PAD_LEFT), $formatted);
         }
 
-        // Legacy support for {NNNN} format
         if (str_contains($formatted, '{NNNNN}')) {
             $formatted = str_replace('{NNNNN}', str_pad($number, 5, '0', STR_PAD_LEFT), $formatted);
         } elseif (str_contains($formatted, '{NNNN}')) {
@@ -152,9 +119,6 @@ class MachineSerialService
         return $formatted;
     }
 
-    /**
-     * Get example format for user feedback.
-     */
     public function getFormatExample(): string
     {
         $settings = GeneralSetting::first();
@@ -163,18 +127,6 @@ class MachineSerialService
         return $this->formatSerialNumber($format, 1, $settings);
     }
 
-    /**
-     * Bulk generate machines with auto-serial numbers.
-     *
-     * @param  int  $quantity  Number of machines to generate
-     * @param  string  $baseName  Base name for machines
-     * @param  string  $model  3-4 character model code (e.g., ABC or A101)
-     * @param  string  $year  4-digit year
-     * @param  int  $startProductCode  Starting product code (will increment)
-     * @param  int  $status  Machine status (0 or 1)
-     * @param  string|null  $thumbnail  S3 path for thumbnail image
-     * @param  string|null  $detailImage  S3 path for detail image
-     */
     public function bulkGenerate(
         int $quantity,
         string $baseName,
@@ -227,9 +179,6 @@ class MachineSerialService
         return $machines;
     }
 
-    /**
-     * Determine whether a query exception is caused by a duplicate machine serial.
-     */
     protected function isSerialNumberDuplicateException(QueryException $e): bool
     {
         $errorCode = (int) ($e->errorInfo[1] ?? 0);
@@ -242,9 +191,6 @@ class MachineSerialService
             || str_contains($message, 'machines.serial_number');
     }
 
-    /**
-     * Parse format pattern into components.
-     */
     public function parseFormat(string $format): array
     {
         return [
@@ -256,9 +202,6 @@ class MachineSerialService
         ];
     }
 
-    /**
-     * Get serial number length from format.
-     */
     protected function getSerialLength(string $format): int
     {
         if (str_contains($format, '{SSSSS}') || str_contains($format, '{NNNNN}')) {
@@ -274,15 +217,12 @@ class MachineSerialService
             return 2;
         }
 
-        return 4; // default
+        return 4;
     }
 
-    /**
-     * Parse a serial number into its components.
-     */
     public function parseSerialNumber(string $serialNumber): array
     {
-        // Expected format: MODEL(3-4) + YYYY(4) + SSSS(4)
+
         if (preg_match('/^([A-Z0-9]{3,4})(\d{4})(\d{4})$/', $serialNumber, $matches) !== 1) {
             return [
                 'valid' => false,

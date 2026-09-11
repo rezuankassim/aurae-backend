@@ -9,9 +9,6 @@ use Illuminate\Support\Str;
 
 class ChunkedUploadController extends Controller
 {
-    /**
-     * Initialize a chunked upload session
-     */
     public function initiate(Request $request)
     {
         $request->validate([
@@ -23,10 +20,8 @@ class ChunkedUploadController extends Controller
         $uploadId = Str::uuid()->toString();
         $tempDir = "temp/uploads/{$uploadId}";
 
-        // Create temporary directory
         Storage::disk('local')->makeDirectory($tempDir);
 
-        // Store upload metadata
         Storage::disk('local')->put("{$tempDir}/metadata.json", json_encode([
             'filename' => $request->filename,
             'total_chunks' => $request->total_chunks,
@@ -41,9 +36,6 @@ class ChunkedUploadController extends Controller
         ]);
     }
 
-    /**
-     * Upload a single chunk
-     */
     public function uploadChunk(Request $request)
     {
         $request->validate([
@@ -56,12 +48,10 @@ class ChunkedUploadController extends Controller
         $chunkIndex = $request->chunk_index;
         $tempDir = "temp/uploads/{$uploadId}";
 
-        // Verify upload session exists
         if (! Storage::disk('local')->exists("{$tempDir}/metadata.json")) {
             return response()->json(['error' => 'Invalid upload session'], 404);
         }
 
-        // Save chunk
         $chunkPath = "{$tempDir}/chunk_{$chunkIndex}";
         Storage::disk('local')->putFileAs(
             dirname($chunkPath),
@@ -69,7 +59,6 @@ class ChunkedUploadController extends Controller
             basename($chunkPath)
         );
 
-        // Update metadata
         $metadata = json_decode(Storage::disk('local')->get("{$tempDir}/metadata.json"), true);
         $metadata['uploaded_chunks'][] = $chunkIndex;
         $metadata['uploaded_chunks'] = array_unique($metadata['uploaded_chunks']);
@@ -86,9 +75,6 @@ class ChunkedUploadController extends Controller
         ]);
     }
 
-    /**
-     * Finalize the upload by combining all chunks
-     */
     public function finalize(Request $request)
     {
         $request->validate([
@@ -98,14 +84,12 @@ class ChunkedUploadController extends Controller
         $uploadId = $request->upload_id;
         $tempDir = "temp/uploads/{$uploadId}";
 
-        // Verify upload session exists
         if (! Storage::disk('local')->exists("{$tempDir}/metadata.json")) {
             return response()->json(['error' => 'Invalid upload session'], 404);
         }
 
         $metadata = json_decode(Storage::disk('local')->get("{$tempDir}/metadata.json"), true);
 
-        // Verify all chunks are uploaded
         if (count($metadata['uploaded_chunks']) !== $metadata['total_chunks']) {
             return response()->json([
                 'error' => 'Not all chunks uploaded',
@@ -114,18 +98,15 @@ class ChunkedUploadController extends Controller
             ], 400);
         }
 
-        // Combine chunks
         $finalPath = 'knowledge/videos/'.Str::uuid().'-'.$metadata['filename'];
         $localPath = Storage::disk('local')->path($tempDir);
         $finalLocalPath = Storage::disk('public')->path($finalPath);
 
-        // Ensure directory exists
         $finalDir = dirname($finalLocalPath);
         if (! file_exists($finalDir)) {
             mkdir($finalDir, 0755, true);
         }
 
-        // Create final file
         $finalFile = fopen($finalLocalPath, 'wb');
 
         for ($i = 0; $i < $metadata['total_chunks']; $i++) {
@@ -142,7 +123,6 @@ class ChunkedUploadController extends Controller
 
         fclose($finalFile);
 
-        // Clean up temporary files
         Storage::disk('local')->deleteDirectory($tempDir);
 
         return response()->json([
@@ -151,9 +131,6 @@ class ChunkedUploadController extends Controller
         ]);
     }
 
-    /**
-     * Cancel an upload and clean up temporary files
-     */
     public function cancel(Request $request)
     {
         $request->validate([

@@ -13,12 +13,6 @@ use Illuminate\Support\Str;
 
 class HealthReportController extends Controller
 {
-    /**
-     * Determine if the request user may view this health report.
-     *
-     * Either the report belongs to them directly, OR the report belongs to
-     * a guest user that is registered on a device the request user owns.
-     */
     protected function userCanAccess(Request $request, HealthReport $healthReport): bool
     {
         $user = $request->user();
@@ -36,9 +30,6 @@ class HealthReportController extends Controller
         return OwnerDeviceResolver::ownsDevice($user, $guest->device_id);
     }
 
-    /**
-     * Display a listing of health reports for authenticated user.
-     */
     public function index(Request $request)
     {
         $healthReports = HealthReport::where('user_id', $request->user()->id)
@@ -52,9 +43,6 @@ class HealthReportController extends Controller
             ]);
     }
 
-    /**
-     * Display the specified health report.
-     */
     public function show(Request $request, HealthReport $healthReport)
     {
         if (! $this->userCanAccess($request, $healthReport)) {
@@ -74,9 +62,6 @@ class HealthReportController extends Controller
             ]);
     }
 
-    /**
-     * Stream a specific report file.
-     */
     public function file(Request $request, HealthReport $healthReport, string $type)
     {
         if (! $this->userCanAccess($request, $healthReport)) {

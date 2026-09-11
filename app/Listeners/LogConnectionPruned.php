@@ -7,17 +7,8 @@ use Laravel\Reverb\Events\ConnectionPruned;
 
 class LogConnectionPruned
 {
-    /**
-     * Create the event listener.
-     */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct() {}
 
-    /**
-     * Handle the event.
-     */
     public function handle(ConnectionPruned $event): void
     {
         $connection = $event->connection->connection();

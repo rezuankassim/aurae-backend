@@ -8,14 +8,10 @@ use App\Models\Device;
 use App\Models\DeviceMaintenance;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DeviceMaintenanceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $deviceMaintenances = DeviceMaintenance::with('device')
@@ -28,9 +24,6 @@ class DeviceMaintenanceController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $devices = Device::where('user_id', auth()->id())
@@ -42,20 +35,16 @@ class DeviceMaintenanceController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(DeviceMaintenanceCreateRequest $request)
     {
         $validated = $request->validated();
 
-        // Verify device belongs to user
         $device = Device::where('id', $validated['device_id'])
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
         DeviceMaintenance::create([
-            'status' => 1, // pending_factory
+            'status' => 1,
             'device_id' => $validated['device_id'],
             'maintenance_requested_at' => Carbon::parse($validated['maintenance_date'].' '.$validated['maintenance_time']),
             'service_type' => $validated['service_type'],
@@ -65,9 +54,6 @@ class DeviceMaintenanceController extends Controller
         return to_route('device-maintenance.index')->with('success', 'Device maintenance scheduled successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(DeviceMaintenance $deviceMaintenance)
     {
         if ($deviceMaintenance->user_id !== auth()->id() || ! auth()->user()->is_admin) {
@@ -104,9 +90,6 @@ class DeviceMaintenanceController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(DeviceMaintenance $deviceMaintenance)
     {
         if ($deviceMaintenance->user_id !== auth()->id()) {
@@ -120,9 +103,6 @@ class DeviceMaintenanceController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(DeviceMaintenanceUpdateRequest $request, DeviceMaintenance $deviceMaintenance)
     {
         if ($deviceMaintenance->user_id !== auth()->id()) {
@@ -146,7 +126,7 @@ class DeviceMaintenanceController extends Controller
             'maintenance_requested_at' => Carbon::parse($validated['maintenance_date'].' '.$validated['maintenance_time']),
             'factory_maintenance_requested_at' => null,
             'service_type' => $validated['service_type'],
-            'status' => 1, // pending_factory
+            'status' => 1,
             'is_user_approved' => false,
             'is_factory_approved' => false,
             'requested_at_changes' => json_encode($requested_changes),
@@ -155,27 +135,8 @@ class DeviceMaintenanceController extends Controller
         return to_route('device-maintenance.index')->with('success', 'Device maintenance updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(DeviceMaintenance $deviceMaintenance)
-    {
-        // if ($deviceMaintenance->user_id !== auth()->id()) {
-        //     return to_route('device-maintenance.index')->with('error', 'You are not authorized to delete this maintenance request.');
-        // }
+    public function destroy(DeviceMaintenance $deviceMaintenance) {}
 
-        // if ($deviceMaintenance->status === 1 && !$deviceMaintenance->is_factory_approved && $deviceMaintenance->requested_at_changes === null) {
-        //     return to_route('device-maintenance.index')->with('error', 'Only maintenance requests that havent been viewed yet can be deleted.');
-        // }
-
-        // $deviceMaintenance->delete();
-
-        // return to_route('device-maintenance.index')->with('success', 'Device maintenance request deleted successfully.');
-    }
-
-    /**
-     * Client approves the maintenance request.
-     */
     public function approve(DeviceMaintenance $deviceMaintenance)
     {
         abort_if($deviceMaintenance->user_id !== auth()->id(), 403);
@@ -185,7 +146,7 @@ class DeviceMaintenanceController extends Controller
 
         $deviceMaintenance->update([
             'is_user_approved' => true,
-            'status' => 2, // in_progress
+            'status' => 2,
         ]);
 
         return to_route('device-maintenance.index')->with('success', 'You have approved the maintenance request.');

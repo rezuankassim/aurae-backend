@@ -69,7 +69,7 @@ export interface User {
             is_admin: boolean;
         } | null;
     } | null;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface Therapy {
@@ -85,13 +85,13 @@ export interface Therapy {
     updated_at: string;
     image_url?: string | null;
     music_url?: string | null;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface UserAddress {
     id: number;
     is_default: boolean;
-    type: 0 | 1 | 2; // 0 = Home, 1 = Work, 2 = Other
+    type: 0 | 1 | 2;
     name: string;
     phone: string;
     line1: string;
@@ -131,12 +131,12 @@ export interface Address {
     created_at: string;
     updated_at: string;
     stateData: { id: number; name: string; code: string; country_id: number };
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface News {
     id: number;
-    type: 0 | 1; // 0 = news, 1 = promotion
+    type: 0 | 1;
     title: string;
     content: string;
     html_content: string;
@@ -148,7 +148,7 @@ export interface News {
     created_at: string;
     updated_at: string;
     image_url?: string | null;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface Knowledge {
@@ -167,7 +167,7 @@ export interface Knowledge {
     video_path: string | null;
     order: number;
     cover_image_url?: string | null;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface Faq {
@@ -178,7 +178,7 @@ export interface Faq {
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface Feedback {
@@ -188,7 +188,7 @@ export interface Feedback {
     description: string;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface HealthReport {
@@ -202,7 +202,7 @@ export interface HealthReport {
     multidimensional_file_url: string | null;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface UsageHistory {
@@ -212,12 +212,12 @@ export interface UsageHistory {
     created_at: string;
     updated_at: string;
     therapy?: Therapy;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface DeviceMaintenance {
     id: number;
-    status: 0 | 1 | 2 | 3; // 0: pending, 1: pending_factory, 2: in_progress, 3: completed
+    status: 0 | 1 | 2 | 3;
     user_id: number;
     user: User;
     device_id: string;
@@ -243,7 +243,7 @@ export interface DeviceMaintenance {
         previous_factory_maintenance_requested_at: string;
         new_factory_maintenance_requested_at: string | null;
     }[];
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface MaintenanceBanner {
@@ -255,7 +255,7 @@ export interface MaintenanceBanner {
     created_at: string;
     updated_at: string;
     image_url?: string | null;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface MarketplaceBanner {
@@ -267,7 +267,7 @@ export interface MarketplaceBanner {
     created_at: string;
     updated_at: string;
     image_url?: string | null;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface Product {
@@ -281,12 +281,12 @@ export interface Product {
     variants: ProductVariant[];
     product_type: ProductType;
     tags: Tag[];
-    tags_array: number[]; // Array of tag IDs
+    tags_array: number[];
     created_at: string;
     updated_at: string;
     prices?: Price[];
     collections?: Collection[];
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface ProductVariant {
@@ -315,7 +315,7 @@ export interface ProductType {
     is_subscription: boolean;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface Tag {
@@ -323,7 +323,7 @@ export interface Tag {
     value: string;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface Media {
@@ -336,7 +336,7 @@ export interface Media {
     created_at: string;
     updated_at: string;
     url: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface ProductOption {
@@ -349,7 +349,7 @@ export interface ProductOption {
     created_at: string;
     updated_at: string;
     values: ProductOptionValue[];
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface ProductOptionValue {
@@ -360,7 +360,7 @@ export interface ProductOptionValue {
     product_option_id: number;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface Price {
@@ -372,7 +372,7 @@ export interface Price {
     compare_price: PriceV | number;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface Currency {
@@ -383,7 +383,7 @@ export interface Currency {
     default: boolean;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface PriceV {
@@ -404,7 +404,7 @@ export interface LoginActivity {
     succeeded: number;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface TaxClass {
@@ -413,7 +413,7 @@ export interface TaxClass {
     created_at: string;
     updated_at: string;
     default: boolean;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface CollectionGroup {
@@ -424,7 +424,7 @@ export interface CollectionGroup {
     created_at: string;
     updated_at: string;
     collections?: Collection[];
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface Collection {
@@ -441,7 +441,7 @@ export interface Collection {
     updated_at: string;
     deleted_at: string | null;
     pivot: { product_id: number; collection_id: number; position: number };
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface SocialMedia {
@@ -449,7 +449,7 @@ export interface SocialMedia {
     links: Record<string, string>;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface GeneralSetting {
@@ -469,7 +469,7 @@ export interface GeneralSetting {
     privacy_policy_html: string | null;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface Cart {

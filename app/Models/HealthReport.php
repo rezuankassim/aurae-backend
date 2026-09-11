@@ -9,14 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class HealthReport extends Model
 {
-    /** @use HasFactory<\Database\Factories\HealthReportFactory> */
     use HasFactory, HasUuids;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'full_body_file',
         'meridian_file',
@@ -24,9 +18,6 @@ class HealthReport extends Model
         'user_id',
     ];
 
-    /**
-     * Get the user that owns the health report.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

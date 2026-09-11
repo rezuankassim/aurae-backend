@@ -30,7 +30,7 @@ export function BlockFormatDropDown({ children }: { children: React.ReactNode })
             const elementDOM = activeEditor.getElementByKey(elementKey);
 
             if (elementDOM !== null) {
-                // setSelectedElementKey(elementKey);
+
                 if ($isListNode(element)) {
                     const parentList = $getNearestNodeOfType<ListNode>(anchorNode, ListNode);
                     const type = parentList ? parentList.getListType() : element.getListType();

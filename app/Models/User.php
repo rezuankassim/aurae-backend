@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
@@ -22,14 +21,8 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUserInterface
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, HasRoles, LunarUser, Notifiable, SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'username',
         'is_admin',
@@ -43,21 +36,11 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
         'phone_verified_at',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -69,41 +52,26 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
         ];
     }
 
-    /**
-     * Get the addresses associated with the user.
-     */
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
     }
 
-    /**
-     * Get the emergency contacts associated with the user.
-     */
     public function emergencyContacts(): HasMany
     {
         return $this->hasMany(EmergencyContact::class);
     }
 
-    /**
-     * Get the health reportss associated with the user.
-     */
     public function healthReports(): HasMany
     {
         return $this->hasMany(HealthReport::class);
     }
 
-    /**
-     * Get the devices associated with the user.
-     */
     public function userDevices(): MorphMany
     {
         return $this->morphMany(UserDevice::class, 'deviceable');
     }
 
-    /**
-     * Get the latest successful login activity for the user.
-     */
     public function latestLoginActivity(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(LoginActivity::class)
@@ -112,33 +80,21 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
             ->latestOfMany('occurred_at');
     }
 
-    /**
-     * Get the guest record if this user is a guest.
-     */
     public function guest(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Guest::class);
     }
 
-    /**
-     * Check if this user is a guest user.
-     */
     public function isGuest(): bool
     {
         return (bool) $this->is_guest;
     }
 
-    /**
-     * Get the user subscriptions.
-     */
     public function subscriptions(): HasMany
     {
         return $this->hasMany(UserSubscription::class);
     }
 
-    /**
-     * Get the user's active subscription (latest one).
-     */
     public function activeSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(UserSubscription::class)
@@ -150,9 +106,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
             ->latest();
     }
 
-    /**
-     * Get all user's active subscriptions.
-     */
     public function activeSubscriptions(): HasMany
     {
         return $this->hasMany(UserSubscription::class)
@@ -163,43 +116,26 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
             });
     }
 
-    /**
-     * Get the machines bound to this user.
-     */
     public function machines(): HasMany
     {
         return $this->hasMany(Machine::class);
     }
 
-    /**
-     * Get the maximum number of devices this user can bind.
-     * Each active subscription allows 1 device.
-     */
     public function getMaxDevices(): int
     {
         return $this->activeSubscriptions()->count();
     }
 
-    /**
-     * Get the maximum number of machines this user can have based on subscriptions.
-     * Each active subscription allows 1 machine.
-     */
     public function getMaxMachines(): int
     {
         return $this->activeSubscriptions()->count();
     }
 
-    /**
-     * Get the user's settings.
-     */
     public function setting(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(UserSetting::class);
     }
 
-    /**
-     * Get or create user settings.
-     */
     public function getOrCreateSetting(): UserSetting
     {
         return $this->setting ?? $this->setting()->create([
@@ -207,9 +143,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
         ]);
     }
 
-    /**
-     * Get the user's Lunar customer, creating one if it doesn't exist.
-     */
     public function getOrCreateCustomer(): Customer
     {
         $customer = $this->customers()->first();
@@ -246,9 +179,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
         });
     }
 
-    /**
-     * Unlink machines owned by this user so they can be bound again.
-     */
     public function unlinkMachines(): void
     {
         $deviceIds = $this->machines()
@@ -270,9 +200,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
         ]);
     }
 
-    /**
-     * Get the latest deletion audit entry for this user.
-     */
     public function latestDeletionActivity(): ?Activity
     {
         return Activity::query()
@@ -284,11 +211,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
             ->first();
     }
 
-    /**
-     * Format the latest deletion audit entry for Inertia responses.
-     *
-     * @return array<string, mixed>|null
-     */
     public function deletionAudit(): ?array
     {
         $activity = $this->latestDeletionActivity();
@@ -312,9 +234,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
         ];
     }
 
-    /**
-     * Record who deleted this user.
-     */
     protected function recordDeletionActivity(): void
     {
         $actor = auth()->user();
@@ -334,9 +253,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
             ->log('user-deleted');
     }
 
-    /**
-     * Determine how this user deletion was initiated.
-     */
     protected function deletionType(?User $actor): string
     {
         if (! $actor) {
@@ -354,20 +270,14 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, LunarUser
         return 'user';
     }
 
-    /**
-     * Determine if the user can access the Filament panel.
-     */
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->is_admin;
     }
 
-    /**
-     * Get the avatar URL for Filament.
-     */
     public function getFilamentAvatarUrl(): ?string
     {
-        // Return system logo as default avatar
+
         return asset('logo.png');
     }
 }

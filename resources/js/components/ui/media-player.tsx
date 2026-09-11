@@ -1973,7 +1973,7 @@ function MediaPlayerSeek(props: MediaPlayerSeekProps) {
       collisionDataRef.current = null;
       lastSeekCommitTimeRef.current = Date.now();
 
-      // Reset movement tracking after seek commit
+
       pointerEnterTimeRef.current = Date.now();
       horizontalMovementRef.current = 0;
       verticalMovementRef.current = 0;
@@ -3163,7 +3163,7 @@ export {
   MediaPlayerSettings,
   MediaPlayerPortal,
   MediaPlayerTooltip,
-  //
+
   MediaPlayerRoot as Root,
   MediaPlayerVideo as Video,
   MediaPlayerAudio as Audio,
@@ -3187,7 +3187,7 @@ export {
   MediaPlayerSettings as Settings,
   MediaPlayerPortal as Portal,
   MediaPlayerTooltip as Tooltip,
-  //
+
   useMediaSelector as useMediaPlayer,
   useStoreSelector as useMediaPlayerStore,
 };

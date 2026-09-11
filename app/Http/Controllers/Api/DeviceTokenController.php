@@ -8,16 +8,12 @@ use Illuminate\Http\Request;
 
 class DeviceTokenController extends Controller
 {
-    /**
-     * Update device FCM token
-     */
     public function update(Request $request)
     {
         $request->validate([
             'fcm_token' => ['required', 'string'],
         ]);
 
-        // Update the device's FCM token
         $request->device->update([
             'fcm_token' => $request->input('fcm_token'),
         ]);

@@ -15,15 +15,10 @@ use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
-    /**
-     * Get the authenticated user's profile.
-     */
     public function show(Request $request)
     {
         $user = $request->user();
 
-        // Ensure newly added columns are always present in the response payload,
-        // even if the user model instance was loaded with a limited select.
         $user->setAttribute('phone_country_code', $user->phone_country_code);
 
         return BaseResource::make($user)
@@ -33,13 +28,6 @@ class ProfileController extends Controller
             ]);
     }
 
-    /**
-     * Update the authenticated user's profile.
-     *
-     * Fields: name, email, phone, password (optional)
-     * If phone is changed, verification is required.
-     * If password is provided, it will be updated.
-     */
     public function update(Request $request)
     {
         $user = $request->user();
@@ -51,31 +39,26 @@ class ProfileController extends Controller
             'phone_country_code' => ['nullable', 'string', 'max:10'],
         ];
 
-        // Only check phone uniqueness if phone is being changed
         if ($request->phone !== $user->phone) {
             $rules['phone'][] = Rule::unique('users', 'phone')->whereNull('deleted_at');
         }
 
-        // Only validate password fields if password is provided and not empty
         if ($request->filled('password')) {
             $rules['password'] = ['required', 'string', 'min:8', 'confirmed'];
         }
 
         $validated = $request->validate($rules);
 
-        // Handle password update if provided
         if ($request->filled('password')) {
             $user->password = Hash::make($validated['password']);
         }
 
         $phoneChanged = $user->phone !== $validated['phone'];
 
-        // Update name, email, and phone_country_code immediately
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->phone_country_code = $validated['phone_country_code'] ?? $user->phone_country_code;
 
-        // Sync customer record with updated name
         $customer = $user->customers()->first();
         if ($customer) {
             $customer->first_name = Str::before($validated['name'], ' ');
@@ -83,9 +66,8 @@ class ProfileController extends Controller
             $customer->save();
         }
 
-        // If phone is changed, require verification
         if ($phoneChanged) {
-            // Store the new phone in verification table for pending verification
+
             $code = rand(100000, 999999);
 
             Verification::updateOrCreate(
@@ -99,7 +81,6 @@ class ProfileController extends Controller
 
             $user->save();
 
-            // Send OTP via Exabytes SMS to the new phone number
             $exabytesService = app(ExabytesService::class);
             $result = $exabytesService->sendOtp($validated['phone'], (string) $code);
 
@@ -129,9 +110,6 @@ class ProfileController extends Controller
             ]);
     }
 
-    /**
-     * Verify phone number change with OTP.
-     */
     public function verifyPhoneChange(Request $request)
     {
         $request->validate([
@@ -151,7 +129,6 @@ class ProfileController extends Controller
             ]);
         }
 
-        // Check if phone is already taken by another user
         $existingUser = User::where('phone', $request->phone)
             ->where('id', '!=', $user->id)
             ->first();
@@ -162,12 +139,10 @@ class ProfileController extends Controller
             ]);
         }
 
-        // Update user's phone
         $user->phone = $request->phone;
         $user->phone_verified_at = now();
         $user->save();
 
-        // Delete verification record
         $verification->delete();
 
         return BaseResource::make($user)
@@ -177,9 +152,6 @@ class ProfileController extends Controller
             ]);
     }
 
-    /**
-     * Resend phone verification OTP.
-     */
     public function resendPhoneVerificationOtp(Request $request)
     {
         $request->validate([
@@ -188,7 +160,6 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        // Check if there's a pending verification for this phone
         $verification = Verification::where('phone', $request->phone)
             ->where('user_id', $user->id)
             ->first();
@@ -199,14 +170,12 @@ class ProfileController extends Controller
             ]);
         }
 
-        // Generate new OTP
         $code = rand(100000, 999999);
         $verification->update([
             'code' => $code,
             'verified_at' => null,
         ]);
 
-        // Send OTP via Exabytes SMS
         $exabytesService = app(ExabytesService::class);
         $result = $exabytesService->sendOtp($request->phone, (string) $code);
 

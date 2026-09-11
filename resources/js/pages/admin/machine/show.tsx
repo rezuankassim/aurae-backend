@@ -82,7 +82,7 @@ export default function MachineShow({ machine }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Machine - ${machine.serial_number}`} />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl px-4 py-6">
-                {/* Header */}
+                {}
                 <div className="flex items-start justify-between">
                     <Heading title={machine.serial_number} description={machine.name} />
                     <div className="flex items-center gap-2">
@@ -97,7 +97,7 @@ export default function MachineShow({ machine }: Props) {
                 </div>
 
                 <div className="grid gap-6 lg:grid-cols-3">
-                    {/* Machine Details */}
+                    {}
                     <div className="space-y-6 lg:col-span-2">
                         <Card>
                             <CardHeader>
@@ -141,7 +141,7 @@ export default function MachineShow({ machine }: Props) {
                             </CardContent>
                         </Card>
 
-                        {/* Images */}
+                        {}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Machine Images</CardTitle>
@@ -182,7 +182,7 @@ export default function MachineShow({ machine }: Props) {
                             </CardContent>
                         </Card>
 
-                        {/* User Information */}
+                        {}
                         {machine.user && (
                             <Card>
                                 <CardHeader>
@@ -211,9 +211,9 @@ export default function MachineShow({ machine }: Props) {
                         )}
                     </div>
 
-                    {/* Sidebar */}
+                    {}
                     <div className="space-y-6">
-                        {/* Device Card */}
+                        {}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Linked Tablet</CardTitle>
@@ -237,7 +237,7 @@ export default function MachineShow({ machine }: Props) {
                             </CardContent>
                         </Card>
 
-                        {/* Subscription Card */}
+                        {}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Subscription</CardTitle>
@@ -273,7 +273,7 @@ export default function MachineShow({ machine }: Props) {
                             </CardContent>
                         </Card>
 
-                        {/* Actions */}
+                        {}
                         {machine.user && (
                             <Card className="border-red-200 dark:border-red-900">
                                 <CardHeader>

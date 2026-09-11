@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 class UsageHistoryController extends Controller
 {
-    /**
-     * Store a newly created usage history in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -43,9 +40,6 @@ class UsageHistoryController extends Controller
             ]);
     }
 
-    /**
-     * Get chart data for usage statistics.
-     */
     public function chart(Request $request)
     {
         $request->validate([
@@ -57,11 +51,9 @@ class UsageHistoryController extends Controller
         $from = $request->input('from');
         $to = $request->input('to');
 
-        // Build base query
         $query = UsageHistory::where('user_id', $userId)
             ->whereNotNull('content->started_at');
 
-        // Apply date filters if provided
         if ($from) {
             $query->whereDate('created_at', '>=', $from);
         }
@@ -69,7 +61,6 @@ class UsageHistoryController extends Controller
             $query->whereDate('created_at', '<=', $to);
         }
 
-        // Get daily usage data
         $dailyUsage = (clone $query)
             ->select(
                 DB::raw('DATE(created_at) as date'),
@@ -87,11 +78,9 @@ class UsageHistoryController extends Controller
                 ];
             });
 
-        // Calculate overall average daily usage
         $totalSessions = $query->count();
         $totalDuration = $query->sum(DB::raw('CAST(JSON_EXTRACT(content, "$.duration") AS DECIMAL(10,2))')) ?? 0;
 
-        // Calculate number of days with usage
         $daysWithUsage = (clone $query)
             ->select(DB::raw('COUNT(DISTINCT DATE(created_at)) as days'))
             ->value('days') ?? 1;

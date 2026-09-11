@@ -8,9 +8,6 @@ use Inertia\Inertia;
 
 class FeedbackController extends Controller
 {
-    /**
-     * Display a listing of feedbacks.
-     */
     public function index()
     {
         $feedbacks = Feedback::with('user:id,name,email')
@@ -22,9 +19,6 @@ class FeedbackController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified feedback.
-     */
     public function show(Feedback $feedback)
     {
         $feedback->load('user:id,name,email');

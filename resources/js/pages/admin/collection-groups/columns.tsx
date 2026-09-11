@@ -39,11 +39,7 @@ export const columns: ColumnDef<CollectionGroup>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        {/* <DropdownMenuItem asChild>
-                            <Link className="hover:cursor-pointer" href={show(row.original.id).url}>
-                                View
-                            </Link>
-                        </DropdownMenuItem> */}
+                        {}
                         <DropdownMenuItem asChild>
                             <Link className="hover:cursor-pointer" href={edit(row.original.id).url}>
                                 Edit

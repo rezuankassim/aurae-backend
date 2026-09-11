@@ -14,9 +14,6 @@ use Lunar\Models\State;
 
 class UserAddressController extends Controller
 {
-    /**
-     * Display the user's addresses.
-     */
     public function index(User $user)
     {
         $customer = $user->getOrCreateCustomer();
@@ -58,16 +55,12 @@ class UserAddressController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created address for the user.
-     */
     public function store(UserAddressCreateRequest $request, User $user)
     {
         $validated = $request->validated();
 
         $customer = $user->getOrCreateCustomer();
 
-        // If this address is set as default, unset any existing defaults
         if (! empty($validated['is_default'])) {
             $customer->addresses()->update(['shipping_default' => false]);
         }
@@ -106,9 +99,6 @@ class UserAddressController extends Controller
             ->with('success', 'Address created successfully.');
     }
 
-    /**
-     * Update the specified address.
-     */
     public function update(UserAddressUpdateRequest $request, User $user, Address $address)
     {
         $customer = $user->getOrCreateCustomer();
@@ -117,7 +107,6 @@ class UserAddressController extends Controller
 
         $validated = $request->validated();
 
-        // If this address is set as default, unset any existing defaults
         if (! empty($validated['is_default'])) {
             $customer->addresses()
                 ->where('id', '!=', $address->id)
@@ -160,9 +149,6 @@ class UserAddressController extends Controller
             ->with('success', 'Address updated successfully.');
     }
 
-    /**
-     * Remove the specified address.
-     */
     public function destroy(User $user, Address $address)
     {
         $customer = $user->getOrCreateCustomer();

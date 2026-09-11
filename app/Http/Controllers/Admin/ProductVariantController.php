@@ -16,20 +16,8 @@ use Lunar\Models\ProductOptionValue;
 use Lunar\Models\ProductVariant;
 use Lunar\Models\TaxClass;
 
-// $variant = $product->variants()->create([
-//     'tax_class_id' => TaxClass::getDefault()->id,
-//     'sku' => $data['sku'],
-// ]);
-// $variant->prices()->create([
-//     'min_quantity' => 1,
-//     'currency_id' => $currency->id,
-//     'price' => (int) bcmul($data['base_price'], $currency->factor),
-// ]);
 class ProductVariantController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Product $product)
     {
         $options = $product->productOptions()->with('values')->get();
@@ -49,9 +37,6 @@ class ProductVariantController extends Controller
         ]);
     }
 
-    /**
-     * Configure options for the product.
-     */
     public function configure(Product $product)
     {
         return Inertia::render('admin/products/variants/configure', [
@@ -61,9 +46,6 @@ class ProductVariantController extends Controller
         ]);
     }
 
-    /**
-     * Update all variants of the product.
-     */
     public function updateAll(Request $request, Product $product)
     {
         $data = $request->all();
@@ -94,9 +76,6 @@ class ProductVariantController extends Controller
         return to_route('admin.products.variants.index', $product->id)->with('success', 'Variants updated successfully.');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request, Product $product)
     {
         $data = $request->all();
@@ -111,7 +90,7 @@ class ProductVariantController extends Controller
         $optionsId = [];
         $optionsOrder = 1;
         if (count($grouped) == 0) {
-            // No options, remove all exisiting options variants except the first one
+
             $variant = $product->variants()->first();
             $variant->values()->detach();
 
@@ -190,7 +169,7 @@ class ProductVariantController extends Controller
         })->toArray();
 
         foreach ($combinations as $combination) {
-            // See if this combination already has a variant
+
             $exists = collect($variants)->first(function ($variant) use ($combination) {
                 $valueDifference = array_diff_assoc($combination, $variant['values']);
 
@@ -219,41 +198,19 @@ class ProductVariantController extends Controller
         return to_route('admin.products.variants.index', $request->product->id)->with('success', 'Variant saved successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    public function show(string $id) {}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    public function edit(string $id) {}
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    public function update(Request $request, string $id) {}
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Product $product, ProductVariant $variant)
     {
-        // Check if this is the last variant - products must have at least one variant
+
         if ($product->variants()->count() <= 1) {
             return back()->with('error', 'Cannot delete the last variant. Products must have at least one variant.');
         }
 
-        // Delete related data
         $variant->basePrices()->delete();
         $variant->values()->detach();
         $variant->delete();
@@ -273,17 +230,15 @@ class ProductVariantController extends Controller
             function (?Collection $carry, $items) {
                 $items = collect($items);
 
-                // First dimension: seed with single-item arrays
                 if ($carry === null) {
                     return $items->map(fn ($i) => [$i]);
                 }
 
-                // Combine previous combos with current items
                 return $carry->flatMap(
                     fn ($combo) => $items->map(fn ($i) => array_merge($combo, [$i]))
                 );
             },
-            null // IMPORTANT: start with null, not collect()
+            null
         );
 
         return $result ? $result->values()->toArray() : [];

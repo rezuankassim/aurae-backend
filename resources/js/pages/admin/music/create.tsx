@@ -59,11 +59,11 @@ export default function MusicCreate() {
                 return;
             }
 
-            // Try S3 upload first (will return null in development)
+
             const musicResult = await uploadToS3(musicFile, 'music');
 
             if (musicResult === null) {
-                // Development mode - use traditional form upload
+
                 const formData = new FormData();
                 formData.append('title', title);
                 formData.append('music', musicFile);
@@ -80,13 +80,13 @@ export default function MusicCreate() {
                 return;
             }
 
-            // S3 upload succeeded - upload thumbnail if present
+
             let thumbnailResult = null;
             if (thumbnailFile) {
                 thumbnailResult = await uploadToS3(thumbnailFile, 'music/thumbnails');
             }
 
-            // Send S3 keys to server
+
             router.post(
                 store().url,
                 {

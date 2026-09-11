@@ -10,9 +10,6 @@ use Inertia\Inertia;
 
 class LegalSettingController extends Controller
 {
-    /**
-     * Show the form for editing legal settings.
-     */
     public function edit()
     {
         $generalSetting = GeneralSetting::firstOrCreate();
@@ -22,9 +19,6 @@ class LegalSettingController extends Controller
         ]);
     }
 
-    /**
-     * Update the legal settings.
-     */
     public function update(Request $request)
     {
         $validated = $request->validate([

@@ -6,11 +6,6 @@ use Illuminate\Http\Request;
 
 class PaymentHistoryResource extends BaseResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         $type = $this->resource['type'];
@@ -27,29 +22,22 @@ class PaymentHistoryResource extends BaseResource
         return [];
     }
 
-    /**
-     * Format marketplace order for payment history.
-     *
-     * @param  \Lunar\Models\Order  $order
-     */
     protected function formatMarketplaceOrder($order): array
     {
-        // Get the order reference/number (e.g., "12345")
+
         $orderNumber = $order->reference ?? $order->id;
 
-        // Get the total amount (negative for display as expense)
         $amount = $order->total?->decimal ?? 0;
         $currencyCode = $order->currency?->code ?? 'MYR';
 
-        // Format the amount with currency symbol
         $formattedAmount = $this->formatAmount($amount, $currencyCode);
 
         return [
             'id' => $order->id,
             'type' => 'marketplace',
             'title' => "Marketplace #{$orderNumber}",
-            'amount' => "-{$formattedAmount}", // Negative because it's an expense
-            'amount_value' => -abs($amount), // Numeric value for calculations
+            'amount' => "-{$formattedAmount}",
+            'amount_value' => -abs($amount),
             'currency' => $currencyCode,
             'status' => $order->status,
             'date' => $order->placed_at instanceof \Carbon\Carbon
@@ -61,18 +49,12 @@ class PaymentHistoryResource extends BaseResource
         ];
     }
 
-    /**
-     * Format subscription payment for payment history.
-     *
-     * @param  \App\Models\SubscriptionTransaction  $transaction
-     */
     protected function formatSubscriptionPayment($transaction): array
     {
         $amount = (float) ($transaction->amount ?? 0);
         $currencyCode = 'MYR';
         $formattedAmount = $this->formatAmount($amount, $currencyCode);
 
-        // Determine the title based on transaction type
         $subscriptionName = $transaction->userSubscription?->subscription?->title ?? 'Subscription';
         $isRenewal = str_contains($transaction->notes ?? '', 'renewal') ||
                      ($transaction->meta['type'] ?? '') === 'recurring_renewal';
@@ -100,9 +82,6 @@ class PaymentHistoryResource extends BaseResource
         ];
     }
 
-    /**
-     * Format amount with currency symbol.
-     */
     protected function formatAmount(float $amount, string $currencyCode): string
     {
         $currencySymbols = [

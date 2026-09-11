@@ -16,7 +16,7 @@ export default function UsersLayout({
 }: PropsWithChildren<{
     id_record: number;
 }>) {
-    // When server-side rendering, we only render the layout on the client...
+
     if (typeof window === 'undefined') {
         return null;
     }

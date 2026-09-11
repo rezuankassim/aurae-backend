@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 
 class EditorUploadController extends Controller
 {
-    /**
-     * Upload an image for the rich text editor.
-     */
     public function store(Request $request): JsonResponse
     {
         $request->validate([

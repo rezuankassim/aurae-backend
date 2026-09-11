@@ -6,17 +6,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        // Add senangpay_recurring_id to subscriptions table
+
         Schema::table('subscriptions', function (Blueprint $table) {
             $table->string('senangpay_recurring_id')->nullable()->after('is_active');
         });
 
-        // Add recurring fields to user_subscriptions table
         Schema::table('user_subscriptions', function (Blueprint $table) {
             $table->boolean('is_recurring')->default(true)->after('payment_status');
             $table->timestamp('next_billing_at')->nullable()->after('paid_at');
@@ -24,9 +20,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('subscriptions', function (Blueprint $table) {

@@ -16,10 +16,6 @@ use Lunar\Shipping\Facades\Shipping;
 
 class CheckoutController extends Controller
 {
-    /**
-     * Scope a cart's lines relation to selected lines only, then calculate.
-     * This ensures shipping and tax are computed against the items being checked out.
-     */
     private function scopeCartToSelected(Cart $cart): Cart
     {
         $selectedLines = $cart->lines()->where('selected', true)->with([
@@ -34,9 +30,6 @@ class CheckoutController extends Controller
         return $cart;
     }
 
-    /**
-     * Get available shipping options for cart.
-     */
     public function getShippingOptions(Request $request)
     {
         $cart = Cart::where('user_id', $request->user()->id)->first();
@@ -65,21 +58,17 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Calculate cart scoped to selected lines
         $this->scopeCartToSelected($cart);
         $cart->calculate();
 
-        // Get shipping rates from table rate shipping
         $shippingRates = Shipping::shippingRates($cart)->get();
 
-        // Get shipping options
         $shippingOptions = Shipping::shippingOptions($cart)->get(
             new ShippingOptionLookup(
                 shippingRates: $shippingRates
             )
         );
 
-        // Format options from table rate shipping
         $options = [];
 
         foreach ($shippingOptions as $shippingOption) {
@@ -106,9 +95,6 @@ class CheckoutController extends Controller
         ]);
     }
 
-    /**
-     * Set shipping option for cart.
-     */
     public function setShippingOption(Request $request)
     {
         $validated = $request->validate([
@@ -141,11 +127,9 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Calculate cart scoped to selected lines
         $this->scopeCartToSelected($cart);
         $cart->calculate();
 
-        // Get shipping rates and options from database
         $shippingRates = Shipping::shippingRates($cart)->get();
         $shippingOptions = Shipping::shippingOptions($cart)->get(
             new ShippingOptionLookup(
@@ -153,7 +137,6 @@ class CheckoutController extends Controller
             )
         );
 
-        // Find the requested shipping option
         $shippingOption = null;
         foreach ($shippingOptions as $optionResult) {
             if ($optionResult->option->getIdentifier() === $validated['shipping_option']) {
@@ -170,17 +153,10 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Set the shipping option on the cart
         $cart->setShippingOption($shippingOption);
 
-        // Clear stale shipping breakdown from the prior calculate() call.
-        // Without this, ApplyShipping reuses the existing breakdown and
-        // accumulates the old shipping option alongside the new one,
-        // resulting in an incorrect shipping total.
         $cart->shippingBreakdown = null;
 
-        // Re-scope to selected lines and force-recalculate so totals include shipping
-        // against only the items being checked out (not the full cart)
         $this->scopeCartToSelected($cart);
         $cart->recalculate();
 
@@ -204,9 +180,6 @@ class CheckoutController extends Controller
         ]);
     }
 
-    /**
-     * Set shipping and billing addresses for cart.
-     */
     public function setAddresses(Request $request)
     {
         $validated = $request->validate([
@@ -243,7 +216,6 @@ class CheckoutController extends Controller
             'billing_address.contact_phone' => ['nullable', 'string', 'max:255'],
         ]);
 
-        // Get or create cart for user
         $cart = Cart::where('user_id', $request->user()->id)->first();
 
         if (! $cart) {
@@ -254,7 +226,6 @@ class CheckoutController extends Controller
             ], 404);
         }
 
-        // Set shipping address
         $cart->shippingAddress()->updateOrCreate(
             ['cart_id' => $cart->id, 'type' => 'shipping'],
             [
@@ -275,7 +246,6 @@ class CheckoutController extends Controller
             ]
         );
 
-        // Set billing address
         if ($request->boolean('billing_same_as_shipping', true)) {
             $cart->billingAddress()->updateOrCreate(
                 ['cart_id' => $cart->id, 'type' => 'billing'],
@@ -318,7 +288,6 @@ class CheckoutController extends Controller
             );
         }
 
-        // Recalculate cart with addresses
         $cart->calculate();
 
         return response()->json([
@@ -330,16 +299,12 @@ class CheckoutController extends Controller
         ]);
     }
 
-    /**
-     * Initiate payment for cart.
-     */
     public function initiatePayment(Request $request)
     {
         $validated = $request->validate([
             'payment_method' => ['required', 'string', 'in:senangpay,cash-in-hand'],
         ]);
 
-        // Get user's cart
         $cart = Cart::where('user_id', $request->user()->id)->first();
 
         if (! $cart || $cart->lines->isEmpty()) {
@@ -358,7 +323,6 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Check if addresses are set
         if (! $cart->shippingAddress || ! $cart->billingAddress) {
             return response()->json([
                 'status' => 400,
@@ -367,13 +331,9 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Scope to selected lines and do an initial calculate to populate shipping rates lookup
         $this->scopeCartToSelected($cart);
         $cart->calculate();
 
-        // Ensure a shipping option is set. shippingOptionOverride is an in-memory-only
-        // property (always null after a fresh DB load), so we check the shipping address
-        // DB record via ShippingManifest instead.
         $existingShippingOption = \Lunar\Facades\ShippingManifest::getShippingOption($cart);
 
         if (! $existingShippingOption) {
@@ -384,7 +344,6 @@ class CheckoutController extends Controller
                 )
             );
 
-            // Fall back to BASDEL (Basic Delivery)
             $shippingOptionSet = false;
 
             foreach ($shippingOptions as $optionResult) {
@@ -404,18 +363,11 @@ class CheckoutController extends Controller
             }
         }
 
-        // Clear stale shipping breakdown from the prior calculate() call to
-        // prevent accumulation of old shipping items during recalculate.
         $cart->shippingBreakdown = null;
 
-        // Force-recalculate after shipping is confirmed so $cart->total correctly
-        // reflects selected lines + shipping. This covers both the case where
-        // setShippingOption() was just called (which only updates the DB, not the
-        // in-memory cart) and where shipping was already set in a prior request.
         $this->scopeCartToSelected($cart);
         $cart->recalculate();
 
-        // Initiate payment based on method
         if ($validated['payment_method'] === 'senangpay') {
             try {
                 $paymentDriver = Payments::driver('senangpay')
@@ -460,7 +412,7 @@ class CheckoutController extends Controller
                 ], 500);
             }
         } else {
-            // Cash in hand - create order directly
+
             try {
                 $order = $cart->createOrder();
 
@@ -499,12 +451,9 @@ class CheckoutController extends Controller
         }
     }
 
-    /**
-     * Check payment status by reference number.
-     */
     public function checkPaymentStatus(string $reference)
     {
-        // Find order by reference (check both senangpay and revpay for backward compatibility)
+
         $order = Order::where(function ($query) use ($reference) {
             $query->whereJsonContains('meta->senangpay_reference', $reference)
                 ->orWhereJsonContains('meta->revpay_reference', $reference);
@@ -518,13 +467,11 @@ class CheckoutController extends Controller
             ], 404);
         }
 
-        // Get latest transaction (check both senangpay and revpay)
         $transaction = Transaction::where('reference', $reference)
             ->whereIn('driver', ['senangpay', 'revpay'])
             ->latest()
             ->first();
 
-        // Determine payment status
         $paymentStatus = 'pending';
         if ($transaction) {
             if ($transaction->type === 'capture' && $transaction->success) {
@@ -549,9 +496,6 @@ class CheckoutController extends Controller
         ]);
     }
 
-    /**
-     * Get user's order history.
-     */
     public function orderHistory(Request $request)
     {
         $orders = Order::where('user_id', $request->user()->id)
@@ -559,7 +503,6 @@ class CheckoutController extends Controller
             ->latest()
             ->get();
 
-        // Load purchasable only for non-shipping lines to avoid morphTo issues
         $orders->each(function ($order) {
             $productLines = $order->lines->where('type', '!=', 'shipping');
             if ($productLines->isNotEmpty()) {
@@ -574,12 +517,9 @@ class CheckoutController extends Controller
             ]);
     }
 
-    /**
-     * Initiate repayment for an existing order in payment-pending or payment-failed status.
-     */
     public function repay(Request $request, Order $order, SenangpaySignatureService $signatureService)
     {
-        // Ensure user can only repay their own orders
+
         if ($order->user_id !== $request->user()->id) {
             return response()->json([
                 'status' => 403,
@@ -588,7 +528,6 @@ class CheckoutController extends Controller
             ], 403);
         }
 
-        // Ensure order is in a repayable status
         if (! in_array($order->status, ['payment-pending', 'payment-failed'])) {
             return response()->json([
                 'status' => 400,
@@ -602,13 +541,10 @@ class CheckoutController extends Controller
             $secretKey = config('services.senangpay.secret_key');
             $baseUrl = config('services.senangpay.base_url', 'https://app.senangpay.my');
 
-            // Generate a new unique reference number to avoid SenangPay "Duplicated Order Id" rejection
             $referenceNumber = 'ORD-'.date('Y').'-'.str_pad($order->id, 5, '0', STR_PAD_LEFT).'-R'.now()->format('His');
 
-            // Format amount to decimal
             $amount = $signatureService->formatAmount($order->total->value);
 
-            // Get customer details from the order's billing address
             $customerName = '';
             $customerEmail = '';
             $customerPhone = '';
@@ -619,10 +555,8 @@ class CheckoutController extends Controller
                 $customerPhone = $order->billingAddress->contact_phone;
             }
 
-            // Build detail description
             $detail = 'Order_'.$referenceNumber;
 
-            // Generate hash
             $hash = $signatureService->generatePaymentHash(
                 $secretKey,
                 $detail,
@@ -630,7 +564,6 @@ class CheckoutController extends Controller
                 $referenceNumber
             );
 
-            // Create new intent transaction
             Transaction::create([
                 'order_id' => $order->id,
                 'success' => true,
@@ -652,7 +585,6 @@ class CheckoutController extends Controller
                 ],
             ]);
 
-            // Build payment URL
             $paymentUrl = $baseUrl.'/payment/'.$merchantId.'?'.http_build_query([
                 'detail' => $detail,
                 'amount' => $amount,
@@ -663,7 +595,6 @@ class CheckoutController extends Controller
                 'phone' => $customerPhone,
             ]);
 
-            // Update order meta with new reference number
             $order->update([
                 'status' => 'payment-pending',
                 'meta' => array_merge((array) $order->meta, [
@@ -700,12 +631,9 @@ class CheckoutController extends Controller
         }
     }
 
-    /**
-     * Get specific order details.
-     */
     public function orderDetail(Request $request, Order $order)
     {
-        // Ensure user can only view their own orders
+
         if ($order->user_id !== $request->user()->id) {
             return response()->json([
                 'status' => 403,
@@ -722,7 +650,6 @@ class CheckoutController extends Controller
             'transactions',
         ]);
 
-        // Load purchasable only for non-shipping lines to avoid morphTo issues
         $productLines = $order->lines->where('type', '!=', 'shipping');
         if ($productLines->isNotEmpty()) {
             $productLines->load(['purchasable.product.productType', 'purchasable.product.thumbnail', 'purchasable.values.option']);

@@ -60,7 +60,7 @@ return line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg';
 
                 <div className="grid gap-6 lg:grid-cols-3">
                     <div className="space-y-6 lg:col-span-2">
-                        {/* Order Items */}
+                        {}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Order Items</CardTitle>
@@ -93,7 +93,7 @@ return line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg';
                             </CardContent>
                         </Card>
 
-                        {/* Shipping Address */}
+                        {}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Shipping Address</CardTitle>
@@ -120,7 +120,7 @@ return line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg';
                             </CardContent>
                         </Card>
 
-                        {/* Billing Address */}
+                        {}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Billing Address</CardTitle>
@@ -146,7 +146,7 @@ return line.purchasable?.product?.thumbnail?.url || '/placeholder-product.svg';
                         </Card>
                     </div>
 
-                    {/* Order Summary */}
+                    {}
                     <div className="lg:col-span-1">
                         <Card className="sticky top-4">
                             <CardHeader>
