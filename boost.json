@@ -1,8 +1,6 @@
 {
     "agents": [
-        "claude_code",
-        "codex",
-        "zed"
+        "codex"
     ],
     "cloud": false,
     "guidelines": true,

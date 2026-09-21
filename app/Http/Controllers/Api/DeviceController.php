@@ -81,6 +81,15 @@ class DeviceController extends Controller
         $isAvailable = is_null($device->user_id) && ! $hasMachineBound;
         $belongsToOther = ! $isAvailable && ! $belongsToUser;
 
+        if ($belongsToOther) {
+            Log::debug('Device belongs to another user.', [
+                'device_id' => $device->id,
+                'device_uuid' => $device->uuid,
+                'current_user_id' => $user->id,
+                'device_user_id' => $device->user_id,
+            ]);
+        }
+        
         return BaseResource::make([
             'exists' => true,
             'is_available' => $isAvailable,
