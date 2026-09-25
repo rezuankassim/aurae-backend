@@ -208,7 +208,7 @@ class MachineController extends Controller
         }
 
         if ($machine->device) {
-            $machine->device->update(['user_id' => null]);
+            $machine->device()->update(['user_id' => null]);
         }
 
         $machine->update([
